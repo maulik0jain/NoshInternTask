@@ -394,14 +394,19 @@ def grabcut_refine(rgb, mask, p):
     m8 = mask.astype(np.uint8)
     gc = np.full(mask.shape, cv2.GC_PR_BGD, np.uint8)
     gc[m8 > 0] = cv2.GC_PR_FGD
+    clip = None
     if p.get("ellipse_prior"):
         # T13: the enlarged fitted ellipse of each egg also starts as "probably egg", so
         # the shaded side is in the egg colour model from the first iteration
         n, lab = cv2.connectedComponents(m8, connectivity=8)
+        if p.get("ellipse_clip"):
+            clip = mask.copy()
         for i in range(1, n):
             f = component_features(lab == i, mask.shape)
             if "ellipse" in f:
                 gc[scaled_ellipse_mask(mask.shape, f["ellipse"], p["ellipse_prior"])] = cv2.GC_PR_FGD
+                if clip is not None:
+                    clip |= scaled_ellipse_mask(mask.shape, f["ellipse"], p["ellipse_clip"])
     gc[cv2.erode(m8, disk(p["erode"])) > 0] = cv2.GC_FGD
     gc[cv2.dilate(m8, disk(p["bg_dilate"])) == 0] = cv2.GC_BGD
     if not (gc == cv2.GC_FGD).any():  # blob too small to erode: keep it as probable fg only
@@ -413,6 +418,10 @@ def grabcut_refine(rgb, mask, p):
     except cv2.error:
         return mask  # degenerate GMM (e.g. no background samples): keep the input
     out = (gc == cv2.GC_FGD) | (gc == cv2.GC_PR_FGD)
+    if clip is not None:
+        # round 3: an egg may grow only up to its fitted ellipse x ellipse_clip, so a surface
+        # next to it that looks like the egg (water, steel, pale wall) can't be pulled in
+        out &= clip
     if p.get("fill_holes", True):
         out = fill_holes(out)
     # GrabCut refines the eggs it was given; blobs that don't touch the seed are new
