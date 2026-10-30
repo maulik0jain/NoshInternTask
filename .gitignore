@@ -8,3 +8,6 @@ __pycache__/
 *.pyc
 # task brief from the company, not mine to publish
 CV Intern Task Wellfound.pdf
+# Task 4: the YouTube video and its frames are not mine to publish; the output videos go to Google Drive
+data/video/
+results/task4/videos/

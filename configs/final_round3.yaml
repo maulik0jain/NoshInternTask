@@ -1,0 +1,3 @@
+# Round 3 pipeline (scene rule + forward selection, scripts/loso.py), frozen before this eval run.
+trial: T21
+note: "Third use of the eval split, after the round-3 pipeline was frozen; nothing is changed after it. Round 3's own estimate for an unseen scene is the leave-one-scene-out number on dev (results/round3/loso.json). The clean, one-shot eval result is still round 1 (results/final_eval, trial T11)."

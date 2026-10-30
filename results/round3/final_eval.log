@@ -1,0 +1,2 @@
+ dev: IoU 0.655 (med 0.727)  Dice 0.733  P 0.818  R 0.720  BF1 0.527  instF1 0.639  empty 2
+eval: IoU 0.612 (med 0.723)  Dice 0.679  P 0.764  R 0.732  BF1 0.537  instF1 0.690  empty 2

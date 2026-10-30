@@ -11,6 +11,7 @@ Egg segmentation: pretrained-model ground truth → classical image-processing s
 | Task 2 — classical segmentation + experiment log | done ([experiments/LOG.md](experiments/LOG.md)) |
 | Task 3 — evaluation & analysis | done ([results/](results/)) |
 | Round 2 — the improvements from the Task 3 analysis (T12–T18) | done; round-1 results kept as they were ([results/round2/](results/round2/)) |
+| Round 3 — scene-level decisions + leave-one-scene-out (T19–T21) | done ([results/round3/](results/round3/)) |
 | Task 4 — video tracking | next |
 
 ## Setup
@@ -69,6 +70,18 @@ python scripts/compare_rounds.py           # round 1 vs round 2 tables + plots -
 python scripts/loss_check.py               # images that got worse, one round-2 change undone at a time
 ```
 
+### Round 3 — stopping the overfitting
+
+Decisions per scene (rule in `src/eggseg/scenes.py`, committed before any round-3 run), checked by
+leave-one-scene-out on dev. Trials T19–T21; final pipeline T21 (`configs/final_round3.yaml`).
+
+```bash
+python scripts/scene_check.py              # round-2 decisions re-judged per scene
+python scripts/loso.py                     # 48-pipeline dev grid (cached), selection + leave-one-scene-out
+python scripts/final_eval.py --config configs/final_round3.yaml --out results/final_eval_round3
+python scripts/round3_check.py             # dev prediction vs eval, per round
+```
+
 ## Layout
 
 ```
@@ -82,11 +95,13 @@ ground_truth/annotations.json  boxes, scores, areas, settings
 ground_truth_overrides.json  manual fixes from reviewing the overlays
 data/processed/attributes_manual.csv  hand labels per image (hand, background, lighting...) for Task 3
 src/eggseg/                  library: classical pipeline, metrics, config loading, plots
-configs/                     default pipeline (all stages off) + final.yaml (round 1) + final_round2.yaml
-experiments/                 one folder per trial (T0..T18), sweeps/, LOG.md
+configs/                     default pipeline (all stages off) + final.yaml (round 1) + final_round2/3.yaml
+experiments/                 one folder per trial (T0..T21), sweeps/, LOG.md
 results/final_eval/          round-1 eval run (the clean one): summary.json, per-image CSVs, predicted masks
 results/final_eval_round2/   round-2 eval run (second look at eval)
 results/round2/              round 1 vs round 2 comparison, loss check
+results/final_eval_round3/   round-3 eval run (third look, after freezing T21)
+results/round3/              per-scene check, dev grid, leave-one-scene-out, prediction vs eval
 results/analysis/            Task 3 tables, plots, failure sheets and labels
 results/ablation/            dev-only ablation of the final pipeline
 scripts/                     entry points

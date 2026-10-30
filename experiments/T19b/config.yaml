@@ -1,0 +1,9 @@
+id: T19b
+extends: T11
+round: 3
+what: "Round 3, step 1 alternative: ellipse prior + clip (GrabCut may not grow past the fitted ellipse x 1.3)"
+why: "In round 2 the ellipse prior caused 5 of the 7 losses: GrabCut kept 'probably egg' pixels on surfaces next to the egg (dev #2, #18, #133; eval #124, #145). A clip should stop that. Scale 1.3 fixed beforehand, not swept."
+changes:
+  grabcut: {ellipse_prior: 1.15, ellipse_clip: 1.3}
+decision: discarded
+reason: "Failed the scene rule: scene-mean IoU -0.020, 4 scenes helped, 8 hurt, worst -0.11, P(gain) 0.06. The loss is all recall (dev recall 0.705 -> 0.619 vs the prior alone; #13 recall 0.95 -> 0.26 at precision 1.00): the egg often reaches well past 1.3x the ellipse fitted to what the search found, and the clip cuts it off. Not re-tuned: a looser value picked after seeing this would be the dev fitting round 3 is meant to stop."

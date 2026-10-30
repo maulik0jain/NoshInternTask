@@ -1,0 +1,241 @@
+{
+  "trial": "T21",
+  "run_at": "2026-10-31T02:08:31",
+  "config": "configs/final_round3.yaml",
+  "note": "Third use of the eval split, after the round-3 pipeline was frozen; nothing is changed after it. Round 3's own estimate for an unseen scene is the leave-one-scene-out number on dev (results/round3/loso.json). The clean, one-shot eval result is still round 1 (results/final_eval, trial T11).",
+  "pipeline": {
+    "preprocess": {
+      "white_balance": false,
+      "clahe": {
+        "enabled": false,
+        "clip": 2.0,
+        "tile": 8
+      },
+      "blur": 5
+    },
+    "candidate": {
+      "method": "search",
+      "channel": "L",
+      "chroma_weight": 1.0,
+      "k": 3,
+      "samples": 20000,
+      "seed": 0,
+      "levels": 24,
+      "pct_range": [
+        20,
+        99.5
+      ],
+      "open": 3,
+      "min_score": 0.8,
+      "score_tol": 0.03,
+      "max_overlap": 0.2,
+      "fallback_min_score": 0.65,
+      "fallback_max_eggs": null,
+      "max_eggs": null,
+      "split_merged": false,
+      "split_peak_rel": 0.6,
+      "split_min_core_px": 30,
+      "edge_weight": 0.0,
+      "edge_rank_only": false,
+      "edge_tol": 2,
+      "canny": [
+        30,
+        90
+      ],
+      "edge_candidates": false,
+      "edge_min_support": 0.6,
+      "edge_min_pts": 40,
+      "edge_min_pct": 40,
+      "max_texture": 5.0
+    },
+    "skin": {
+      "enabled": false,
+      "cb": [
+        77,
+        127
+      ],
+      "cr": [
+        133,
+        173
+      ],
+      "mode": "all",
+      "min_region": 0.02,
+      "close": 7
+    },
+    "grow": {
+      "enabled": false,
+      "roi_scale": 1.4,
+      "keep_scale": 1.15,
+      "respect_gate": true
+    },
+    "saturation": {
+      "enabled": true,
+      "s_max": 40
+    },
+    "morphology": {
+      "enabled": true,
+      "open": 3,
+      "close": 7,
+      "fill_holes": true
+    },
+    "components": {
+      "enabled": false,
+      "min_area": 0.003,
+      "max_area": 0.6,
+      "min_solidity": 0.85,
+      "max_axis_ratio": 2.2,
+      "min_ellipse_iou": 0.0,
+      "max_border_frac": 0.35,
+      "max_rectangularity": 0.9
+    },
+    "grabcut": {
+      "enabled": true,
+      "iters": 5,
+      "erode": 10,
+      "bg_dilate": 70,
+      "fill_holes": true,
+      "ellipse_prior": 1.15,
+      "ellipse_clip": null
+    },
+    "ellipse": {
+      "enabled": false,
+      "min_fit_iou": 0.9,
+      "mode": "replace"
+    },
+    "watershed": {
+      "enabled": true,
+      "peak_rel": 0.6,
+      "min_core_px": 30
+    }
+  },
+  "dev": {
+    "images": 85,
+    "empty_predictions": 2,
+    "iou": {
+      "mean": 0.6555,
+      "median": 0.7265
+    },
+    "dice": {
+      "mean": 0.7326,
+      "median": 0.8416
+    },
+    "precision": {
+      "mean": 0.8182,
+      "median": 0.9586
+    },
+    "recall": {
+      "mean": 0.7199,
+      "median": 0.8713
+    },
+    "boundary_f1": {
+      "mean": 0.5269,
+      "median": 0.5438
+    },
+    "instance": {
+      "precision": 0.5891,
+      "recall": 0.6972,
+      "f1": 0.6387,
+      "count_exact": 0.7529
+    },
+    "worst": [
+      {
+        "image": "train/egg/not_damaged_27_jpg.rf.9eabbf76d6ac2d4caccb38b11e0d28ad.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "test/egg/not_damaged_30_jpg.rf.48e9261777355fe67139ac1c5eae596b.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "test/egg/not_damaged_78_jpg.rf.d3a6e8624d192abc58ff7df9d5781bb5.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_116_jpg.rf.43fecd96347e2129115fceed65986cc9.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_155_jpg.rf.a65395f65d93bcd6cbf6bdab6d94e551.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_160_jpg.rf.64b7834918be5b72840ecee1e390157e.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "test/egg/not_damaged_161_jpg.rf.fd216aa5e11e147fc1527478cceae94e.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_106_jpg.rf.4ab043b322cc9e55bdf788a4d69ae74b.jpg",
+        "iou": 0.0009
+      }
+    ],
+    "seconds_per_image": 1.628
+  },
+  "eval": {
+    "images": 25,
+    "empty_predictions": 2,
+    "iou": {
+      "mean": 0.6121,
+      "median": 0.7226
+    },
+    "dice": {
+      "mean": 0.6788,
+      "median": 0.839
+    },
+    "precision": {
+      "mean": 0.7643,
+      "median": 0.9516
+    },
+    "recall": {
+      "mean": 0.7321,
+      "median": 0.9669
+    },
+    "boundary_f1": {
+      "mean": 0.5374,
+      "median": 0.5815
+    },
+    "instance": {
+      "precision": 0.7143,
+      "recall": 0.6667,
+      "f1": 0.6897,
+      "count_exact": 0.92
+    },
+    "worst": [
+      {
+        "image": "train/egg/not_damaged_20_jpg.rf.5e8498e31e0e596d64f6185f7c56534f.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_24_jpg.rf.a557aeb67c480dc55479509a77b4e160.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_44_jpg.rf.a4dbaabec5b64e4c34d874a6870964be.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "train/egg/not_damaged_139_jpg.rf.9f18c65b30035092401a5281a03b7124.jpg",
+        "iou": 0.0
+      },
+      {
+        "image": "valid/egg/not_damaged_149_jpg.rf.c3c35299246e8c667ee33f02855a6e99.jpg",
+        "iou": 0.1663
+      },
+      {
+        "image": "train/egg/not_damaged_110_jpg.rf.2de10ae949146248df94e52f9065bdd8.jpg",
+        "iou": 0.2593
+      },
+      {
+        "image": "train/egg/not_damaged_31_jpg.rf.7a5340cc049f94d06b26fa34850535ab.jpg",
+        "iou": 0.3444
+      },
+      {
+        "image": "test/egg/not_damaged_153_jpg.rf.ea842e70f08e63e69bbcc74f1bc143a8.jpg",
+        "iou": 0.3899
+      }
+    ],
+    "seconds_per_image": 1.607
+  }
+}

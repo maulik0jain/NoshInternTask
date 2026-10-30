@@ -1,0 +1,9 @@
+id: T19
+extends: T11
+round: 3
+what: "Round 3, step 1: ellipse prior on the round-1 pipeline"
+why: "Round 3 restarts from the round-1 pipeline and adds round-2 changes one at a time, by the scene rule (src/eggseg/scenes.py, fixed before the run). Step 1 tries every change on T11; the ellipse prior has the largest scene gain."
+changes:
+  grabcut: {ellipse_prior: 1.15}
+decision: kept
+reason: "Scene rule passed: scene-mean IoU +0.051, 12 of 14 scenes helped, 1 hurt, worst scene -0.05, bootstrap P(gain) 1.00. Largest gain of the candidates at step 1."

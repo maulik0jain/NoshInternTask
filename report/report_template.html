@@ -44,7 +44,7 @@
 <body>
 
 <h1>Nosh CV Intern Task — Report</h1>
-<div class="sub">Repo: <a href="https://github.com/maulik0jain/NoshInternTask">github.com/maulik0jain/NoshInternTask</a> &nbsp;·&nbsp; last updated 30 Oct 2026</div>
+<div class="sub">Repo: <a href="https://github.com/maulik0jain/NoshInternTask">github.com/maulik0jain/NoshInternTask</a> &nbsp;·&nbsp; last updated 31 Oct 2026</div>
 
 <table class="status">
   <tr><th>Part</th><th>Status</th></tr>
@@ -53,6 +53,7 @@
   <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — {{log.trials|count}} trials, {{log.sweeps|count}} sweeps (§3)</td></tr>
   <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU {{final.eval.iou.mean:.3f}} (§4)</td></tr>
   <tr><td>Round 2 — the five improvements from §4, tried on dev</td><td class="done">done — dev IoU {{cmp.splits.dev.round1.iou_mean:.3f}} → {{cmp.splits.dev.round2.iou_mean:.3f}}, eval {{cmp.splits.eval.round1.iou_mean:.3f}} → {{cmp.splits.eval.round2.iou_mean:.3f}} (§5)</td></tr>
+  <tr><td>Round 3 — stopping the overfitting (scene rule, leave-one-scene-out)</td><td class="done">done — held-out-scene estimate {{r3.rounds.3.loso:.3f}}, eval {{final3.eval.iou.mean:.3f}} (§6)</td></tr>
   <tr><td>Task 4 — video tracking (Drive link goes here)</td><td class="todo">next</td></tr>
 </table>
 
@@ -64,6 +65,7 @@
   <li>Eval (run once): IoU <b>{{final.eval.iou.mean:.3f}}</b> (median {{final.eval.iou.median:.3f}}), Dice {{final.eval.dice.mean:.3f}}, boundary F1 {{final.eval.boundary_f1.mean:.3f}}; dev IoU {{final.dev.iou.mean:.3f}}</li>
   <li>Main gap: eggs on white / pale backgrounds and partly hidden eggs — the method relies on "the egg is the brightest egg-shaped thing"</li>
   <li><b>Round 2</b> (§5): the improvements from the Task 3 analysis, tried one by one on dev → dev IoU {{cmp.splits.dev.round1.iou_mean:.3f}} → {{cmp.splits.dev.round2.iou_mean:.3f}}; eval {{cmp.splits.eval.round1.iou_mean:.3f}} → {{cmp.splits.eval.round2.iou_mean:.3f}} → the dev gain did not carry over to the unseen eval scenes. Round 1 stays the clean eval number</li>
+  <li><b>Round 3</b> (§6): decide per scene and check the selection by leave-one-scene-out → the held-out-scene estimate ({{r3.rounds.3.loso:.3f}}) matched eval ({{final3.eval.iou.mean:.3f}}); round 2's dev number had overshot by {{r3.rounds.2.gap_dev_minus_eval:.3f}}. Same eval as before, with 3 changes instead of 5 and an honest estimate</li>
 </ul>
 
 <h2>0. Dataset — quick facts</h2>
@@ -467,10 +469,92 @@
 </ul>
 
 
-<h2>6. Task 4 — video tracking</h2>
+<h2 class="pb">6. Round 3 — trying to stop the overfitting</h2>
+
+<h3>Why</h3>
+<ul>
+  <li>Round 2: dev {{cmp.splits.dev.round1.iou_mean:.3f}} → {{cmp.splits.dev.round2.iou_mean:.3f}}, eval {{cmp.splits.eval.round1.iou_mean:.3f}} → {{cmp.splits.eval.round2.iou_mean:.3f}}. The dev gain did not carry over</li>
+  <li>Two suspects:
+    <ul>
+      <li>too many decisions on the same 85 images ({{log.trials|count}} trials incl. round 3, {{log.sweeps|count}} sweeps) — the winner of many close comparisons always looks better than it is</li>
+      <li>image mean: a 12-image scene counts 4× a 3-image one, so a change that helps two big scenes looks like a general gain</li>
+    </ul></li>
+</ul>
+
+<h3>What changed in the process</h3>
+<ul>
+  <li><b>Decide per scene</b> (14 dev scenes). Keep a change only if all four hold, against the pipeline without it:
+    <ol>
+      <li>mean scene IoU goes up</li>
+      <li>more scenes helped than hurt (± {{sc.rule.help}})</li>
+      <li>no scene loses more than {{sc.rule.worst}}</li>
+      <li>scene bootstrap ({{sc.rule.n_boot}} resamples of the scenes): mean gain &gt; 0 in ≥ {{sc.rule.p_min:.0%}} of them</li>
+    </ol></li>
+  <li><b>No sweeps</b>: every change keeps the value it had before any sweep (e.g. edge weight 0.5, not the swept 0.3)</li>
+  <li><b>Forward selection</b> from the round-1 pipeline: try every change, add the passing one with the largest gain, repeat</li>
+  <li><b>Leave-one-scene-out (LOSO)</b>: run the whole selection 14 times, each time without one scene, and score the left-out scene with what was chosen. In-sample minus LOSO = how much the selection overfits</li>
+  <li>Rule and selection written and committed (<code>src/eggseg/scenes.py</code>) before any round-3 run</li>
+  <li>To make LOSO cheap: all 48 on/off combinations of the changes run once on dev (<code>loso.py</code>); the grid reproduces T11, T12, T13 and T17 image by image</li>
+</ul>
+
+<h3>Step 1 — the round-2 decisions, judged per scene</h3>
+{{@scene_rule_table}}
+<figure><img src="../results/round3/scene_check.png" style="width:92%"><figcaption>Dev, per scene: IoU change from each round-2 change, on the trial it was tested on. Scene = most common background (images).</figcaption></figure>
+<ul>
+  <li>{{sc.n_passed}} of 5 round-2 changes pass. Blob splitting and edge ranking fail</li>
+  <li>Edge ranking: small plus on the image mean, but it costs the rice scene 0.25 — exactly the kind of gain round 3 is meant to catch</li>
+  <li>Blob splitting: + on ash and white bag, − on the hand scene → a coin flip, not a method</li>
+  <li>Ellipse prior: helps {{sc.changes.1.helped}} of {{sc.n_scenes}} scenes → the most general round-2 change</li>
+</ul>
+
+<h3>Step 2 — a safer ellipse prior (failed)</h3>
+<ul>
+  <li>Idea (from the round-2 losses): stop GrabCut from growing past the fitted ellipse ×1.3. Scale fixed before the run</li>
+  <li>T19b: dev IoU {{trial.T19b.iou:.3f}} vs {{trial.T19.iou:.3f}} without the clip. Loss is all recall: eggs reach well past 1.3× the ellipse fitted to what the search found</li>
+  <li>Not re-tuned with a looser value — that would be the same dev fitting again. Logged as a failure</li>
+</ul>
+
+<h3>Step 3 — selection on all 14 scenes</h3>
+{{@selection_table}}
+{{@exp_table_r3}}
+<ul>
+  <li>Result: <b>T21</b> = ellipse prior + shape / texture reject + skin filter off. Blob splitting and edge ranking dropped</li>
+  <li>Dev IoU {{trial.T21.iou:.3f}} vs {{trial.T18.iou:.3f}} for T18 — a bit lower in-sample, with two fewer changes</li>
+</ul>
+
+<h3 class="pb">Step 4 — does the selection overfit? (LOSO)</h3>
+{{@loso_table}}
+{{@stability_table}}
+<ul>
+  <li><b>Round-2 rule</b>: in-sample {{loso.procedures.round-2 rule, round-2 changes.in_sample.iou_image:.3f}}, held-out scene {{loso.procedures.round-2 rule, round-2 changes.loso.iou_image:.3f}} → optimism {{loso.procedures.round-2 rule, round-2 changes.optimism_image:+.3f}}. Selection overfitting is real but small. (Round-2 rule re-run on the grid: no sweeps, so it ends at T17 without blob splitting, in-sample {{loso.procedures.round-2 rule, round-2 changes.in_sample.iou_image:.3f}} — not exactly T18)</li>
+  <li><b>My stricter rule did not reduce it</b>: optimism {{loso.procedures.round-3 rule, + clip option.optimism_image:+.3f}}, held-out scene {{loso.procedures.round-3 rule, + clip option.loso.iou_image:.3f}}. With 13 scenes per fold, changes near the threshold flip between pass and fail (skin filter off: picked in {{loso.procedures.round-3 rule, + clip option.stability.skin_off}} of 14 folds) → less stable choices ({{loso.procedures.round-3 rule, + clip option.distinct_choices}} different sets vs {{loso.procedures.round-2 rule, round-2 changes.distinct_choices}}). A stricter test is not a more stable one</li>
+  <li>Stable under both rules: ellipse prior, picked in {{loso.procedures.round-3 rule, + clip option.stability.ellipse_prior}} / 14. Under the scene rule blob splitting is picked in {{loso.procedures.round-3 rule, + clip option.stability.split}} fold, edge ranking in {{loso.procedures.round-3 rule, + clip option.stability.edge_rank}} → they fit a few scenes. The clip: {{loso.procedures.round-3 rule, + clip option.stability.ellipse_clip}} folds</li>
+</ul>
+
+<h3>Step 5 — eval, third look (after T21 was frozen)</h3>
+<ul><li>Run once by the same <code>final_eval.py</code> into <code>results/final_eval_round3/</code>; nothing was changed after it</li></ul>
+{{@predict_table}}
+<figure><img src="../results/round3/predicted_vs_eval.png" style="width:82%"><figcaption>Round 1 had no scene-level selection to re-run, so no LOSO number.</figcaption></figure>
+<ul>
+  <li>Round 3 on eval: {{final3.eval.iou.mean:.3f}}, the same as rounds 1 and 2. Paired with round 1, image by image: {{r3.eval_deltas.3_vs_1.mean:+.3f}} (90%: {{r3.eval_deltas.3_vs_1.ci90.0:+.3f}} to {{r3.eval_deltas.3_vs_1.ci90.1:+.3f}}) → no measurable difference</li>
+  <li>From round 2 to 3, {{r3.moved_2_to_3|count}} eval images moved by more than 0.1 → dropping blob splitting and edge ranking cost nothing on eval</li>
+  <li><b>What changed is the prediction.</b> Round 2's dev number ({{r3.rounds.2.dev_in_sample:.3f}}) overshot eval by {{r3.rounds.2.gap_dev_minus_eval:.3f}}. Round 3's held-out-scene number ({{r3.rounds.3.loso:.3f}}) was off by {{r3.rounds.3.gap_loso_minus_eval:+.3f}}</li>
+  <li>Eval: 25 images, 5 scenes → the 90% interval is about ±0.12. It can't rank the rounds; the video in §7 is one more unseen scene</li>
+</ul>
+
+<h3>What I take from it</h3>
+<ul>
+  <li>The overfitting here was in the <b>number</b>, not a method that falls apart: the in-sample dev IoU promised a gain that unseen scenes don't show. The fix that worked: judge and report on held-out scenes (LOSO), never on the scenes the choices were made on</li>
+  <li>Of round 2's {{r3.rounds.2.gap_dev_minus_eval:.3f}} gap, the selection explains about {{loso.procedures.round-2 rule, round-2 changes.optimism_image:.3f}} (LOSO). The rest is that eval scenes are different from dev ones → more varied dev scenes or new cues would help; a stricter rule doesn't</li>
+  <li>My stricter keep rule was not the fix I expected: with 14 scenes it decides less stably. Worth retrying only with more scenes</li>
+  <li>Final pipeline: <b>T21</b> — three changes instead of five, same eval, an honest estimate. Used for Task 4</li>
+</ul>
+
+
+<h2 class="pb">7. Task 4 — video tracking</h2>
 <ul><li>Next. Google Drive link to the output video will go here</li></ul>
 
-<h2>7. How to run</h2>
+<h2>8. How to run</h2>
 <pre>pip install -r requirements.txt
 python scripts/download_assets.py          # SAM 2.1 checkpoint (+ dataset if missing)
 python scripts/task1_sam2_groundtruth.py   # Task 1  -> ground_truth/
@@ -490,17 +574,23 @@ python scripts/ablation.py                 # dev only -> results/ablation/
 python scripts/final_eval.py --config configs/final_round2.yaml --out results/final_eval_round2
 python scripts/compare_rounds.py           # -> results/round2/ (tables, plots, changes.jpg)
 python scripts/loss_check.py               # -> results/round2/loss_check.json
+
+# Round 3: per-scene check, 48-pipeline dev grid + leave-one-scene-out, then the third eval run
+python scripts/scene_check.py              # -> results/round3/scene_check.json, .png
+python scripts/loso.py                     # -> results/round3/grid_dev.csv, loso.json
+python scripts/final_eval.py --config configs/final_round3.yaml --out results/final_eval_round3
+python scripts/round3_check.py             # -> results/round3/check.json, predicted_vs_eval.png
 python scripts/build_report.py             # -> report/report.html + report.pdf
 pytest tests/</pre>
 <ul><li>Tested on Windows 11, Python 3.13, PyTorch 2.6 + CUDA 12.4, RTX 4070 Laptop (8 GB). Task 2/3 need only OpenCV, NumPy, PyYAML, matplotlib (CPU)</li></ul>
 
-<h2>8. AI tools</h2>
+<h2>9. AI tools</h2>
 <ul>
   <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures) and drafting this report</li>
   <li>Decisions (what to try next, keep / discard, failure labels) were made by looking at dev results and worst-case panels; every number in this report is filled in by <code>build_report.py</code> from saved result files</li>
 </ul>
 
-<h2>9. References</h2>
+<h2>10. References</h2>
 <ol class="refs">
   <li>N. Otsu. A threshold selection method from gray-level histograms. IEEE Trans. SMC, 1979</li>
   <li>D. Chai, K. N. Ngan. Face segmentation using skin-color map in videophone applications. IEEE Trans. CSVT, 1999</li>

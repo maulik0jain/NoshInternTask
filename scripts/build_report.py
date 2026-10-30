@@ -30,7 +30,13 @@ SOURCES = {
     "final2": ROOT / "results" / "final_eval_round2" / "summary.json",
     "cmp": ROOT / "results" / "round2" / "compare.json",
     "loss": ROOT / "results" / "round2" / "loss_check.json",
+    "sc": ROOT / "results" / "round3" / "scene_check.json",
+    "loso": ROOT / "results" / "round3" / "loso.json",
+    "r3": ROOT / "results" / "round3" / "check.json",
+    "final3": ROOT / "results" / "final_eval_round3" / "summary.json",
 }
+OPTION_LABEL = {"skin_off": "skin filter off", "ellipse_prior": "ellipse prior", "ellipse_clip": "ellipse prior + clip",
+                "split": "blob splitting", "edge_rank": "edge ranking", "shape_reject": "shape / texture reject"}
 CHROME = Path("C:/Program Files/Google/Chrome/Application/chrome.exe")
 
 
@@ -194,7 +200,80 @@ def zero_table(ctx):
     return "\n".join(rows) + "</table>"
 
 
+def opts(names):
+    return " + ".join(OPTION_LABEL[n] for n in names) or "none (round-1 pipeline)"
+
+
+def yes(ok):
+    return "<span class='kept'>pass</span>" if ok else "<span class='dropped'>fail</span>"
+
+
+def scene_rule_table(ctx):
+    """Round-2 decisions re-judged per scene (results/round3/scene_check.json)."""
+    rows = ["<table class='num'><tr><th>Round-2 change</th><th>vs</th><th>Δ IoU, image mean (round-2 rule)</th>"
+            "<th>Δ IoU, scene mean</th><th>Scenes helped / hurt</th><th>Worst scene</th><th>P(gain), scene bootstrap</th>"
+            "<th>Round-3 rule</th></tr>"]
+    for c in ctx["sc"]["changes"]:
+        rows.append(f"<tr><td>{c['label']}</td><td>{c['base']}</td><td>{c['image_delta']:+.3f}</td>"
+                    f"<td>{c['scene_delta']:+.3f}</td><td>{c['helped']} / {c['hurt']}</td><td>{c['worst']:+.2f}</td>"
+                    f"<td>{c['p_gain']:.3f}</td><td>{yes(c['passed'])}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def selection_table(ctx):
+    """Forward selection of the final round-3 procedure on all dev scenes, every candidate tried."""
+    proc = ctx["loso"]["procedures"][ctx["loso"]["final"]["procedure"]]
+    rows = ["<table class='num'><tr><th>Step</th><th>Already in</th><th>Candidate</th><th>Δ scene IoU</th>"
+            "<th>Helped / hurt</th><th>Worst scene</th><th>P(gain)</th><th>Rule</th></tr>"]
+    for i, st in enumerate(proc["steps"], 1):
+        for t in sorted(st["tried"], key=lambda t: -t["scene_delta"]):
+            add = " → <b>added</b>" if st.get("added") == t["option"] else ""
+            failed = ", ".join(k.replace("_", " ") for k, ok in t["checks"].items() if not ok)
+            rows.append(f"<tr><td>{i}</td><td>{opts(st['chosen_before'])}</td><td>{OPTION_LABEL[t['option']]}</td>"
+                        f"<td>{t['scene_delta']:+.3f}</td><td>{t['helped']} / {t['hurt']}</td><td>{t['worst']:+.2f}</td>"
+                        f"<td>{t['p_gain']:.3f}</td><td>{yes(t['passed'])}{add}"
+                        f"{'' if t['passed'] else ' <small>(' + failed + ')</small>'}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def loso_table(ctx):
+    rows = ["<table class='num'><tr><th>Selection procedure</th><th>Chosen on all 14 dev scenes</th>"
+            "<th>Dev IoU, in-sample</th><th>Dev IoU, held-out scene (LOSO)</th><th>Optimism</th>"
+            "<th>Different choices over 14 folds</th></tr>"]
+    for name, p in ctx["loso"]["procedures"].items():
+        rows.append(f"<tr><td>{name}</td><td>{opts(p['chosen'])}</td><td>{fmt(p['in_sample']['iou_image'])}</td>"
+                    f"<td>{fmt(p['loso']['iou_image'])}</td><td>{p['optimism_image']:+.3f}</td>"
+                    f"<td>{p['distinct_choices']}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def stability_table(ctx):
+    procs = ctx["loso"]["procedures"]
+    names = list(procs)
+    rows = ["<table class='num narrow'><tr><th>Change: picked in how many of the 14 folds</th>"
+            + "".join(f"<th>{n}</th>" for n in names) + "</tr>"]
+    for o in OPTION_LABEL:
+        rows.append(f"<tr><td>{OPTION_LABEL[o]}</td>"
+                    + "".join(f"<td>{procs[n]['stability'].get(o, '–')}</td>" for n in names) + "</tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def predict_table(ctx):
+    rows = ["<table class='num narrow'><tr><th></th><th>Dev, in-sample</th><th>Dev, held-out scene (LOSO)</th>"
+            "<th>Eval</th><th>Eval 90% interval</th><th>Gap in-sample − eval</th><th>Gap held-out − eval</th></tr>"]
+    for r, v in ctx["r3"]["rounds"].items():
+        lo, hi = v["eval_ci90"]
+        rows.append(f"<tr><td>Round {r} ({v['trial']})</td><td>{fmt(v['dev_in_sample'])}</td>"
+                    f"<td>{fmt(v.get('loso'))}</td><td>{fmt(v['eval'])}</td><td>{lo:.3f} – {hi:.3f}</td>"
+                    f"<td>{v['gap_dev_minus_eval']:+.3f}</td>"
+                    f"<td>{'–' if 'gap_loso_minus_eval' not in v else format(v['gap_loso_minus_eval'], '+.3f')}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
 BLOCKS = {
+    "scene_rule_table": scene_rule_table, "selection_table": selection_table, "loso_table": loso_table,
+    "stability_table": stability_table, "predict_table": predict_table,
+    "exp_table_r3": lambda c: exp_table(c, 3), "trial_cards_r3": lambda c: trial_cards(c, 3),
     "rounds_table": rounds_table, "cause_table": cause_table, "loss_table": loss_table, "zero_table": zero_table,
     "exp_table": exp_table, "trial_cards": trial_cards, "sweep_table": sweep_table,
     "exp_table_r2": lambda c: exp_table(c, 2), "trial_cards_r2": lambda c: trial_cards(c, 2),

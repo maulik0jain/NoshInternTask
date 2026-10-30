@@ -1,0 +1,71 @@
+{
+  "n_boot": 2000,
+  "rounds": {
+    "1": {
+      "trial": "T11",
+      "dev_in_sample": 0.5888,
+      "eval": 0.6181,
+      "eval_ci90": [
+        0.4952,
+        0.7351
+      ],
+      "gap_dev_minus_eval": -0.0293
+    },
+    "2": {
+      "trial": "T18",
+      "dev_in_sample": 0.6693,
+      "eval": 0.6134,
+      "eval_ci90": [
+        0.4852,
+        0.7362
+      ],
+      "gap_dev_minus_eval": 0.0559,
+      "loso": 0.6386,
+      "loso_procedure": "round-2 rule, round-2 changes",
+      "gap_loso_minus_eval": 0.0252
+    },
+    "3": {
+      "trial": "T21",
+      "dev_in_sample": 0.6555,
+      "eval": 0.6121,
+      "eval_ci90": [
+        0.493,
+        0.7312
+      ],
+      "gap_dev_minus_eval": 0.0434,
+      "loso": 0.6153,
+      "loso_procedure": "round-3 rule, + clip option",
+      "gap_loso_minus_eval": 0.0032
+    }
+  },
+  "eval_deltas": {
+    "3_vs_1": {
+      "mean": -0.006,
+      "ci90": [
+        -0.0416,
+        0.0266
+      ],
+      "better": 3,
+      "worse": 3
+    },
+    "3_vs_2": {
+      "mean": -0.0013,
+      "ci90": [
+        -0.0061,
+        0.0033
+      ],
+      "better": 0,
+      "worse": 0
+    },
+    "2_vs_1": {
+      "mean": -0.0047,
+      "ci90": [
+        -0.0395,
+        0.0274
+      ],
+      "better": 3,
+      "worse": 3
+    }
+  },
+  "moved_2_to_3": []
+}

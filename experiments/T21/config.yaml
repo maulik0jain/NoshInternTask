@@ -1,0 +1,9 @@
+id: T21
+extends: T20
+round: 3
+what: "Round 3, step 3: skin filter off on T20 - final round-3 pipeline"
+why: "Step 3 tries the remaining changes on T20."
+changes:
+  skin: {enabled: false}
+decision: kept
+reason: "Scene rule passed: +0.011, 3 scenes helped, 2 hurt, worst -0.02, P(gain) 0.95. Step 4: blob splitting and edge ranking still fail -> selection stops. Final round-3 pipeline (configs/final_round3.yaml)."

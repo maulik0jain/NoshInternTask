@@ -44,15 +44,16 @@
 <body>
 
 <h1>Nosh CV Intern Task — Report</h1>
-<div class="sub">Repo: <a href="https://github.com/maulik0jain/NoshInternTask">github.com/maulik0jain/NoshInternTask</a> &nbsp;·&nbsp; last updated 30 Oct 2026</div>
+<div class="sub">Repo: <a href="https://github.com/maulik0jain/NoshInternTask">github.com/maulik0jain/NoshInternTask</a> &nbsp;·&nbsp; last updated 31 Oct 2026</div>
 
 <table class="status">
   <tr><th>Part</th><th>Status</th></tr>
   <tr><td>Task 1 — ground-truth masks with a pretrained model</td><td class="done">done</td></tr>
   <tr><td>Task 2a — dev / eval split (4:1, leakage-aware)</td><td class="done">done, frozen</td></tr>
-  <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — 28 trials, 12 sweeps (§3)</td></tr>
+  <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — 32 trials, 12 sweeps (§3)</td></tr>
   <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU 0.618 (§4)</td></tr>
   <tr><td>Round 2 — the five improvements from §4, tried on dev</td><td class="done">done — dev IoU 0.589 → 0.669, eval 0.618 → 0.613 (§5)</td></tr>
+  <tr><td>Round 3 — stopping the overfitting (scene rule, leave-one-scene-out)</td><td class="done">done — held-out-scene estimate 0.615, eval 0.612 (§6)</td></tr>
   <tr><td>Task 4 — video tracking (Drive link goes here)</td><td class="todo">next</td></tr>
 </table>
 
@@ -64,6 +65,7 @@
   <li>Eval (run once): IoU <b>0.618</b> (median 0.817), Dice 0.683, boundary F1 0.489; dev IoU 0.589</li>
   <li>Main gap: eggs on white / pale backgrounds and partly hidden eggs — the method relies on "the egg is the brightest egg-shaped thing"</li>
   <li><b>Round 2</b> (§5): the improvements from the Task 3 analysis, tried one by one on dev → dev IoU 0.589 → 0.669; eval 0.618 → 0.613 → the dev gain did not carry over to the unseen eval scenes. Round 1 stays the clean eval number</li>
+  <li><b>Round 3</b> (§6): decide per scene and check the selection by leave-one-scene-out → the held-out-scene estimate (0.615) matched eval (0.612); round 2's dev number had overshot by 0.056. Same eval as before, with 3 changes instead of 5 and an honest estimate</li>
 </ul>
 
 <h2>0. Dataset — quick facts</h2>
@@ -596,10 +598,132 @@
 </ul>
 
 
-<h2>6. Task 4 — video tracking</h2>
+<h2 class="pb">6. Round 3 — trying to stop the overfitting</h2>
+
+<h3>Why</h3>
+<ul>
+  <li>Round 2: dev 0.589 → 0.669, eval 0.618 → 0.613. The dev gain did not carry over</li>
+  <li>Two suspects:
+    <ul>
+      <li>too many decisions on the same 85 images (32 trials incl. round 3, 12 sweeps) — the winner of many close comparisons always looks better than it is</li>
+      <li>image mean: a 12-image scene counts 4× a 3-image one, so a change that helps two big scenes looks like a general gain</li>
+    </ul></li>
+</ul>
+
+<h3>What changed in the process</h3>
+<ul>
+  <li><b>Decide per scene</b> (14 dev scenes). Keep a change only if all four hold, against the pipeline without it:
+    <ol>
+      <li>mean scene IoU goes up</li>
+      <li>more scenes helped than hurt (± 0.01)</li>
+      <li>no scene loses more than 0.1</li>
+      <li>scene bootstrap (2000 resamples of the scenes): mean gain &gt; 0 in ≥ 90% of them</li>
+    </ol></li>
+  <li><b>No sweeps</b>: every change keeps the value it had before any sweep (e.g. edge weight 0.5, not the swept 0.3)</li>
+  <li><b>Forward selection</b> from the round-1 pipeline: try every change, add the passing one with the largest gain, repeat</li>
+  <li><b>Leave-one-scene-out (LOSO)</b>: run the whole selection 14 times, each time without one scene, and score the left-out scene with what was chosen. In-sample minus LOSO = how much the selection overfits</li>
+  <li>Rule and selection written and committed (<code>src/eggseg/scenes.py</code>) before any round-3 run</li>
+  <li>To make LOSO cheap: all 48 on/off combinations of the changes run once on dev (<code>loso.py</code>); the grid reproduces T11, T12, T13 and T17 image by image</li>
+</ul>
+
+<h3>Step 1 — the round-2 decisions, judged per scene</h3>
+<table class='num'><tr><th>Round-2 change</th><th>vs</th><th>Δ IoU, image mean (round-2 rule)</th><th>Δ IoU, scene mean</th><th>Scenes helped / hurt</th><th>Worst scene</th><th>P(gain), scene bootstrap</th><th>Round-3 rule</th></tr>
+<tr><td>skin filter off (T12)</td><td>T11</td><td>+0.020</td><td>+0.014</td><td>3 / 2</td><td>-0.03</td><td>0.933</td><td><span class='kept'>pass</span></td></tr>
+<tr><td>ellipse prior (T13)</td><td>T12</td><td>+0.037</td><td>+0.045</td><td>12 / 2</td><td>-0.08</td><td>0.999</td><td><span class='kept'>pass</span></td></tr>
+<tr><td>blob splitting (T14)</td><td>T13</td><td>+0.004</td><td>+0.005</td><td>2 / 2</td><td>-0.07</td><td>0.692</td><td><span class='dropped'>fail</span></td></tr>
+<tr><td>edge ranking (T15c)</td><td>T13</td><td>+0.006</td><td>-0.001</td><td>6 / 3</td><td>-0.25</td><td>0.520</td><td><span class='dropped'>fail</span></td></tr>
+<tr><td>shape / texture reject (T16)</td><td>T13</td><td>+0.010</td><td>+0.016</td><td>2 / 0</td><td>+0.00</td><td>0.956</td><td><span class='kept'>pass</span></td></tr>
+<tr><td>all together (T17)</td><td>T13</td><td>+0.014</td><td>+0.014</td><td>8 / 4</td><td>-0.25</td><td>0.716</td><td><span class='dropped'>fail</span></td></tr>
+<tr><td>edge weight 0.3 (T18)</td><td>T17</td><td>+0.009</td><td>+0.018</td><td>1 / 0</td><td>-0.00</td><td>0.890</td><td><span class='dropped'>fail</span></td></tr>
+<tr><td>round 2 as a whole (T11 → T18)</td><td>T11</td><td>+0.080</td><td>+0.091</td><td>11 / 1</td><td>-0.03</td><td>1.000</td><td><span class='kept'>pass</span></td></tr></table>
+<figure><img src="../results/round3/scene_check.png" style="width:92%"><figcaption>Dev, per scene: IoU change from each round-2 change, on the trial it was tested on. Scene = most common background (images).</figcaption></figure>
+<ul>
+  <li>3 of 5 round-2 changes pass. Blob splitting and edge ranking fail</li>
+  <li>Edge ranking: small plus on the image mean, but it costs the rice scene 0.25 — exactly the kind of gain round 3 is meant to catch</li>
+  <li>Blob splitting: + on ash and white bag, − on the hand scene → a coin flip, not a method</li>
+  <li>Ellipse prior: helps 12 of 14 scenes → the most general round-2 change</li>
+</ul>
+
+<h3>Step 2 — a safer ellipse prior (failed)</h3>
+<ul>
+  <li>Idea (from the round-2 losses): stop GrabCut from growing past the fitted ellipse ×1.3. Scale fixed before the run</li>
+  <li>T19b: dev IoU 0.569 vs 0.635 without the clip. Loss is all recall: eggs reach well past 1.3× the ellipse fitted to what the search found</li>
+  <li>Not re-tuned with a looser value — that would be the same dev fitting again. Logged as a failure</li>
+</ul>
+
+<h3>Step 3 — selection on all 14 scenes</h3>
+<table class='num'><tr><th>Step</th><th>Already in</th><th>Candidate</th><th>Δ scene IoU</th><th>Helped / hurt</th><th>Worst scene</th><th>P(gain)</th><th>Rule</th></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>ellipse prior</td><td>+0.051</td><td>12 / 1</td><td>-0.05</td><td>1.000</td><td><span class='kept'>pass</span> → <b>added</b></td></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>skin filter off</td><td>+0.014</td><td>3 / 2</td><td>-0.03</td><td>0.933</td><td><span class='kept'>pass</span></td></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>shape / texture reject</td><td>+0.010</td><td>3 / 0</td><td>+0.00</td><td>0.956</td><td><span class='kept'>pass</span></td></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>blob splitting</td><td>+0.007</td><td>1 / 2</td><td>-0.06</td><td>0.612</td><td><span class='dropped'>fail</span> <small>(more helped, bootstrap)</small></td></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>edge ranking</td><td>+0.002</td><td>6 / 3</td><td>-0.17</td><td>0.592</td><td><span class='dropped'>fail</span> <small>(no scene broken, bootstrap)</small></td></tr>
+<tr><td>1</td><td>none (round-1 pipeline)</td><td>ellipse prior + clip</td><td>-0.020</td><td>4 / 8</td><td>-0.11</td><td>0.059</td><td><span class='dropped'>fail</span> <small>(mean up, more helped, no scene broken, bootstrap)</small></td></tr>
+<tr><td>2</td><td>ellipse prior</td><td>shape / texture reject</td><td>+0.013</td><td>2 / 0</td><td>+0.00</td><td>0.956</td><td><span class='kept'>pass</span> → <b>added</b></td></tr>
+<tr><td>2</td><td>ellipse prior</td><td>skin filter off</td><td>+0.008</td><td>2 / 2</td><td>-0.02</td><td>0.898</td><td><span class='dropped'>fail</span> <small>(more helped, bootstrap)</small></td></tr>
+<tr><td>2</td><td>ellipse prior</td><td>blob splitting</td><td>+0.007</td><td>1 / 1</td><td>-0.07</td><td>0.630</td><td><span class='dropped'>fail</span> <small>(more helped, bootstrap)</small></td></tr>
+<tr><td>2</td><td>ellipse prior</td><td>edge ranking</td><td>-0.004</td><td>5 / 3</td><td>-0.25</td><td>0.469</td><td><span class='dropped'>fail</span> <small>(mean up, no scene broken, bootstrap)</small></td></tr>
+<tr><td>3</td><td>ellipse prior + shape / texture reject</td><td>skin filter off</td><td>+0.011</td><td>3 / 2</td><td>-0.02</td><td>0.954</td><td><span class='kept'>pass</span> → <b>added</b></td></tr>
+<tr><td>3</td><td>ellipse prior + shape / texture reject</td><td>edge ranking</td><td>-0.004</td><td>5 / 3</td><td>-0.25</td><td>0.472</td><td><span class='dropped'>fail</span> <small>(mean up, no scene broken, bootstrap)</small></td></tr>
+<tr><td>3</td><td>ellipse prior + shape / texture reject</td><td>blob splitting</td><td>-0.005</td><td>0 / 1</td><td>-0.07</td><td>0.308</td><td><span class='dropped'>fail</span> <small>(mean up, more helped, bootstrap)</small></td></tr>
+<tr><td>4</td><td>ellipse prior + shape / texture reject + skin filter off</td><td>blob splitting</td><td>-0.000</td><td>1 / 1</td><td>-0.07</td><td>0.458</td><td><span class='dropped'>fail</span> <small>(mean up, more helped, bootstrap)</small></td></tr>
+<tr><td>4</td><td>ellipse prior + shape / texture reject + skin filter off</td><td>edge ranking</td><td>-0.002</td><td>6 / 3</td><td>-0.25</td><td>0.506</td><td><span class='dropped'>fail</span> <small>(mean up, no scene broken, bootstrap)</small></td></tr></table>
+<table class='num'><tr><th>Trial</th><th>Change</th><th>IoU mean</th><th>IoU med.</th><th>Prec.</th><th>Recall</th><th>Bnd F1</th><th>Inst F1</th><th>Empty</th><th>Decision</th></tr>
+<tr class='kept'><td>T19</td><td>Round 3, step 1: ellipse prior on the round-1 pipeline</td><td>0.635</td><td>0.714</td><td>0.811</td><td>0.705</td><td>0.513</td><td>0.602</td><td>2</td><td>kept</td></tr>
+<tr class='dropped'><td>T19b</td><td>Round 3, step 1 alternative: ellipse prior + clip (GrabCut may not grow past the fitted ellipse x 1.3)</td><td>0.569</td><td>0.593</td><td>0.825</td><td>0.619</td><td>0.425</td><td>0.549</td><td>2</td><td>discarded</td></tr>
+<tr class='kept'><td>T20</td><td>Round 3, step 2: shape / texture reject on T19</td><td>0.643</td><td>0.717</td><td>0.820</td><td>0.705</td><td>0.524</td><td>0.638</td><td>2</td><td>kept</td></tr>
+<tr class='kept'><td>T21</td><td>Round 3, step 3: skin filter off on T20 - final round-3 pipeline</td><td>0.655</td><td>0.727</td><td>0.818</td><td>0.720</td><td>0.527</td><td>0.639</td><td>2</td><td>kept</td></tr></table>
+<ul>
+  <li>Result: <b>T21</b> = ellipse prior + shape / texture reject + skin filter off. Blob splitting and edge ranking dropped</li>
+  <li>Dev IoU 0.655 vs 0.669 for T18 — a bit lower in-sample, with two fewer changes</li>
+</ul>
+
+<h3 class="pb">Step 4 — does the selection overfit? (LOSO)</h3>
+<table class='num'><tr><th>Selection procedure</th><th>Chosen on all 14 dev scenes</th><th>Dev IoU, in-sample</th><th>Dev IoU, held-out scene (LOSO)</th><th>Optimism</th><th>Different choices over 14 folds</th></tr>
+<tr><td>round-2 rule, round-2 changes</td><td>edge ranking + ellipse prior + shape / texture reject + skin filter off</td><td>0.661</td><td>0.639</td><td>+0.023</td><td>4</td></tr>
+<tr><td>round-3 rule, round-2 changes</td><td>ellipse prior + shape / texture reject + skin filter off</td><td>0.655</td><td>0.615</td><td>+0.040</td><td>5</td></tr>
+<tr><td>round-2 rule, + clip option</td><td>edge ranking + ellipse prior + shape / texture reject + skin filter off</td><td>0.661</td><td>0.639</td><td>+0.023</td><td>4</td></tr>
+<tr><td>round-3 rule, + clip option</td><td>ellipse prior + shape / texture reject + skin filter off</td><td>0.655</td><td>0.615</td><td>+0.040</td><td>5</td></tr></table>
+<table class='num narrow'><tr><th>Change: picked in how many of the 14 folds</th><th>round-2 rule, round-2 changes</th><th>round-3 rule, round-2 changes</th><th>round-2 rule, + clip option</th><th>round-3 rule, + clip option</th></tr>
+<tr><td>skin filter off</td><td>14</td><td>9</td><td>14</td><td>9</td></tr>
+<tr><td>ellipse prior</td><td>14</td><td>14</td><td>14</td><td>14</td></tr>
+<tr><td>ellipse prior + clip</td><td>–</td><td>–</td><td>0</td><td>0</td></tr>
+<tr><td>blob splitting</td><td>2</td><td>1</td><td>2</td><td>1</td></tr>
+<tr><td>edge ranking</td><td>13</td><td>1</td><td>13</td><td>1</td></tr>
+<tr><td>shape / texture reject</td><td>13</td><td>11</td><td>13</td><td>11</td></tr></table>
+<ul>
+  <li><b>Round-2 rule</b>: in-sample 0.661, held-out scene 0.639 → optimism +0.023. Selection overfitting is real but small. (Round-2 rule re-run on the grid: no sweeps, so it ends at T17 without blob splitting, in-sample 0.661 — not exactly T18)</li>
+  <li><b>My stricter rule did not reduce it</b>: optimism +0.040, held-out scene 0.615. With 13 scenes per fold, changes near the threshold flip between pass and fail (skin filter off: picked in 9 of 14 folds) → less stable choices (5 different sets vs 4). A stricter test is not a more stable one</li>
+  <li>Stable under both rules: ellipse prior, picked in 14 / 14. Under the scene rule blob splitting is picked in 1 fold, edge ranking in 1 → they fit a few scenes. The clip: 0 folds</li>
+</ul>
+
+<h3>Step 5 — eval, third look (after T21 was frozen)</h3>
+<ul><li>Run once by the same <code>final_eval.py</code> into <code>results/final_eval_round3/</code>; nothing was changed after it</li></ul>
+<table class='num narrow'><tr><th></th><th>Dev, in-sample</th><th>Dev, held-out scene (LOSO)</th><th>Eval</th><th>Eval 90% interval</th><th>Gap in-sample − eval</th><th>Gap held-out − eval</th></tr>
+<tr><td>Round 1 (T11)</td><td>0.589</td><td>–</td><td>0.618</td><td>0.495 – 0.735</td><td>-0.029</td><td>–</td></tr>
+<tr><td>Round 2 (T18)</td><td>0.669</td><td>0.639</td><td>0.613</td><td>0.485 – 0.736</td><td>+0.056</td><td>+0.025</td></tr>
+<tr><td>Round 3 (T21)</td><td>0.655</td><td>0.615</td><td>0.612</td><td>0.493 – 0.731</td><td>+0.043</td><td>+0.003</td></tr></table>
+<figure><img src="../results/round3/predicted_vs_eval.png" style="width:82%"><figcaption>Round 1 had no scene-level selection to re-run, so no LOSO number.</figcaption></figure>
+<ul>
+  <li>Round 3 on eval: 0.612, the same as rounds 1 and 2. Paired with round 1, image by image: -0.006 (90%: -0.042 to +0.027) → no measurable difference</li>
+  <li>From round 2 to 3, 0 eval images moved by more than 0.1 → dropping blob splitting and edge ranking cost nothing on eval</li>
+  <li><b>What changed is the prediction.</b> Round 2's dev number (0.669) overshot eval by 0.056. Round 3's held-out-scene number (0.615) was off by +0.003</li>
+  <li>Eval: 25 images, 5 scenes → the 90% interval is about ±0.12. It can't rank the rounds; the video in §7 is one more unseen scene</li>
+</ul>
+
+<h3>What I take from it</h3>
+<ul>
+  <li>The overfitting here was in the <b>number</b>, not a method that falls apart: the in-sample dev IoU promised a gain that unseen scenes don't show. The fix that worked: judge and report on held-out scenes (LOSO), never on the scenes the choices were made on</li>
+  <li>Of round 2's 0.056 gap, the selection explains about 0.023 (LOSO). The rest is that eval scenes are different from dev ones → more varied dev scenes or new cues would help; a stricter rule doesn't</li>
+  <li>My stricter keep rule was not the fix I expected: with 14 scenes it decides less stably. Worth retrying only with more scenes</li>
+  <li>Final pipeline: <b>T21</b> — three changes instead of five, same eval, an honest estimate. Used for Task 4</li>
+</ul>
+
+
+<h2 class="pb">7. Task 4 — video tracking</h2>
 <ul><li>Next. Google Drive link to the output video will go here</li></ul>
 
-<h2>7. How to run</h2>
+<h2>8. How to run</h2>
 <pre>pip install -r requirements.txt
 python scripts/download_assets.py          # SAM 2.1 checkpoint (+ dataset if missing)
 python scripts/task1_sam2_groundtruth.py   # Task 1  -> ground_truth/
@@ -619,17 +743,23 @@ python scripts/ablation.py                 # dev only -> results/ablation/
 python scripts/final_eval.py --config configs/final_round2.yaml --out results/final_eval_round2
 python scripts/compare_rounds.py           # -> results/round2/ (tables, plots, changes.jpg)
 python scripts/loss_check.py               # -> results/round2/loss_check.json
+
+# Round 3: per-scene check, 48-pipeline dev grid + leave-one-scene-out, then the third eval run
+python scripts/scene_check.py              # -> results/round3/scene_check.json, .png
+python scripts/loso.py                     # -> results/round3/grid_dev.csv, loso.json
+python scripts/final_eval.py --config configs/final_round3.yaml --out results/final_eval_round3
+python scripts/round3_check.py             # -> results/round3/check.json, predicted_vs_eval.png
 python scripts/build_report.py             # -> report/report.html + report.pdf
 pytest tests/</pre>
 <ul><li>Tested on Windows 11, Python 3.13, PyTorch 2.6 + CUDA 12.4, RTX 4070 Laptop (8 GB). Task 2/3 need only OpenCV, NumPy, PyYAML, matplotlib (CPU)</li></ul>
 
-<h2>8. AI tools</h2>
+<h2>9. AI tools</h2>
 <ul>
   <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures) and drafting this report</li>
   <li>Decisions (what to try next, keep / discard, failure labels) were made by looking at dev results and worst-case panels; every number in this report is filled in by <code>build_report.py</code> from saved result files</li>
 </ul>
 
-<h2>9. References</h2>
+<h2>10. References</h2>
 <ol class="refs">
   <li>N. Otsu. A threshold selection method from gray-level histograms. IEEE Trans. SMC, 1979</li>
   <li>D. Chai, K. N. Ngan. Face segmentation using skin-color map in videophone applications. IEEE Trans. CSVT, 1999</li>

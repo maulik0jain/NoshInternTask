@@ -1,0 +1,54 @@
+grid: 48 of 48 pipelines to run on 85 dev images, 6 workers
+  base: IoU 0.589
+  shape_reject: IoU 0.596
+  edge_rank: IoU 0.596
+  edge_rank+shape_reject: IoU 0.603
+  split: IoU 0.593
+  shape_reject+split: IoU 0.588
+  edge_rank+split: IoU 0.602
+  edge_rank+shape_reject+split: IoU 0.597
+  ellipse_prior: IoU 0.635
+  ellipse_prior+shape_reject: IoU 0.643
+  edge_rank+ellipse_prior: IoU 0.639
+  edge_rank+ellipse_prior+shape_reject: IoU 0.647
+  ellipse_prior+split: IoU 0.638
+  ellipse_prior+shape_reject+split: IoU 0.634
+  edge_rank+ellipse_prior+split: IoU 0.642
+  edge_rank+ellipse_prior+shape_reject+split: IoU 0.638
+  ellipse_clip: IoU 0.569
+  ellipse_clip+shape_reject: IoU 0.576
+  edge_rank+ellipse_clip: IoU 0.581
+  edge_rank+ellipse_clip+shape_reject: IoU 0.588
+  ellipse_clip+split: IoU 0.574
+  ellipse_clip+shape_reject+split: IoU 0.568
+  edge_rank+ellipse_clip+split: IoU 0.587
+  edge_rank+ellipse_clip+shape_reject+split: IoU 0.583
+  skin_off: IoU 0.609
+  shape_reject+skin_off: IoU 0.615
+  edge_rank+skin_off: IoU 0.613
+  edge_rank+shape_reject+skin_off: IoU 0.620
+  skin_off+split: IoU 0.614
+  shape_reject+skin_off+split: IoU 0.615
+  edge_rank+skin_off+split: IoU 0.619
+  edge_rank+shape_reject+skin_off+split: IoU 0.620
+  ellipse_prior+skin_off: IoU 0.646
+  ellipse_prior+shape_reject+skin_off: IoU 0.656
+  edge_rank+ellipse_prior+skin_off: IoU 0.652
+  edge_rank+ellipse_prior+shape_reject+skin_off: IoU 0.661
+  ellipse_prior+skin_off+split: IoU 0.650
+  ellipse_prior+shape_reject+skin_off+split: IoU 0.654
+  edge_rank+ellipse_prior+skin_off+split: IoU 0.657
+  edge_rank+ellipse_prior+shape_reject+skin_off+split: IoU 0.660
+  ellipse_clip+skin_off: IoU 0.589
+  ellipse_clip+shape_reject+skin_off: IoU 0.598
+  edge_rank+ellipse_clip+skin_off: IoU 0.600
+  edge_rank+ellipse_clip+shape_reject+skin_off: IoU 0.608
+  ellipse_clip+skin_off+split: IoU 0.596
+  ellipse_clip+shape_reject+skin_off+split: IoU 0.598
+  edge_rank+ellipse_clip+skin_off+split: IoU 0.607
+  edge_rank+ellipse_clip+shape_reject+skin_off+split: IoU 0.609
+ round-2 rule, round-2 changes: chosen edge_rank+ellipse_prior+shape_reject+skin_off in-sample 0.661  LOSO 0.639  optimism +0.023  (scene-mean 0.657 / 0.636)  4 distinct choices over 14 folds
+ round-3 rule, round-2 changes: chosen ellipse_prior+shape_reject+skin_off           in-sample 0.656  LOSO 0.615  optimism +0.040  (scene-mean 0.659 / 0.612)  5 distinct choices over 14 folds
+   round-2 rule, + clip option: chosen edge_rank+ellipse_prior+shape_reject+skin_off in-sample 0.661  LOSO 0.639  optimism +0.023  (scene-mean 0.657 / 0.636)  4 distinct choices over 14 folds
+   round-3 rule, + clip option: chosen ellipse_prior+shape_reject+skin_off           in-sample 0.656  LOSO 0.615  optimism +0.040  (scene-mean 0.659 / 0.612)  5 distinct choices over 14 folds
+final round-3 choice: ['ellipse_prior', 'shape_reject', 'skin_off']

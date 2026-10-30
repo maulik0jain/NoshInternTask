@@ -1,0 +1,2133 @@
+{
+  "base": "T11",
+  "changes": {
+    "skin_off": {
+      "skin": {
+        "enabled": false
+      }
+    },
+    "ellipse_prior": {
+      "grabcut": {
+        "ellipse_prior": 1.15
+      }
+    },
+    "ellipse_clip": {
+      "grabcut": {
+        "ellipse_prior": 1.15,
+        "ellipse_clip": 1.3
+      }
+    },
+    "split": {
+      "candidate": {
+        "split_merged": true,
+        "split_peak_rel": 0.6,
+        "split_min_core_px": 30
+      }
+    },
+    "edge_rank": {
+      "candidate": {
+        "edge_weight": 0.5,
+        "edge_rank_only": true,
+        "edge_tol": 2,
+        "canny": [
+          30,
+          90
+        ]
+      }
+    },
+    "shape_reject": {
+      "components": {
+        "max_rectangularity": 0.9
+      },
+      "candidate": {
+        "max_texture": 5.0
+      }
+    }
+  },
+  "rule": {
+    "help": 0.01,
+    "worst": 0.1,
+    "n_boot": 2000,
+    "p_min": 0.9
+  },
+  "reproduces": {
+    "T11": true,
+    "T12": true,
+    "T13": true,
+    "T17": true
+  },
+  "grid": {
+    "base": {
+      "iou_image": 0.5888,
+      "iou_scene": 0.5844
+    },
+    "shape_reject": {
+      "iou_image": 0.5956,
+      "iou_scene": 0.5946
+    },
+    "edge_rank": {
+      "iou_image": 0.5961,
+      "iou_scene": 0.586
+    },
+    "edge_rank+shape_reject": {
+      "iou_image": 0.6031,
+      "iou_scene": 0.5966
+    },
+    "split": {
+      "iou_image": 0.5928,
+      "iou_scene": 0.5916
+    },
+    "shape_reject+split": {
+      "iou_image": 0.5875,
+      "iou_scene": 0.59
+    },
+    "edge_rank+split": {
+      "iou_image": 0.6023,
+      "iou_scene": 0.5949
+    },
+    "edge_rank+shape_reject+split": {
+      "iou_image": 0.5973,
+      "iou_scene": 0.5938
+    },
+    "ellipse_prior": {
+      "iou_image": 0.6348,
+      "iou_scene": 0.6355
+    },
+    "ellipse_prior+shape_reject": {
+      "iou_image": 0.6428,
+      "iou_scene": 0.6487
+    },
+    "edge_rank+ellipse_prior": {
+      "iou_image": 0.6388,
+      "iou_scene": 0.6316
+    },
+    "edge_rank+ellipse_prior+shape_reject": {
+      "iou_image": 0.6469,
+      "iou_scene": 0.6451
+    },
+    "ellipse_prior+split": {
+      "iou_image": 0.638,
+      "iou_scene": 0.6426
+    },
+    "ellipse_prior+shape_reject+split": {
+      "iou_image": 0.6338,
+      "iou_scene": 0.6439
+    },
+    "edge_rank+ellipse_prior+split": {
+      "iou_image": 0.6418,
+      "iou_scene": 0.6388
+    },
+    "edge_rank+ellipse_prior+shape_reject+split": {
+      "iou_image": 0.6376,
+      "iou_scene": 0.6399
+    },
+    "ellipse_clip": {
+      "iou_image": 0.5691,
+      "iou_scene": 0.5643
+    },
+    "ellipse_clip+shape_reject": {
+      "iou_image": 0.5756,
+      "iou_scene": 0.5748
+    },
+    "edge_rank+ellipse_clip": {
+      "iou_image": 0.5809,
+      "iou_scene": 0.5715
+    },
+    "edge_rank+ellipse_clip+shape_reject": {
+      "iou_image": 0.5878,
+      "iou_scene": 0.5827
+    },
+    "ellipse_clip+split": {
+      "iou_image": 0.5736,
+      "iou_scene": 0.5721
+    },
+    "ellipse_clip+shape_reject+split": {
+      "iou_image": 0.5683,
+      "iou_scene": 0.5708
+    },
+    "edge_rank+ellipse_clip+split": {
+      "iou_image": 0.5875,
+      "iou_scene": 0.5804
+    },
+    "edge_rank+ellipse_clip+shape_reject+split": {
+      "iou_image": 0.5825,
+      "iou_scene": 0.5797
+    },
+    "skin_off": {
+      "iou_image": 0.6088,
+      "iou_scene": 0.5985
+    },
+    "shape_reject+skin_off": {
+      "iou_image": 0.6148,
+      "iou_scene": 0.6075
+    },
+    "edge_rank+skin_off": {
+      "iou_image": 0.6134,
+      "iou_scene": 0.5998
+    },
+    "edge_rank+shape_reject+skin_off": {
+      "iou_image": 0.6197,
+      "iou_scene": 0.6093
+    },
+    "skin_off+split": {
+      "iou_image": 0.6141,
+      "iou_scene": 0.604
+    },
+    "shape_reject+skin_off+split": {
+      "iou_image": 0.6146,
+      "iou_scene": 0.6079
+    },
+    "edge_rank+skin_off+split": {
+      "iou_image": 0.6191,
+      "iou_scene": 0.6059
+    },
+    "edge_rank+shape_reject+skin_off+split": {
+      "iou_image": 0.62,
+      "iou_scene": 0.6102
+    },
+    "ellipse_prior+skin_off": {
+      "iou_image": 0.646,
+      "iou_scene": 0.6435
+    },
+    "ellipse_prior+shape_reject+skin_off": {
+      "iou_image": 0.6555,
+      "iou_scene": 0.6593
+    },
+    "edge_rank+ellipse_prior+skin_off": {
+      "iou_image": 0.6522,
+      "iou_scene": 0.6422
+    },
+    "edge_rank+ellipse_prior+shape_reject+skin_off": {
+      "iou_image": 0.6614,
+      "iou_scene": 0.6574
+    },
+    "ellipse_prior+skin_off+split": {
+      "iou_image": 0.6503,
+      "iou_scene": 0.6486
+    },
+    "ellipse_prior+shape_reject+skin_off+split": {
+      "iou_image": 0.6543,
+      "iou_scene": 0.659
+    },
+    "edge_rank+ellipse_prior+skin_off+split": {
+      "iou_image": 0.6568,
+      "iou_scene": 0.6476
+    },
+    "edge_rank+ellipse_prior+shape_reject+skin_off+split": {
+      "iou_image": 0.6602,
+      "iou_scene": 0.6571
+    },
+    "ellipse_clip+skin_off": {
+      "iou_image": 0.5894,
+      "iou_scene": 0.5805
+    },
+    "ellipse_clip+shape_reject+skin_off": {
+      "iou_image": 0.5977,
+      "iou_scene": 0.5936
+    },
+    "edge_rank+ellipse_clip+skin_off": {
+      "iou_image": 0.5999,
+      "iou_scene": 0.5872
+    },
+    "edge_rank+ellipse_clip+shape_reject+skin_off": {
+      "iou_image": 0.6079,
+      "iou_scene": 0.6
+    },
+    "ellipse_clip+skin_off+split": {
+      "iou_image": 0.5955,
+      "iou_scene": 0.5869
+    },
+    "ellipse_clip+shape_reject+skin_off+split": {
+      "iou_image": 0.598,
+      "iou_scene": 0.5944
+    },
+    "edge_rank+ellipse_clip+skin_off+split": {
+      "iou_image": 0.6072,
+      "iou_scene": 0.5943
+    },
+    "edge_rank+ellipse_clip+shape_reject+skin_off+split": {
+      "iou_image": 0.6094,
+      "iou_scene": 0.6012
+    }
+  },
+  "procedures": {
+    "round-2 rule, round-2 changes": {
+      "rule": "image",
+      "chosen": [
+        "edge_rank",
+        "ellipse_prior",
+        "shape_reject",
+        "skin_off"
+      ],
+      "steps": [
+        {
+          "chosen_before": [],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.014086619264922237,
+              "image_delta": 0.019984500385295534,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.028418209753094836,
+              "p_gain": 0.9335,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_prior",
+              "passed": true,
+              "scene_delta": 0.051088122923410674,
+              "image_delta": 0.04598001499019566,
+              "helped": 12,
+              "hurt": 1,
+              "worst": -0.04501217320928508,
+              "p_gain": 1.0,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.007225168763498407,
+              "image_delta": 0.00394015963441563,
+              "helped": 1,
+              "hurt": 2,
+              "worst": -0.06110264006692617,
+              "p_gain": 0.612,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": 0.0016570392798138814,
+              "image_delta": 0.007204108886611493,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.167214903796559,
+              "p_gain": 0.592,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.010252885121501612,
+              "image_delta": 0.006782264488247036,
+              "helped": 3,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "ellipse_prior"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.008068830906502416,
+              "image_delta": 0.011121700083609576,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.898,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.007093807895222555,
+              "image_delta": 0.003130505841140385,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.6305,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.0038447477293836207,
+              "image_delta": 0.004017037402445522,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.469,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.013281577931615659,
+              "image_delta": 0.0079511182846842,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "skin_off"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.005069555025747098,
+              "image_delta": 0.004303636295633684,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.6915,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.001326448968408516,
+              "image_delta": 0.006256020506588578,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.52,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.015722022353557356,
+              "image_delta": 0.009559915938470276,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "shape_reject"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0002436701499442608,
+              "image_delta": -0.0012365199522860193,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.458,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.001840925282384585,
+              "image_delta": 0.005917071405616037,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.506,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ],
+          "added": "edge_rank"
+        },
+        {
+          "chosen_before": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0003557881932381197,
+              "image_delta": -0.0012243310544254316,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314679,
+              "p_gain": 0.43,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            }
+          ]
+        }
+      ],
+      "in_sample": {
+        "iou_image": 0.6614,
+        "iou_scene": 0.6574
+      },
+      "loso": {
+        "iou_image": 0.6386,
+        "iou_scene": 0.6361
+      },
+      "optimism_image": 0.0228,
+      "optimism_scene": 0.0213,
+      "folds": [
+        {
+          "held_out": "0",
+          "n": 11,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.5115,
+          "iou_chosen_in_sample": 0.5799
+        },
+        {
+          "held_out": "1",
+          "n": 7,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7915,
+          "iou_chosen_in_sample": 0.7915
+        },
+        {
+          "held_out": "2",
+          "n": 5,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8198,
+          "iou_chosen_in_sample": 0.8198
+        },
+        {
+          "held_out": "3",
+          "n": 6,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4003,
+          "iou_chosen_in_sample": 0.4003
+        },
+        {
+          "held_out": "4",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.9397,
+          "iou_chosen_in_sample": 0.9397
+        },
+        {
+          "held_out": "5",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.816,
+          "iou_chosen_in_sample": 0.816
+        },
+        {
+          "held_out": "6",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.5774,
+          "iou_chosen_in_sample": 0.7199
+        },
+        {
+          "held_out": "8",
+          "n": 6,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8272,
+          "iou_chosen_in_sample": 0.8272
+        },
+        {
+          "held_out": "9",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8026,
+          "iou_chosen_in_sample": 0.8903
+        },
+        {
+          "held_out": "10",
+          "n": 10,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.3606,
+          "iou_chosen_in_sample": 0.3606
+        },
+        {
+          "held_out": "12",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.2223,
+          "iou_chosen_in_sample": 0.2223
+        },
+        {
+          "held_out": "13",
+          "n": 12,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7917,
+          "iou_chosen_in_sample": 0.7917
+        },
+        {
+          "held_out": "14",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4326,
+          "iou_chosen_in_sample": 0.4326
+        },
+        {
+          "held_out": "17",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.6119,
+          "iou_chosen_in_sample": 0.6119
+        }
+      ],
+      "stability": {
+        "skin_off": 14,
+        "ellipse_prior": 14,
+        "split": 2,
+        "edge_rank": 13,
+        "shape_reject": 13
+      },
+      "n_folds": 14,
+      "distinct_choices": 4
+    },
+    "round-3 rule, round-2 changes": {
+      "rule": "scene",
+      "chosen": [
+        "ellipse_prior",
+        "shape_reject",
+        "skin_off"
+      ],
+      "steps": [
+        {
+          "chosen_before": [],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.014086619264922237,
+              "image_delta": 0.019984500385295534,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.028418209753094836,
+              "p_gain": 0.9335,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_prior",
+              "passed": true,
+              "scene_delta": 0.051088122923410674,
+              "image_delta": 0.04598001499019566,
+              "helped": 12,
+              "hurt": 1,
+              "worst": -0.04501217320928508,
+              "p_gain": 1.0,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": 0.007225168763498407,
+              "image_delta": 0.00394015963441563,
+              "helped": 1,
+              "hurt": 2,
+              "worst": -0.06110264006692617,
+              "p_gain": 0.612,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": 0.0016570392798138814,
+              "image_delta": 0.007204108886611493,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.167214903796559,
+              "p_gain": 0.592,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.010252885121501612,
+              "image_delta": 0.006782264488247036,
+              "helped": 3,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "ellipse_prior"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": false,
+              "scene_delta": 0.008068830906502416,
+              "image_delta": 0.011121700083609576,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.898,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": 0.007093807895222555,
+              "image_delta": 0.003130505841140385,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.6305,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.0038447477293836207,
+              "image_delta": 0.004017037402445522,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.469,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.013281577931615659,
+              "image_delta": 0.0079511182846842,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "shape_reject"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.010509275328444114,
+              "image_delta": 0.012730497737395652,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.9535,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.004885209875944989,
+              "image_delta": -0.008968591101579548,
+              "helped": 0,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.3085,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.003691515533991395,
+              "image_delta": 0.004117990378233349,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.4725,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ],
+          "added": "skin_off"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0002436701499442608,
+              "image_delta": -0.0012365199522860193,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.458,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.001840925282384585,
+              "image_delta": 0.005917071405616037,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.506,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ]
+        }
+      ],
+      "in_sample": {
+        "iou_image": 0.6555,
+        "iou_scene": 0.6593
+      },
+      "loso": {
+        "iou_image": 0.6153,
+        "iou_scene": 0.6117
+      },
+      "optimism_image": 0.0402,
+      "optimism_scene": 0.0475,
+      "folds": [
+        {
+          "held_out": "0",
+          "n": 11,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.503,
+          "iou_chosen_in_sample": 0.5714
+        },
+        {
+          "held_out": "1",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7726,
+          "iou_chosen_in_sample": 0.7726
+        },
+        {
+          "held_out": "2",
+          "n": 5,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8192,
+          "iou_chosen_in_sample": 0.8192
+        },
+        {
+          "held_out": "3",
+          "n": 6,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.3813,
+          "iou_chosen_in_sample": 0.3822
+        },
+        {
+          "held_out": "4",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8848,
+          "iou_chosen_in_sample": 0.8848
+        },
+        {
+          "held_out": "5",
+          "n": 3,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.6328,
+          "iou_chosen_in_sample": 0.7023
+        },
+        {
+          "held_out": "6",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.5707,
+          "iou_chosen_in_sample": 0.7221
+        },
+        {
+          "held_out": "8",
+          "n": 6,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8128,
+          "iou_chosen_in_sample": 0.8128
+        },
+        {
+          "held_out": "9",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "iou_held_out": 0.72,
+          "iou_chosen_in_sample": 0.8026
+        },
+        {
+          "held_out": "10",
+          "n": 10,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.3637,
+          "iou_chosen_in_sample": 0.3637
+        },
+        {
+          "held_out": "12",
+          "n": 3,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.2749,
+          "iou_chosen_in_sample": 0.2749
+        },
+        {
+          "held_out": "13",
+          "n": 12,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "iou_held_out": 0.7496,
+          "iou_chosen_in_sample": 0.7928
+        },
+        {
+          "held_out": "14",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4326,
+          "iou_chosen_in_sample": 0.6817
+        },
+        {
+          "held_out": "17",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.6465,
+          "iou_chosen_in_sample": 0.6465
+        }
+      ],
+      "stability": {
+        "skin_off": 9,
+        "ellipse_prior": 14,
+        "split": 1,
+        "edge_rank": 1,
+        "shape_reject": 11
+      },
+      "n_folds": 14,
+      "distinct_choices": 5
+    },
+    "round-2 rule, + clip option": {
+      "rule": "image",
+      "chosen": [
+        "edge_rank",
+        "ellipse_prior",
+        "shape_reject",
+        "skin_off"
+      ],
+      "steps": [
+        {
+          "chosen_before": [],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.014086619264922237,
+              "image_delta": 0.019984500385295534,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.028418209753094836,
+              "p_gain": 0.9335,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_prior",
+              "passed": true,
+              "scene_delta": 0.051088122923410674,
+              "image_delta": 0.04598001499019566,
+              "helped": 12,
+              "hurt": 1,
+              "worst": -0.04501217320928508,
+              "p_gain": 1.0,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_clip",
+              "passed": false,
+              "scene_delta": -0.020088266687410587,
+              "image_delta": -0.019768611926313406,
+              "helped": 4,
+              "hurt": 8,
+              "worst": -0.11006600598289518,
+              "p_gain": 0.059,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.007225168763498407,
+              "image_delta": 0.00394015963441563,
+              "helped": 1,
+              "hurt": 2,
+              "worst": -0.06110264006692617,
+              "p_gain": 0.612,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": 0.0016570392798138814,
+              "image_delta": 0.007204108886611493,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.167214903796559,
+              "p_gain": 0.592,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.010252885121501612,
+              "image_delta": 0.006782264488247036,
+              "helped": 3,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "ellipse_prior"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.008068830906502416,
+              "image_delta": 0.011121700083609576,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.898,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.007093807895222555,
+              "image_delta": 0.003130505841140385,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.6305,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.0038447477293836207,
+              "image_delta": 0.004017037402445522,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.469,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.013281577931615659,
+              "image_delta": 0.0079511182846842,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "skin_off"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": true,
+              "scene_delta": 0.005069555025747098,
+              "image_delta": 0.004303636295633684,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.6915,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.001326448968408516,
+              "image_delta": 0.006256020506588578,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.52,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.015722022353557356,
+              "image_delta": 0.009559915938470276,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "shape_reject"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0002436701499442608,
+              "image_delta": -0.0012365199522860193,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.458,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": true,
+              "scene_delta": -0.001840925282384585,
+              "image_delta": 0.005917071405616037,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.506,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ],
+          "added": "edge_rank"
+        },
+        {
+          "chosen_before": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0003557881932381197,
+              "image_delta": -0.0012243310544254316,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314679,
+              "p_gain": 0.43,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            }
+          ]
+        }
+      ],
+      "in_sample": {
+        "iou_image": 0.6614,
+        "iou_scene": 0.6574
+      },
+      "loso": {
+        "iou_image": 0.6386,
+        "iou_scene": 0.6361
+      },
+      "optimism_image": 0.0228,
+      "optimism_scene": 0.0213,
+      "folds": [
+        {
+          "held_out": "0",
+          "n": 11,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.5115,
+          "iou_chosen_in_sample": 0.5799
+        },
+        {
+          "held_out": "1",
+          "n": 7,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7915,
+          "iou_chosen_in_sample": 0.7915
+        },
+        {
+          "held_out": "2",
+          "n": 5,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8198,
+          "iou_chosen_in_sample": 0.8198
+        },
+        {
+          "held_out": "3",
+          "n": 6,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4003,
+          "iou_chosen_in_sample": 0.4003
+        },
+        {
+          "held_out": "4",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.9397,
+          "iou_chosen_in_sample": 0.9397
+        },
+        {
+          "held_out": "5",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.816,
+          "iou_chosen_in_sample": 0.816
+        },
+        {
+          "held_out": "6",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.5774,
+          "iou_chosen_in_sample": 0.7199
+        },
+        {
+          "held_out": "8",
+          "n": 6,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8272,
+          "iou_chosen_in_sample": 0.8272
+        },
+        {
+          "held_out": "9",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8026,
+          "iou_chosen_in_sample": 0.8903
+        },
+        {
+          "held_out": "10",
+          "n": 10,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.3606,
+          "iou_chosen_in_sample": 0.3606
+        },
+        {
+          "held_out": "12",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.2223,
+          "iou_chosen_in_sample": 0.2223
+        },
+        {
+          "held_out": "13",
+          "n": 12,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7917,
+          "iou_chosen_in_sample": 0.7917
+        },
+        {
+          "held_out": "14",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4326,
+          "iou_chosen_in_sample": 0.4326
+        },
+        {
+          "held_out": "17",
+          "n": 4,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.6119,
+          "iou_chosen_in_sample": 0.6119
+        }
+      ],
+      "stability": {
+        "skin_off": 14,
+        "ellipse_prior": 14,
+        "ellipse_clip": 0,
+        "split": 2,
+        "edge_rank": 13,
+        "shape_reject": 13
+      },
+      "n_folds": 14,
+      "distinct_choices": 4
+    },
+    "round-3 rule, + clip option": {
+      "rule": "scene",
+      "chosen": [
+        "ellipse_prior",
+        "shape_reject",
+        "skin_off"
+      ],
+      "steps": [
+        {
+          "chosen_before": [],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.014086619264922237,
+              "image_delta": 0.019984500385295534,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.028418209753094836,
+              "p_gain": 0.9335,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_prior",
+              "passed": true,
+              "scene_delta": 0.051088122923410674,
+              "image_delta": 0.04598001499019566,
+              "helped": 12,
+              "hurt": 1,
+              "worst": -0.04501217320928508,
+              "p_gain": 1.0,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "ellipse_clip",
+              "passed": false,
+              "scene_delta": -0.020088266687410587,
+              "image_delta": -0.019768611926313406,
+              "helped": 4,
+              "hurt": 8,
+              "worst": -0.11006600598289518,
+              "p_gain": 0.059,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": 0.007225168763498407,
+              "image_delta": 0.00394015963441563,
+              "helped": 1,
+              "hurt": 2,
+              "worst": -0.06110264006692617,
+              "p_gain": 0.612,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": 0.0016570392798138814,
+              "image_delta": 0.007204108886611493,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.167214903796559,
+              "p_gain": 0.592,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.010252885121501612,
+              "image_delta": 0.006782264488247036,
+              "helped": 3,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "ellipse_prior"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": false,
+              "scene_delta": 0.008068830906502416,
+              "image_delta": 0.011121700083609576,
+              "helped": 2,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.898,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": 0.007093807895222555,
+              "image_delta": 0.003130505841140385,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.6305,
+              "checks": {
+                "mean_up": true,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.0038447477293836207,
+              "image_delta": 0.004017037402445522,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.469,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "shape_reject",
+              "passed": true,
+              "scene_delta": 0.013281577931615659,
+              "image_delta": 0.0079511182846842,
+              "helped": 2,
+              "hurt": 0,
+              "worst": 0.0,
+              "p_gain": 0.9555,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            }
+          ],
+          "added": "shape_reject"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "tried": [
+            {
+              "option": "skin_off",
+              "passed": true,
+              "scene_delta": 0.010509275328444114,
+              "image_delta": 0.012730497737395652,
+              "helped": 3,
+              "hurt": 2,
+              "worst": -0.016073378198952826,
+              "p_gain": 0.9535,
+              "checks": {
+                "mean_up": true,
+                "more_helped": true,
+                "no_scene_broken": true,
+                "bootstrap": true
+              }
+            },
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.004885209875944989,
+              "image_delta": -0.008968591101579548,
+              "helped": 0,
+              "hurt": 1,
+              "worst": -0.07077739925367754,
+              "p_gain": 0.3085,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.003691515533991395,
+              "image_delta": 0.004117990378233349,
+              "helped": 5,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.4725,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ],
+          "added": "skin_off"
+        },
+        {
+          "chosen_before": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "tried": [
+            {
+              "option": "split",
+              "passed": false,
+              "scene_delta": -0.0002436701499442608,
+              "image_delta": -0.0012365199522860193,
+              "helped": 1,
+              "hurt": 1,
+              "worst": -0.06842132364314657,
+              "p_gain": 0.458,
+              "checks": {
+                "mean_up": false,
+                "more_helped": false,
+                "no_scene_broken": true,
+                "bootstrap": false
+              }
+            },
+            {
+              "option": "edge_rank",
+              "passed": false,
+              "scene_delta": -0.001840925282384585,
+              "image_delta": 0.005917071405616037,
+              "helped": 6,
+              "hurt": 3,
+              "worst": -0.24912274775438326,
+              "p_gain": 0.506,
+              "checks": {
+                "mean_up": false,
+                "more_helped": true,
+                "no_scene_broken": false,
+                "bootstrap": false
+              }
+            }
+          ]
+        }
+      ],
+      "in_sample": {
+        "iou_image": 0.6555,
+        "iou_scene": 0.6593
+      },
+      "loso": {
+        "iou_image": 0.6153,
+        "iou_scene": 0.6117
+      },
+      "optimism_image": 0.0402,
+      "optimism_scene": 0.0475,
+      "folds": [
+        {
+          "held_out": "0",
+          "n": 11,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off",
+            "split"
+          ],
+          "iou_held_out": 0.503,
+          "iou_chosen_in_sample": 0.5714
+        },
+        {
+          "held_out": "1",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.7726,
+          "iou_chosen_in_sample": 0.7726
+        },
+        {
+          "held_out": "2",
+          "n": 5,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8192,
+          "iou_chosen_in_sample": 0.8192
+        },
+        {
+          "held_out": "3",
+          "n": 6,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.3813,
+          "iou_chosen_in_sample": 0.3822
+        },
+        {
+          "held_out": "4",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8848,
+          "iou_chosen_in_sample": 0.8848
+        },
+        {
+          "held_out": "5",
+          "n": 3,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.6328,
+          "iou_chosen_in_sample": 0.7023
+        },
+        {
+          "held_out": "6",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior"
+          ],
+          "iou_held_out": 0.5707,
+          "iou_chosen_in_sample": 0.7221
+        },
+        {
+          "held_out": "8",
+          "n": 6,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.8128,
+          "iou_chosen_in_sample": 0.8128
+        },
+        {
+          "held_out": "9",
+          "n": 7,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "iou_held_out": 0.72,
+          "iou_chosen_in_sample": 0.8026
+        },
+        {
+          "held_out": "10",
+          "n": 10,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.3637,
+          "iou_chosen_in_sample": 0.3637
+        },
+        {
+          "held_out": "12",
+          "n": 3,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.2749,
+          "iou_chosen_in_sample": 0.2749
+        },
+        {
+          "held_out": "13",
+          "n": 12,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject"
+          ],
+          "iou_held_out": 0.7496,
+          "iou_chosen_in_sample": 0.7928
+        },
+        {
+          "held_out": "14",
+          "n": 3,
+          "chosen": [
+            "edge_rank",
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.4326,
+          "iou_chosen_in_sample": 0.6817
+        },
+        {
+          "held_out": "17",
+          "n": 4,
+          "chosen": [
+            "ellipse_prior",
+            "shape_reject",
+            "skin_off"
+          ],
+          "iou_held_out": 0.6465,
+          "iou_chosen_in_sample": 0.6465
+        }
+      ],
+      "stability": {
+        "skin_off": 9,
+        "ellipse_prior": 14,
+        "ellipse_clip": 0,
+        "split": 1,
+        "edge_rank": 1,
+        "shape_reject": 11
+      },
+      "n_folds": 14,
+      "distinct_choices": 5
+    }
+  },
+  "final": {
+    "procedure": "round-3 rule, + clip option",
+    "chosen": [
+      "ellipse_prior",
+      "shape_reject",
+      "skin_off"
+    ]
+  }
+}

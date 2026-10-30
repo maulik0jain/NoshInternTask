@@ -1,0 +1,10 @@
+id: T20
+extends: T19
+round: 3
+what: "Round 3, step 2: shape / texture reject on T19"
+why: "Step 2 tries the remaining changes on T19."
+changes:
+  components: {max_rectangularity: 0.9}
+  candidate: {max_texture: 5.0}
+decision: kept
+reason: "Scene rule passed: +0.013, 2 scenes helped, 0 hurt, worst 0.00, P(gain) 0.96. Skin filter off failed this step (2 helped = 2 hurt); blob splitting and edge ranking failed (P(gain) 0.63 and 0.47; edge ranking costs one scene 0.25)."

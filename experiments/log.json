@@ -671,6 +671,98 @@
       "bf1": 0.5437,
       "inst_f1": 0.6583,
       "empty": 2
+    },
+    {
+      "id": "T19",
+      "round": 3,
+      "extends": "T11",
+      "what": "Round 3, step 1: ellipse prior on the round-1 pipeline",
+      "why": "Round 3 restarts from the round-1 pipeline and adds round-2 changes one at a time, by the scene rule (src/eggseg/scenes.py, fixed before the run). Step 1 tries every change on T11; the ellipse prior has the largest scene gain.",
+      "changes": {
+        "grabcut": {
+          "ellipse_prior": 1.15
+        }
+      },
+      "decision": "kept",
+      "reason": "Scene rule passed: scene-mean IoU +0.051, 12 of 14 scenes helped, 1 hurt, worst scene -0.05, bootstrap P(gain) 1.00. Largest gain of the candidates at step 1.",
+      "iou": 0.6348,
+      "iou_med": 0.7137,
+      "dice": 0.7163,
+      "precision": 0.8114,
+      "recall": 0.7051,
+      "bf1": 0.5131,
+      "inst_f1": 0.6024,
+      "empty": 2
+    },
+    {
+      "id": "T19b",
+      "round": 3,
+      "extends": "T11",
+      "what": "Round 3, step 1 alternative: ellipse prior + clip (GrabCut may not grow past the fitted ellipse x 1.3)",
+      "why": "In round 2 the ellipse prior caused 5 of the 7 losses: GrabCut kept 'probably egg' pixels on surfaces next to the egg (dev #2, #18, #133; eval #124, #145). A clip should stop that. Scale 1.3 fixed beforehand, not swept.",
+      "changes": {
+        "grabcut": {
+          "ellipse_prior": 1.15,
+          "ellipse_clip": 1.3
+        }
+      },
+      "decision": "discarded",
+      "reason": "Failed the scene rule: scene-mean IoU -0.020, 4 scenes helped, 8 hurt, worst -0.11, P(gain) 0.06. The loss is all recall (dev recall 0.705 -> 0.619 vs the prior alone; #13 recall 0.95 -> 0.26 at precision 1.00): the egg often reaches well past 1.3x the ellipse fitted to what the search found, and the clip cuts it off. Not re-tuned: a looser value picked after seeing this would be the dev fitting round 3 is meant to stop.",
+      "iou": 0.5691,
+      "iou_med": 0.5928,
+      "dice": 0.6605,
+      "precision": 0.8245,
+      "recall": 0.6185,
+      "bf1": 0.4254,
+      "inst_f1": 0.549,
+      "empty": 2
+    },
+    {
+      "id": "T20",
+      "round": 3,
+      "extends": "T19",
+      "what": "Round 3, step 2: shape / texture reject on T19",
+      "why": "Step 2 tries the remaining changes on T19.",
+      "changes": {
+        "components": {
+          "max_rectangularity": 0.9
+        },
+        "candidate": {
+          "max_texture": 5.0
+        }
+      },
+      "decision": "kept",
+      "reason": "Scene rule passed: +0.013, 2 scenes helped, 0 hurt, worst 0.00, P(gain) 0.96. Skin filter off failed this step (2 helped = 2 hurt); blob splitting and edge ranking failed (P(gain) 0.63 and 0.47; edge ranking costs one scene 0.25).",
+      "iou": 0.6428,
+      "iou_med": 0.7168,
+      "dice": 0.7216,
+      "precision": 0.8204,
+      "recall": 0.7046,
+      "bf1": 0.5242,
+      "inst_f1": 0.6383,
+      "empty": 2
+    },
+    {
+      "id": "T21",
+      "round": 3,
+      "extends": "T20",
+      "what": "Round 3, step 3: skin filter off on T20 - final round-3 pipeline",
+      "why": "Step 3 tries the remaining changes on T20.",
+      "changes": {
+        "skin": {
+          "enabled": false
+        }
+      },
+      "decision": "kept",
+      "reason": "Scene rule passed: +0.011, 3 scenes helped, 2 hurt, worst -0.02, P(gain) 0.95. Step 4: blob splitting and edge ranking still fail -> selection stops. Final round-3 pipeline (configs/final_round3.yaml).",
+      "iou": 0.6555,
+      "iou_med": 0.7265,
+      "dice": 0.7326,
+      "precision": 0.8182,
+      "recall": 0.7199,
+      "bf1": 0.5269,
+      "inst_f1": 0.6387,
+      "empty": 2
     }
   ],
   "sweeps": [
