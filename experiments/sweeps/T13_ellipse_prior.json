@@ -1,0 +1,31 @@
+{
+  "base": "T13",
+  "param": "grabcut.ellipse_prior",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 1.05,
+      "iou_mean": 0.6372,
+      "iou_median": 0.7248,
+      "boundary_f1": 0.5155,
+      "instance_f1": 0.5984,
+      "empty": 2
+    },
+    {
+      "value": 1.15,
+      "iou_mean": 0.646,
+      "iou_median": 0.7168,
+      "boundary_f1": 0.5171,
+      "instance_f1": 0.6154,
+      "empty": 2
+    },
+    {
+      "value": 1.3,
+      "iou_mean": 0.6357,
+      "iou_median": 0.7151,
+      "boundary_f1": 0.4993,
+      "instance_f1": 0.5938,
+      "empty": 2
+    }
+  ]
+}

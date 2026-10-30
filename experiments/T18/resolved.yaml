@@ -1,0 +1,87 @@
+preprocess:
+  white_balance: false
+  clahe:
+    enabled: false
+    clip: 2.0
+    tile: 8
+  blur: 5
+candidate:
+  method: search
+  channel: L
+  chroma_weight: 1.0
+  k: 3
+  samples: 20000
+  seed: 0
+  levels: 24
+  pct_range:
+  - 20
+  - 99.5
+  open: 3
+  min_score: 0.8
+  score_tol: 0.03
+  max_overlap: 0.2
+  fallback_min_score: 0.65
+  fallback_max_eggs: null
+  max_eggs: null
+  split_merged: true
+  split_peak_rel: 0.6
+  split_min_core_px: 30
+  edge_weight: 0.3
+  edge_rank_only: true
+  edge_tol: 2
+  canny:
+  - 30
+  - 90
+  edge_candidates: false
+  edge_min_support: 0.6
+  edge_min_pts: 40
+  edge_min_pct: 40
+  max_texture: 5.0
+skin:
+  enabled: false
+  cb:
+  - 77
+  - 127
+  cr:
+  - 133
+  - 173
+  mode: all
+  min_region: 0.02
+  close: 7
+grow:
+  enabled: false
+  roi_scale: 1.4
+  keep_scale: 1.15
+  respect_gate: true
+saturation:
+  enabled: true
+  s_max: 40
+morphology:
+  enabled: true
+  open: 3
+  close: 7
+  fill_holes: true
+components:
+  enabled: false
+  min_area: 0.003
+  max_area: 0.6
+  min_solidity: 0.85
+  max_axis_ratio: 2.2
+  min_ellipse_iou: 0.0
+  max_border_frac: 0.35
+  max_rectangularity: 0.9
+grabcut:
+  enabled: true
+  iters: 5
+  erode: 10
+  bg_dilate: 70
+  fill_holes: true
+  ellipse_prior: 1.15
+ellipse:
+  enabled: false
+  min_fit_iou: 0.9
+  mode: replace
+watershed:
+  enabled: true
+  peak_rel: 0.6
+  min_core_px: 30

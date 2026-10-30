@@ -1,0 +1,9 @@
+id: T14
+extends: T13
+round: 2
+what: "Split non-egg-shaped blobs with watershed inside the search and score each piece"
+why: "Touching eggs merge into one blob that fails the egg-shape score and is thrown away before the watershed stage ever sees it (round-1 #144: 2 of 3 eggs missed)."
+changes:
+  candidate: {split_merged: true, split_peak_rel: 0.6, split_min_core_px: 30}
+decision: kept
+reason: "Small IoU gain (0.646 -> 0.650) and recall up. Its target #144 is unchanged (0.27); the gain comes from other touching eggs, e.g. #136 now has 2 of 3 eggs matched instead of 1. Also #111 0.35 -> 0.98 (single egg on a pale surface, probably joined to it at the threshold where the whole egg shows up)."

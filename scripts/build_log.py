@@ -32,9 +32,10 @@ def fmt(x, nd=3):
     return "-" if x is None else f"{x:.{nd}f}"
 
 
-def plot_progress(trials):
-    """Dev mean IoU of every trial in run order; discarded trials greyed out."""
-    fig, ax = plt.subplots(figsize=(7.4, 2.7), dpi=150, facecolor=SURFACE)
+def plot_progress(trials, path, title="Dev IoU per trial (run order)"):
+    """Dev mean IoU of every trial in run order; discarded trials greyed out. A dashed
+    line marks where round 2 starts, if the list spans both rounds."""
+    fig, ax = plt.subplots(figsize=(7.4 if len(trials) <= 16 else 9.6, 2.7), dpi=150, facecolor=SURFACE)
     ax.set_facecolor(SURFACE)
     x = range(len(trials))
     colors = [DROPPED if t["decision"] == "discarded" else KEPT for t in trials]
@@ -54,9 +55,14 @@ def plot_progress(trials):
     ax.bar([0], [0], color=KEPT, label="kept (T0 = baseline)")
     ax.bar([0], [0], color=DROPPED, label="discarded")
     ax.legend(loc="upper left", frameon=False, fontsize=8)
-    ax.set_title("Dev IoU per trial (run order)", fontsize=10, fontweight="bold", loc="left")
+    r2 = [i for i, t in enumerate(trials) if t["round"] == 2]
+    if r2 and r2[0] > 0:
+        ax.set_ylim(0, 0.8)  # headroom so the round label clears the value labels
+        ax.axvline(r2[0] - 0.5, color=INK2, linewidth=0.8, linestyle="--")
+        ax.text(r2[0] - 0.4, 0.74, "round 2 →", fontsize=8, color=INK2)
+    ax.set_title(title, fontsize=10, fontweight="bold", loc="left")
     fig.tight_layout()
-    fig.savefig(EXP / "progress.png")
+    fig.savefig(path)
     plt.close(fig)
 
 
@@ -65,7 +71,8 @@ def main():
     for d in sorted((p for p in EXP.iterdir() if p.is_dir() and re.match(r"T\d+", p.name)), key=trial_order):
         cfg = yaml.safe_load((d / "config.yaml").read_text())
         res = json.loads((d / "results.json").read_text())["summary"]
-        trials.append({"id": cfg["id"], "extends": cfg["extends"], "what": cfg["what"], "why": cfg["why"],
+        trials.append({"id": cfg["id"], "round": cfg.get("round", 1), "extends": cfg["extends"],
+                       "what": cfg["what"], "why": cfg["why"],
                        "changes": cfg.get("changes") or {}, "decision": cfg.get("decision", "?"),
                        "reason": cfg.get("reason", ""),
                        "iou": res["iou"]["mean"], "iou_med": res["iou"]["median"], "dice": res["dice"]["mean"],
@@ -103,7 +110,9 @@ def main():
         lines.append("")
     (EXP / "LOG.md").write_text("\n".join(lines), encoding="utf-8")
     (EXP / "log.json").write_text(json.dumps({"trials": trials, "sweeps": sweeps}, indent=2))
-    plot_progress(trials)
+    plot_progress([t for t in trials if t["round"] == 1], EXP / "progress.png")
+    if any(t["round"] == 2 for t in trials):
+        plot_progress(trials, EXP / "progress_all.png", "Dev IoU per trial, both rounds (run order)")
     print(f"{len(trials)} trials, {len(sweeps)} sweeps -> experiments/LOG.md")
 
 

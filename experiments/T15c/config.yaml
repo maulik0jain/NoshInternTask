@@ -1,0 +1,9 @@
+id: T15c
+extends: T13
+round: 2
+what: "Edge support only ranks candidates; the 0.80 cut stays on the plain shape score"
+why: "T15's idea (prefer blobs whose outline lies on image edges, not threshold cuts through a white bag) without its flaw (weighted scores fell below the cut)."
+changes:
+  candidate: {edge_weight: 0.5, edge_rank_only: true, edge_tol: 2, canny: [30, 90]}
+decision: kept
+reason: "IoU 0.646 -> 0.652, boundary F1 up: among candidates that already pass the shape cut, the one whose outline sits on real edges wins, instead of a threshold cut through a white background. Instance F1 slightly down (0.615 -> 0.608)."

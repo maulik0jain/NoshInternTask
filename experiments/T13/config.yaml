@@ -1,0 +1,9 @@
+id: T13
+extends: T12
+round: 2
+what: "GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg'"
+why: "15 round-1 failures are 'shaded side missed': the search keeps the lit cap and GrabCut only partly grows it. Marking the enlarged ellipse as probable egg puts the shaded side into the egg colour model from the start."
+changes:
+  grabcut: {ellipse_prior: 1.15}
+decision: kept
+reason: "Recall 0.657 -> 0.721 and boundary F1 up: the shaded side now gets into GrabCut's egg colour model. Precision drops a little (the ellipse is slightly larger than some eggs). Beats the T13b alternative."

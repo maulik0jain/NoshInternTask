@@ -1,0 +1,9 @@
+id: T15
+extends: T13
+round: 2
+what: "Egg score also rewards blob outlines that lie on Canny edges (weight 0.5)"
+why: "18 round-1 failures are white / pale backgrounds: a threshold cut through a flat white bag has no image edge under it, a real egg outline does. Weighting the score by edge support should prefer real eggs over bag patches."
+changes:
+  candidate: {edge_weight: 0.5, edge_tol: 2, canny: [30, 90]}
+decision: discarded
+reason: "Failed: IoU 0.339 and 33 empty masks. Design flaw, not a bad idea: multiplying the score by (0.5 + 0.5 * edge support) lowers every score, so most real eggs fell below the 0.80 cut that was tuned for the plain score. Fixed in T15c (edge support only ranks)."

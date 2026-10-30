@@ -50,8 +50,9 @@
   <tr><th>Part</th><th>Status</th></tr>
   <tr><td>Task 1 — ground-truth masks with a pretrained model</td><td class="done">done</td></tr>
   <tr><td>Task 2a — dev / eval split (4:1, leakage-aware)</td><td class="done">done, frozen</td></tr>
-  <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — 16 trials, 9 sweeps (§3)</td></tr>
+  <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — 28 trials, 12 sweeps (§3)</td></tr>
   <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU 0.618 (§4)</td></tr>
+  <tr><td>Round 2 — the five improvements from §4, tried on dev</td><td class="done">done — dev IoU 0.589 → 0.669, eval 0.618 → 0.613 (§5)</td></tr>
   <tr><td>Task 4 — video tracking (Drive link goes here)</td><td class="todo">next</td></tr>
 </table>
 
@@ -62,6 +63,7 @@
   <li>Classical method: colour gate → <b>multi-threshold search for egg-shaped blobs</b> → GrabCut edge refinement → watershed split. No learning, all parameters picked on dev</li>
   <li>Eval (run once): IoU <b>0.618</b> (median 0.817), Dice 0.683, boundary F1 0.489; dev IoU 0.589</li>
   <li>Main gap: eggs on white / pale backgrounds and partly hidden eggs — the method relies on "the egg is the brightest egg-shaped thing"</li>
+  <li><b>Round 2</b> (§5): the improvements from the Task 3 analysis, tried one by one on dev → dev IoU 0.589 → 0.669; eval 0.618 → 0.613 → the dev gain did not carry over to the unseen eval scenes. Round 1 stays the clean eval number</li>
 </ul>
 
 <h2>0. Dataset — quick facts</h2>
@@ -168,7 +170,7 @@
 <ul>
   <li>Split frozen in <code>data/splits/split.csv</code> (committed)</li>
   <li>All Task 2 tuning and experiments on <b>dev only</b> — <code>run_experiment.py</code> and <code>sweep.py</code> can't even load eval</li>
-  <li>Eval touched <b>once</b>, by <code>final_eval.py</code>, which refuses to run a second time</li>
+  <li>Eval touched <b>once</b>, by <code>final_eval.py</code>, which refuses to run a second time into the same folder. (A second, separate look came later in round 2, §5)</li>
 </ul>
 
 <h3>Limitations</h3>
@@ -431,13 +433,173 @@
   <li><b>Evaluation itself</b>: GT is SAM pseudo-GT, so boundary F1 at 2 px also counts SAM's edge error; a few hand-drawn masks would show how much of the gap is the GT. Eval has only 5 scenes → per-scene numbers say more than the mean</li>
 </ol>
 <ul>
+  <li>→ All five were tried in round 2 (§5), each as its own dev trial</li>
   <li>Bottom line: the method does well when the egg is the brightest, least-coloured, egg-shaped thing in view (IoU ≥ 0.8 on 13 / 25 eval images), and fails completely when that's not true. Closing the rest of the gap to SAM needs cues beyond brightness — edges, shading, context</li>
 </ul>
 
-<h2>5. Task 4 — video tracking</h2>
+<h2 class="pb">5. Round 2 — improving the method after the analysis</h2>
+
+<h3>Why a second round, and the rules</h3>
+<ul>
+  <li>Round 1 (§3–4) is kept exactly as it was — trials T0–T11b, the one clean eval run of T11 (IoU 0.618), the failure taxonomy</li>
+  <li>Round 2 = the five improvements listed at the end of §4, each tried as its own trial (T12 onwards) on <b>dev only</b>, same decision rule as round 1</li>
+  <li>The ideas came from looking at round-1 failures, eval images included → the round-2 eval number is a <b>second look at eval</b>, not a clean test. Reported separately, never replaces the round-1 number</li>
+  <li>Code: every new option defaults to off, and T11 was re-run after the changes: 85 / 85 dev images give the same IoU → round 1 still reproduces</li>
+</ul>
+
+<figure><img src="../experiments/progress_all.png" style="width:100%"><figcaption>Dev mean IoU of every trial, both rounds. Grey = discarded.</figcaption></figure>
+
+<h3>Round-2 experiment log (dev, 85 images)</h3>
+<table class='num'><tr><th>Trial</th><th>Change</th><th>IoU mean</th><th>IoU med.</th><th>Prec.</th><th>Recall</th><th>Bnd F1</th><th>Inst F1</th><th>Empty</th><th>Decision</th></tr>
+<tr class='kept'><td>T12</td><td>skin filter off</td><td>0.609</td><td>0.667</td><td>0.835</td><td>0.657</td><td>0.477</td><td>0.573</td><td>2</td><td>kept</td></tr>
+<tr class='dropped'><td>T12b</td><td>skin filter only removes large skin regions that touch the image border</td><td>0.592</td><td>0.660</td><td>0.835</td><td>0.642</td><td>0.462</td><td>0.571</td><td>2</td><td>discarded</td></tr>
+<tr class='kept'><td>T13</td><td>GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg'</td><td>0.646</td><td>0.717</td><td>0.807</td><td>0.721</td><td>0.517</td><td>0.615</td><td>2</td><td>kept</td></tr>
+<tr class='dropped'><td>T13b</td><td>Local Otsu growth around each found egg before GrabCut</td><td>0.633</td><td>0.727</td><td>0.823</td><td>0.691</td><td>0.493</td><td>0.588</td><td>2</td><td>discarded</td></tr>
+<tr class='dropped'><td>T13c</td><td>T13 + local Otsu growth (both shaded-side fixes together)</td><td>0.645</td><td>0.716</td><td>0.788</td><td>0.738</td><td>0.502</td><td>0.626</td><td>2</td><td>discarded</td></tr>
+<tr class='kept'><td>T14</td><td>Split non-egg-shaped blobs with watershed inside the search and score each piece</td><td>0.650</td><td>0.717</td><td>0.804</td><td>0.740</td><td>0.524</td><td>0.617</td><td>2</td><td>kept</td></tr>
+<tr class='dropped'><td>T15</td><td>Egg score also rewards blob outlines that lie on Canny edges (weight 0.5)</td><td>0.339</td><td>0.000</td><td>0.685</td><td>0.379</td><td>0.306</td><td>0.406</td><td>33</td><td>discarded</td></tr>
+<tr class='dropped'><td>T15b</td><td>Add ellipses fitted to Canny edge chains as extra egg candidates</td><td>0.573</td><td>0.647</td><td>0.705</td><td>0.728</td><td>0.462</td><td>0.477</td><td>2</td><td>discarded</td></tr>
+<tr class='kept'><td>T15c</td><td>Edge support only ranks candidates; the 0.80 cut stays on the plain shape score</td><td>0.652</td><td>0.727</td><td>0.801</td><td>0.737</td><td>0.523</td><td>0.608</td><td>2</td><td>kept</td></tr>
+<tr class='kept'><td>T16</td><td>Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5)</td><td>0.655</td><td>0.727</td><td>0.818</td><td>0.720</td><td>0.527</td><td>0.639</td><td>2</td><td>kept</td></tr>
+<tr class='kept'><td>T17</td><td>All kept round-2 changes together: T13 + T14 + T15c + T16</td><td>0.660</td><td>0.728</td><td>0.802</td><td>0.744</td><td>0.540</td><td>0.647</td><td>2</td><td>kept</td></tr>
+<tr class='kept'><td>T18</td><td>T17 with edge weight 0.3 (from sweep T17_edge_weight)</td><td>0.669</td><td>0.732</td><td>0.811</td><td>0.744</td><td>0.544</td><td>0.658</td><td>2</td><td>kept</td></tr></table>
+
+<h3>What worked, what didn't</h3>
+<ul>
+  <li><b>1. Skin filter</b> — off (T12): 0.589 → 0.609. The smarter version (only big skin regions on the border, T12b) lost: warm marble floors are "skin" too and take the egg with them</li>
+  <li><b>2. Shaded side</b> — GrabCut gets the egg's fitted ellipse ×1.15 as "probably egg" (T13): 0.609 → 0.646, recall 0.66 → 0.72. Biggest round-2 gain. Local Otsu growth (T13b) helped less; both together (T13c) no better than T13</li>
+  <li><b>3. Touching eggs</b> — split merged blobs before scoring (T14): small gain (0.650); the target image #144 is still not fixed</li>
+  <li><b>4. White backgrounds via edges</b> — two failures, then a fix:
+    <ul>
+      <li>T15: edge support multiplied into the score → 0.339, 33 empty masks. My design mistake: it lowered every score below the 0.80 cut</li>
+      <li>T15b: ellipses fitted to Canny edges as new candidates → 0.573. No change on white bags, fridge trays or rice (the targets); many false eggs on ash and towels</li>
+      <li>T15c: edge support only used to <i>rank</i> candidates → 0.652, kept</li>
+    </ul></li>
+  <li><b>5. False eggs</b> — reject rectangular (key caps) and textured (foil) blobs, limits taken from the dev GT eggs (T16): 0.655, instance F1 0.615 → 0.639</li>
+  <li><b>Together</b> (T17): 0.660 — the changes add up. Edge weight re-tuned by a sweep on T17 → <b>T18: 0.669</b>, the final round-2 pipeline</li>
+  <li>Sweeps on T17 move IoU by &lt; 0.01 and not monotonically → with 85 dev images that's close to noise; I followed the rule but wouldn't read much into the third decimal</li>
+</ul>
+
+<h3>Parameter sweeps (round 2, dev)</h3>
+<table class='num'><tr><th>Sweep (dev)</th><th>On top of</th><th>Values → dev IoU mean</th><th>Picked</th></tr>
+<tr><td><code>grabcut.ellipse_prior</code></td><td>T13</td><td>1.05 → 0.637 · 1.15 → 0.646 · 1.3 → 0.636</td><td>1.15</td></tr>
+<tr><td><code>candidate.edge_weight</code></td><td>T17</td><td>0.3 → 0.669 · 0.5 → 0.660 · 0.8 → 0.661</td><td>0.3</td></tr>
+<tr><td><code>candidate.max_texture</code></td><td>T17</td><td>3.5 → 0.666 · 5.0 → 0.660 · 8.0 → 0.664</td><td>3.5</td></tr></table>
+
+<h3 class="pb">Per-trial notes, round 2</h3>
+<div class='card'><div class='ct'><b>T12</b> &nbsp;skin filter off <span class='kept'>kept</span></div><ul><li><b>Why:</b> Round-1 analysis: in 12 images the skin box removes >= 40% of the egg (cream eggs, warm light, backlit eggs); those images average IoU 0.29. The skin filter was accepted in T3, when the candidate was one Otsu threshold that grabbed whole hands. The egg-shape search should reject hands on its own.</li><li><b>Params:</b> on top of T11 → <code>skin: {"enabled": false}</code></li><li><b>Dev:</b> IoU 0.609 (median 0.667), boundary F1 0.477, instance F1 0.573, empty masks 2</li><li><b>Decision:</b> IoU 0.589 -> 0.609. The shape search already rejects hands (not egg-shaped), so the skin box mostly removed warm-lit egg pixels: #100 0.22 -> 0.90, #140 0.30 -> 0.91 (same trend as the round-1 ablation).</li></ul></div>
+<div class='card'><div class='ct'><b>T12b</b> &nbsp;skin filter only removes large skin regions that touch the image border <span class='dropped'>discarded</span></div><ul><li><b>Why:</b> Keep what the skin filter is for (hands come into the photo from the edge) without deleting egg-sized warm/cream regions in the middle of the image.</li><li><b>Params:</b> on top of T11 → <code>skin: {"mode": "border_regions", "min_region": 0.02, "close": 7}</code></li><li><b>Dev:</b> IoU 0.592 (median 0.660), boundary F1 0.462, instance F1 0.571, empty masks 2</li><li><b>Decision:</b> Better than T11 but well below T12. On warm marble floors the floor itself is in the skin box and forms one big region touching the border, which takes the egg's warm side with it (#100: 0.22 vs 0.90 with T12, #140: 0.30 vs 0.91). Only 2 images are > 0.05 better than T12.</li></ul></div>
+<div class='card'><div class='ct'><b>T13</b> &nbsp;GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg' <span class='kept'>kept</span></div><ul><li><b>Why:</b> 15 round-1 failures are 'shaded side missed': the search keeps the lit cap and GrabCut only partly grows it. Marking the enlarged ellipse as probable egg puts the shaded side into the egg colour model from the start.</li><li><b>Params:</b> on top of T12 → <code>grabcut: {"ellipse_prior": 1.15}</code></li><li><b>Dev:</b> IoU 0.646 (median 0.717), boundary F1 0.517, instance F1 0.615, empty masks 2</li><li><b>Decision:</b> Recall 0.657 -> 0.721 and boundary F1 up: the shaded side now gets into GrabCut's egg colour model. Precision drops a little (the ellipse is slightly larger than some eggs). Beats the T13b alternative.</li></ul></div>
+<div class='card'><div class='ct'><b>T13b</b> &nbsp;Local Otsu growth around each found egg before GrabCut <span class='dropped'>discarded</span></div><ul><li><b>Why:</b> Same failure as T13, different fix: the threshold that isolates the egg globally is too high for its shaded side. Re-threshold locally (Otsu inside the egg's ellipse x1.4) and add connected pixels inside the ellipse x1.15.</li><li><b>Params:</b> on top of T12 → <code>grow: {"enabled": true, "roi_scale": 1.4, "keep_scale": 1.15}</code></li><li><b>Dev:</b> IoU 0.633 (median 0.727), boundary F1 0.493, instance F1 0.588, empty masks 2</li><li><b>Decision:</b> Helps (T12 0.609 -> 0.633) but less than T13 (0.646), with lower boundary F1 and instance F1: a local Otsu threshold still cuts the shaded side wherever it is darker than the surface beside it, while GrabCut's colour model can include it.</li></ul></div>
+<div class='card'><div class='ct'><b>T13c</b> &nbsp;T13 + local Otsu growth (both shaded-side fixes together) <span class='dropped'>discarded</span></div><ul><li><b>Why:</b> T13 and T13b attack the same failure differently; check whether they add up.</li><li><b>Params:</b> on top of T13 → <code>grow: {"enabled": true, "roi_scale": 1.4, "keep_scale": 1.15}</code></li><li><b>Dev:</b> IoU 0.645 (median 0.716), boundary F1 0.502, instance F1 0.626, empty masks 2</li><li><b>Decision:</b> No gain over T13 alone (IoU 0.645 vs 0.646, boundary F1 lower). Once GrabCut has the ellipse prior, the extra pixels from local growth are mostly ones GrabCut already adds, plus some background (precision down).</li></ul></div>
+<div class='card'><div class='ct'><b>T14</b> &nbsp;Split non-egg-shaped blobs with watershed inside the search and score each piece <span class='kept'>kept</span></div><ul><li><b>Why:</b> Touching eggs merge into one blob that fails the egg-shape score and is thrown away before the watershed stage ever sees it (round-1 #144: 2 of 3 eggs missed).</li><li><b>Params:</b> on top of T13 → <code>candidate: {"split_merged": true, "split_peak_rel": 0.6, "split_min_core_px": 30}</code></li><li><b>Dev:</b> IoU 0.650 (median 0.717), boundary F1 0.524, instance F1 0.617, empty masks 2</li><li><b>Decision:</b> Small IoU gain (0.646 -> 0.650) and recall up. Its target #144 is unchanged (0.27); the gain comes from other touching eggs, e.g. #136 now has 2 of 3 eggs matched instead of 1. Also #111 0.35 -> 0.98 (single egg on a pale surface, probably joined to it at the threshold where the whole egg shows up).</li></ul></div>
+<div class='card'><div class='ct'><b>T15</b> &nbsp;Egg score also rewards blob outlines that lie on Canny edges (weight 0.5) <span class='dropped'>discarded</span></div><ul><li><b>Why:</b> 18 round-1 failures are white / pale backgrounds: a threshold cut through a flat white bag has no image edge under it, a real egg outline does. Weighting the score by edge support should prefer real eggs over bag patches.</li><li><b>Params:</b> on top of T13 → <code>candidate: {"edge_weight": 0.5, "edge_tol": 2, "canny": [30, 90]}</code></li><li><b>Dev:</b> IoU 0.339 (median 0.000), boundary F1 0.306, instance F1 0.406, empty masks 33</li><li><b>Decision:</b> Failed: IoU 0.339 and 33 empty masks. Design flaw, not a bad idea: multiplying the score by (0.5 + 0.5 * edge support) lowers every score, so most real eggs fell below the 0.80 cut that was tuned for the plain score. Fixed in T15c (edge support only ranks).</li></ul></div>
+<div class='card'><div class='ct'><b>T15b</b> &nbsp;Add ellipses fitted to Canny edge chains as extra egg candidates <span class='dropped'>discarded</span></div><ul><li><b>Why:</b> On a white background no threshold separates the egg at all, so the search has nothing to score. The outline is still an edge: fit ellipses to edge chains, keep those with >= 60% of the perimeter on edges.</li><li><b>Params:</b> on top of T13 → <code>candidate: {"edge_candidates": true, "edge_min_support": 0.6, "edge_min_pts": 40, "canny": [30, 90]}</code></li><li><b>Dev:</b> IoU 0.573 (median 0.647), boundary F1 0.462, instance F1 0.477, empty masks 2</li><li><b>Decision:</b> Failed: IoU 0.646 -> 0.573. On its targets it changed nothing (white bag 0.36 -> 0.36, fridge tray and rice unchanged). Instead textured backgrounds produced many edge-chain ellipses: ash 0.38 -> 0.15 (predicted eggs 15 -> 29), towel 0.65 -> 0.36.</li></ul></div>
+<div class='card'><div class='ct'><b>T15c</b> &nbsp;Edge support only ranks candidates; the 0.80 cut stays on the plain shape score <span class='kept'>kept</span></div><ul><li><b>Why:</b> T15's idea (prefer blobs whose outline lies on image edges, not threshold cuts through a white bag) without its flaw (weighted scores fell below the cut).</li><li><b>Params:</b> on top of T13 → <code>candidate: {"edge_weight": 0.5, "edge_rank_only": true, "edge_tol": 2, "canny": [30, 90]}</code></li><li><b>Dev:</b> IoU 0.652 (median 0.727), boundary F1 0.523, instance F1 0.608, empty masks 2</li><li><b>Decision:</b> IoU 0.646 -> 0.652, boundary F1 up: among candidates that already pass the shape cut, the one whose outline sits on real edges wins, instead of a threshold cut through a white background. Instance F1 slightly down (0.615 -> 0.608).</li></ul></div>
+<div class='card'><div class='ct'><b>T16</b> &nbsp;Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5) <span class='kept'>kept</span></div><ul><li><b>Why:</b> Round-1 false eggs on keyboard keys, foil and steel. Measured on the dev GT eggs: 99% have rectangularity <= 0.83 (an ellipse is 0.785) and texture <= 4.6, so both limits keep real eggs.</li><li><b>Params:</b> on top of T13 → <code>components: {"max_rectangularity": 0.9}</code>, <code>candidate: {"max_texture": 5.0}</code></li><li><b>Dev:</b> IoU 0.655 (median 0.727), boundary F1 0.527, instance F1 0.639, empty masks 2</li><li><b>Decision:</b> IoU 0.646 -> 0.655 and instance F1 0.615 -> 0.639: key caps, foil and other rectangular or crinkled blobs no longer pass as eggs, and the limits (from the dev GT eggs) don't touch real eggs.</li></ul></div>
+<div class='card'><div class='ct'><b>T17</b> &nbsp;All kept round-2 changes together: T13 + T14 + T15c + T16 <span class='kept'>kept</span></div><ul><li><b>Why:</b> T14, T15c and T16 were each tested alone on top of T13. Check that they add up when combined.</li><li><b>Params:</b> on top of T16 → <code>candidate: {"split_merged": true, "split_peak_rel": 0.6, "split_min_core_px": 30, "edge_weight": 0.5, "edge_rank_only": true, "edge_tol": 2, "canny": [30, 90]}</code></li><li><b>Dev:</b> IoU 0.660 (median 0.728), boundary F1 0.540, instance F1 0.647, empty masks 2</li><li><b>Decision:</b> The changes add up: IoU 0.660 (best), boundary F1 0.540, instance F1 0.647, all above each single change. Base for the round-2 sweeps; the final round-2 pipeline is T18.</li></ul></div>
+<div class='card'><div class='ct'><b>T18</b> &nbsp;T17 with edge weight 0.3 (from sweep T17_edge_weight) <span class='kept'>kept</span></div><ul><li><b>Why:</b> Sweep on T17: edge weight 0.3 gave the best dev IoU and instance F1. Texture limit stays 5.0: 3.5 scored about the same but started rejecting real eggs (one more empty mask), and 5.0 is the limit backed by the dev GT measurement.</li><li><b>Params:</b> on top of T17 → <code>candidate: {"edge_weight": 0.3}</code></li><li><b>Dev:</b> IoU 0.669 (median 0.732), boundary F1 0.544, instance F1 0.658, empty masks 2</li><li><b>Decision:</b> Best dev IoU of both rounds (0.669, median 0.732), instance F1 0.658. Final round-2 pipeline (configs/final_round2.yaml).</li></ul></div>
+
+<h3 class="pb">Round 2 on eval (second look) vs round 1</h3>
+<ul>
+  <li>Final round-2 pipeline: <b>T18</b> (<code>configs/final_round2.yaml</code>), run once on dev + eval by the same <code>final_eval.py</code> into its own folder (<code>results/final_eval_round2/</code>) — round-1 results untouched</li>
+</ul>
+<table class='num narrow'><tr><th></th><th>dev, round 1</th><th>dev, round 2</th><th>eval, round 1 (clean)</th><th>eval, round 2 (2nd look)</th></tr>
+<tr><td>IoU mean</td><td>0.589</td><td>0.669</td><td>0.618</td><td>0.613</td></tr>
+<tr><td>IoU median</td><td>0.660</td><td>0.732</td><td>0.817</td><td>0.723</td></tr>
+<tr><td>Dice</td><td>0.680</td><td>0.742</td><td>0.683</td><td>0.680</td></tr>
+<tr><td>Pixel precision</td><td>0.833</td><td>0.811</td><td>0.824</td><td>0.767</td></tr>
+<tr><td>Pixel recall</td><td>0.639</td><td>0.744</td><td>0.683</td><td>0.731</td></tr>
+<tr><td>Boundary F1 (2 px)</td><td>0.458</td><td>0.544</td><td>0.489</td><td>0.540</td></tr>
+<tr><td>Instance F1</td><td>0.569</td><td>0.658</td><td>0.754</td><td>0.690</td></tr>
+<tr><td>Egg count exactly right</td><td>0.67</td><td>0.73</td><td>0.80</td><td>0.92</td></tr>
+<tr><td>Images with IoU ≥ 0.8</td><td>31</td><td>39</td><td>13</td><td>11</td></tr>
+<tr><td>Images with IoU = 0</td><td>8</td><td>7</td><td>4</td><td>4</td></tr>
+<tr><td>Empty predictions</td><td>2</td><td>2</td><td>2</td><td>2</td></tr></table>
+<ul>
+  <li><b>Dev</b>: IoU 0.589 → 0.669; 30 images better by &gt; 0.1, 4 worse</li>
+  <li><b>Eval: no gain</b> — 0.618 → 0.613. Recall, boundary F1 and egg count went up; precision, median IoU and instance F1 went down. 3 images better, 3 worse</li>
+  <li>Where the change comes from (round-1 failure = IoU &lt; 0.7):
+    <ul>
+      <li>dev, the 47 round-1 failures: 0.35 → 0.48 (20 better)</li>
+      <li>eval, the 11 round-1 failures: 0.25 → 0.27 (only 1 better)</li>
+      <li>eval, the 14 images that were already fine: 0.91 → 0.89 (3 worse)</li>
+    </ul></li>
+  <li>Reading: round 2 fixed the dev failures it was built from, but not the eval ones. Every eval scene is unseen in dev (that's how the split was made), and the eval failures sit in scenes round 2 has no answer for (backlit hand, pale wall, steel pot — below)</li>
+  <li>This is the case for the scene-grouped split: a random split would have put those scenes in dev too and shown a gain</li>
+  <li>Eval has 25 images → each one is 4% of the mean; the small drop is within what a single image moves. Honest summary: "no change on eval", not "worse"</li>
+  <li><b>The headline number stays round 1</b>: T11, eval IoU 0.618, one clean look</li>
+</ul>
+
+<figure><img src="../results/round2/iou_round1_vs_round2.png" style="width:56%"><figcaption>Every image: IoU in round 1 (x) vs round 2 (y). Above the dashed line = better in round 2.</figcaption></figure>
+
+<h3>Did round 2 fix the round-1 failures?</h3>
+<table class='num narrow'><tr><th>Round-1 failure cause</th><th>n</th><th>IoU round 1</th><th>IoU round 2</th></tr>
+<tr><td>white / pale background</td><td>18</td><td>0.22</td><td>0.27</td></tr>
+<tr><td>shaded side missed</td><td>15</td><td>0.52</td><td>0.66</td></tr>
+<tr><td>colour gate removes egg</td><td>10</td><td>0.22</td><td>0.46</td></tr>
+<tr><td>egg partly hidden</td><td>5</td><td>0.36</td><td>0.52</td></tr>
+<tr><td>bright object picked</td><td>5</td><td>0.50</td><td>0.51</td></tr>
+<tr><td>ash camouflage</td><td>4</td><td>0.23</td><td>0.22</td></tr>
+<tr><td>touching eggs</td><td>1</td><td>0.23</td><td>0.27</td></tr></table>
+<figure><img src="../results/round2/iou_by_cause.png" style="width:74%"><figcaption>The 58 round-1 failures (IoU &lt; 0.7), grouped by their round-1 cause: mean IoU before and after.</figcaption></figure>
+<ul>
+  <li>12 of 58 round-1 failures are now ≥ 0.7</li>
+  <li>Largest gains where round 2 aimed: colour gate 0.22 → 0.46, shaded side 0.52 → 0.66</li>
+  <li>White / pale background, the biggest group, barely moved (0.22 → 0.27). Edge ranking (T15c) only re-orders candidates the brightness search already found; the edge-based candidates (T15b) changed nothing on those images</li>
+  <li>Ash camouflage and bright objects: no change</li>
+</ul>
+
+<h3 class="pb">Biggest changes</h3>
+<ul><li>Columns: image · GT · round-1 error map · round-2 error map (<b style="color:#2f9e2f">green</b> correct, <b style="color:#d42020">red</b> false egg, <b style="color:#2860d8">blue</b> missed)</li></ul>
+<figure><img src="../results/round2/changes.jpg" style="width:80%"><figcaption>Top 4 rows: largest gains. Last rows: largest losses.</figcaption></figure>
+<ul>
+  <li>Gains, traced trial by trial in the dev logs: #100 and #140 from dropping the skin filter (T12), #13 from the ellipse prior (T13), #111 from blob splitting (T14)</li>
+</ul>
+<h3>Why some images got worse</h3>
+<ul>
+  <li>Every image that dropped by &gt; 0.1 (7, dev + eval), re-run with one round-2 change undone at a time (<code>loss_check.py</code>; analysis only, nothing picked from it). Bold = the undo that helps most</li>
+</ul>
+<table class='num'><tr><th>Image</th><th>Split</th><th>Round 1</th><th>Round 2</th><th>skin filter back on (T12)</th><th>no ellipse prior (T13)</th><th>no blob splitting (T14)</th><th>no edge ranking (T15c)</th><th>no shape/texture reject (T16)</th></tr>
+<tr><td>#2</td><td>dev</td><td>0.91</td><td>0.73</td><td>0.83</td><td><b>0.92</b></td><td>0.73</td><td>0.73</td><td>0.73</td></tr>
+<tr><td>#18</td><td>dev</td><td>0.43</td><td>0.29</td><td>0.28</td><td><b>0.47</b></td><td>0.29</td><td>0.31</td><td>0.29</td></tr>
+<tr><td>#133</td><td>dev</td><td>0.87</td><td>0.73</td><td>0.76</td><td><b>0.85</b></td><td>0.73</td><td>0.73</td><td>0.73</td></tr>
+<tr><td>#152</td><td>dev</td><td>0.87</td><td>0.23</td><td>0.20</td><td>0.22</td><td><b>0.98</b></td><td>0.23</td><td>0.23</td></tr>
+<tr><td>#120</td><td>eval</td><td>0.90</td><td>0.79</td><td><b>0.96</b></td><td>0.91</td><td>0.79</td><td>0.79</td><td>0.79</td></tr>
+<tr><td>#124</td><td>eval</td><td>0.82</td><td>0.56</td><td>0.56</td><td><b>0.82</b></td><td>0.56</td><td>0.56</td><td>0.56</td></tr>
+<tr><td>#145</td><td>eval</td><td>0.72</td><td>0.43</td><td>0.43</td><td><b>0.72</b></td><td>0.43</td><td>0.43</td><td>0.43</td></tr></table>
+<ul>
+  <li><b>Ellipse prior (T13)</b> is behind 5 of 7: the enlarged ellipse is marked "probably egg", and where the surface next to the egg looks like it, GrabCut keeps it → false egg pixels beside the egg (#145: the water next to it). Same thing as the precision drop in the T13 card</li>
+  <li><b>Blob splitting (T14)</b>: #152 — with splitting off it is back to 0.98; most likely a watershed piece of the tile wall passed as an egg. The same change fixed #111 → it helps and hurts on pale backgrounds</li>
+  <li><b>Skin filter off (T12)</b>: #120 is the one image where the skin box was doing real work</li>
+</ul>
+
+<h3>What is still left</h3>
+<table class='num narrow'><tr><th>Still IoU 0</th><th>Split</th><th>Round-1 cause</th><th>Egg removed by saturation gate</th><th>IoU with that gate off too</th></tr>
+<tr><td>#27</td><td>dev</td><td>ash camouflage</td><td>0%</td><td>0.00</td></tr>
+<tr><td>#30</td><td>dev</td><td>white / pale background</td><td>0%</td><td>0.00</td></tr>
+<tr><td>#78</td><td>dev</td><td>ash camouflage</td><td>0%</td><td>0.00</td></tr>
+<tr><td>#116</td><td>dev</td><td>white / pale background</td><td>1%</td><td>0.00</td></tr>
+<tr><td>#155</td><td>dev</td><td>white / pale background</td><td>4%</td><td>0.00</td></tr>
+<tr><td>#160</td><td>dev</td><td>colour gate removes egg</td><td>46%</td><td>0.00</td></tr>
+<tr><td>#161</td><td>dev</td><td>white / pale background</td><td>26%</td><td>0.69</td></tr>
+<tr><td>#20</td><td>eval</td><td>colour gate removes egg</td><td>76%</td><td>0.00</td></tr>
+<tr><td>#24</td><td>eval</td><td>colour gate removes egg</td><td>97%</td><td>0.00</td></tr>
+<tr><td>#44</td><td>eval</td><td>colour gate removes egg</td><td>86%</td><td>0.00</td></tr>
+<tr><td>#139</td><td>eval</td><td>white / pale background</td><td>20%</td><td>0.00</td></tr></table>
+<ul>
+  <li>7 dev + 4 eval images still at IoU 0. Re-run with the saturation gate off as well: only #161 comes back</li>
+  <li><b>Backlit hand</b> (#20, #24, #44 — the eval-only dark-room scene): egg held up against a lamp, the wall behind is brighter than the egg and the egg looks brown. The saturation gate removes most of it, but even without the gate the search finds nothing → a "brightest egg-shaped blob" search can't solve backlit shots</li>
+  <li><b>Pale backgrounds</b>: still the biggest group. Needs a cue that isn't brightness or colour (shading gradient, cast shadow) — or a learned model</li>
+  <li><b>Ellipse prior</b>: one scale (×1.15) for every egg. Next try: grow it only on the darker side of the egg, or stop GrabCut from keeping "probably egg" pixels that look like the background</li>
+  <li><b>Method lesson</b>: a second round designed from looking at failures took dev from 0.589 to 0.669 and eval nowhere. With 85 dev images in 14 scenes, a third round should use cross-validation over scene groups, not one dev / eval cut, to tell real gains from dev-scene fitting</li>
+</ul>
+
+
+<h2>6. Task 4 — video tracking</h2>
 <ul><li>Next. Google Drive link to the output video will go here</li></ul>
 
-<h2>6. How to run</h2>
+<h2>7. How to run</h2>
 <pre>pip install -r requirements.txt
 python scripts/download_assets.py          # SAM 2.1 checkpoint (+ dataset if missing)
 python scripts/task1_sam2_groundtruth.py   # Task 1  -> ground_truth/
@@ -452,22 +614,28 @@ python scripts/build_log.py                # -> experiments/LOG.md, log.json, pr
 python scripts/final_eval.py               # trial named in configs/final.yaml
 python scripts/analyze.py                  # -> results/analysis/
 python scripts/ablation.py                 # dev only -> results/ablation/
+
+# Round 2: second, separate eval run of the round-2 pipeline, then the comparison
+python scripts/final_eval.py --config configs/final_round2.yaml --out results/final_eval_round2
+python scripts/compare_rounds.py           # -> results/round2/ (tables, plots, changes.jpg)
+python scripts/loss_check.py               # -> results/round2/loss_check.json
 python scripts/build_report.py             # -> report/report.html + report.pdf
 pytest tests/</pre>
 <ul><li>Tested on Windows 11, Python 3.13, PyTorch 2.6 + CUDA 12.4, RTX 4070 Laptop (8 GB). Task 2/3 need only OpenCV, NumPy, PyYAML, matplotlib (CPU)</li></ul>
 
-<h2>7. AI tools</h2>
+<h2>8. AI tools</h2>
 <ul>
   <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures) and drafting this report</li>
   <li>Decisions (what to try next, keep / discard, failure labels) were made by looking at dev results and worst-case panels; every number in this report is filled in by <code>build_report.py</code> from saved result files</li>
 </ul>
 
-<h2>8. References</h2>
+<h2>9. References</h2>
 <ol class="refs">
   <li>N. Otsu. A threshold selection method from gray-level histograms. IEEE Trans. SMC, 1979</li>
   <li>D. Chai, K. N. Ngan. Face segmentation using skin-color map in videophone applications. IEEE Trans. CSVT, 1999</li>
   <li>J. Matas et al. Robust wide-baseline stereo from maximally stable extremal regions (MSER). BMVC, 2002</li>
   <li>A. Fitzgibbon, M. Pilu, R. Fisher. Direct least square fitting of ellipses. IEEE TPAMI, 1999</li>
+  <li>J. Canny. A computational approach to edge detection. IEEE TPAMI, 1986</li>
   <li>Y. Boykov, M.-P. Jolly. Interactive graph cuts for optimal boundary &amp; region segmentation. ICCV, 2001</li>
   <li>C. Rother, V. Kolmogorov, A. Blake. "GrabCut": interactive foreground extraction using iterated graph cuts. SIGGRAPH, 2004</li>
   <li>L. Vincent, P. Soille. Watersheds in digital spaces: an efficient algorithm based on immersion simulations. IEEE TPAMI, 1991</li>

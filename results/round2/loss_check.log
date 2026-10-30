@@ -1,0 +1,23 @@
+     skin filter back on: 0.83  0.28  0.76  0.20  0.96  0.56  0.43
+        no ellipse prior: 0.92  0.47  0.85  0.22  0.91  0.82  0.72
+       no blob splitting: 0.73  0.29  0.73  0.98  0.79  0.56  0.43
+         no edge ranking: 0.73  0.31  0.73  0.23  0.79  0.56  0.43
+ no shape/texture reject: 0.73  0.29  0.73  0.23  0.79  0.56  0.43
+   #2 dev: 0.91 -> 0.73; best undo 'no ellipse prior' -> 0.92
+  #18 dev: 0.43 -> 0.29; best undo 'no ellipse prior' -> 0.47
+ #133 dev: 0.87 -> 0.73; best undo 'no ellipse prior' -> 0.85
+ #152 dev: 0.87 -> 0.23; best undo 'no blob splitting' -> 0.98
+ #120 eval: 0.90 -> 0.79; best undo 'skin filter back on' -> 0.96
+ #124 eval: 0.82 -> 0.56; best undo 'no ellipse prior' -> 0.82
+ #145 eval: 0.72 -> 0.43; best undo 'no ellipse prior' -> 0.72
+  #27 dev: sat_loss 0.00, IoU without saturation gate 0.00  (ash camouflage)
+  #30 dev: sat_loss 0.00, IoU without saturation gate 0.00  (white / pale background)
+  #78 dev: sat_loss 0.00, IoU without saturation gate 0.00  (ash camouflage)
+ #116 dev: sat_loss 0.01, IoU without saturation gate 0.00  (white / pale background)
+ #155 dev: sat_loss 0.04, IoU without saturation gate 0.00  (white / pale background)
+ #160 dev: sat_loss 0.46, IoU without saturation gate 0.00  (colour gate removes egg)
+ #161 dev: sat_loss 0.26, IoU without saturation gate 0.69  (white / pale background)
+  #20 eval: sat_loss 0.76, IoU without saturation gate 0.00  (colour gate removes egg)
+  #24 eval: sat_loss 0.97, IoU without saturation gate 0.00  (colour gate removes egg)
+  #44 eval: sat_loss 0.86, IoU without saturation gate 0.00  (colour gate removes egg)
+ #139 eval: sat_loss 0.20, IoU without saturation gate 0.00  (white / pale background)

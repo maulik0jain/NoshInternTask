@@ -1,0 +1,9 @@
+id: T15b
+extends: T13
+round: 2
+what: "Add ellipses fitted to Canny edge chains as extra egg candidates"
+why: "On a white background no threshold separates the egg at all, so the search has nothing to score. The outline is still an edge: fit ellipses to edge chains, keep those with >= 60% of the perimeter on edges."
+changes:
+  candidate: {edge_candidates: true, edge_min_support: 0.6, edge_min_pts: 40, canny: [30, 90]}
+decision: discarded
+reason: "Failed: IoU 0.646 -> 0.573. On its targets it changed nothing (white bag 0.36 -> 0.36, fridge tray and rice unchanged). Instead textured backgrounds produced many edge-chain ellipses: ash 0.38 -> 0.15 (predicted eggs 15 -> 29), towel 0.65 -> 0.36."

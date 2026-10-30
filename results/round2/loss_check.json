@@ -1,0 +1,243 @@
+{
+  "base": "T18",
+  "drop": 0.1,
+  "images": [
+    {
+      "image": "train/egg/not_damaged_2_jpg.rf.a4629fbffb9457cd3dda5a1dfc6e5365.jpg",
+      "id": "#2",
+      "split": "dev",
+      "iou_round1": 0.9142,
+      "iou_round2": 0.7275,
+      "undo": {
+        "skin filter back on": 0.8296,
+        "no ellipse prior": 0.9187,
+        "no blob splitting": 0.7275,
+        "no edge ranking": 0.7275,
+        "no shape/texture reject": 0.7275
+      },
+      "best_undo": "no ellipse prior",
+      "best_undo_trial": "T13",
+      "recovered": 0.1912
+    },
+    {
+      "image": "train/egg/not_damaged_18_jpg.rf.bc3fb0b05f8e3f72d25ae44db40362c0.jpg",
+      "id": "#18",
+      "split": "dev",
+      "iou_round1": 0.4315,
+      "iou_round2": 0.2947,
+      "undo": {
+        "skin filter back on": 0.2794,
+        "no ellipse prior": 0.4721,
+        "no blob splitting": 0.2947,
+        "no edge ranking": 0.3054,
+        "no shape/texture reject": 0.2851
+      },
+      "best_undo": "no ellipse prior",
+      "best_undo_trial": "T13",
+      "recovered": 0.1774
+    },
+    {
+      "image": "valid/egg/not_damaged_133_jpg.rf.a386f448c321cfb45a902bab446a0536.jpg",
+      "id": "#133",
+      "split": "dev",
+      "iou_round1": 0.8703,
+      "iou_round2": 0.7317,
+      "undo": {
+        "skin filter back on": 0.7587,
+        "no ellipse prior": 0.8506,
+        "no blob splitting": 0.7317,
+        "no edge ranking": 0.7317,
+        "no shape/texture reject": 0.7317
+      },
+      "best_undo": "no ellipse prior",
+      "best_undo_trial": "T13",
+      "recovered": 0.1189
+    },
+    {
+      "image": "test/egg/not_damaged_152_jpg.rf.a57edb18d395ce87e23f7abccbd1ad69.jpg",
+      "id": "#152",
+      "split": "dev",
+      "iou_round1": 0.8688,
+      "iou_round2": 0.2267,
+      "undo": {
+        "skin filter back on": 0.2008,
+        "no ellipse prior": 0.2248,
+        "no blob splitting": 0.9793,
+        "no edge ranking": 0.2267,
+        "no shape/texture reject": 0.2267
+      },
+      "best_undo": "no blob splitting",
+      "best_undo_trial": "T14",
+      "recovered": 0.7526
+    },
+    {
+      "image": "valid/egg/not_damaged_120_jpg.rf.dfe91ad8ce891c84e495a8d59bbe01f5.jpg",
+      "id": "#120",
+      "split": "eval",
+      "iou_round1": 0.901,
+      "iou_round2": 0.7949,
+      "undo": {
+        "skin filter back on": 0.9626,
+        "no ellipse prior": 0.9057,
+        "no blob splitting": 0.7949,
+        "no edge ranking": 0.7949,
+        "no shape/texture reject": 0.7949
+      },
+      "best_undo": "skin filter back on",
+      "best_undo_trial": "T12",
+      "recovered": 0.1677
+    },
+    {
+      "image": "train/egg/not_damaged_124_jpg.rf.931f62b8d40a093039633b898e0e9114.jpg",
+      "id": "#124",
+      "split": "eval",
+      "iou_round1": 0.8169,
+      "iou_round2": 0.5643,
+      "undo": {
+        "skin filter back on": 0.5643,
+        "no ellipse prior": 0.8169,
+        "no blob splitting": 0.5643,
+        "no edge ranking": 0.5643,
+        "no shape/texture reject": 0.5643
+      },
+      "best_undo": "no ellipse prior",
+      "best_undo_trial": "T13",
+      "recovered": 0.2526
+    },
+    {
+      "image": "train/Unlabeled/not_damaged_145_jpg.rf.5147bfde42f30a27504377fd5ef13b05.jpg",
+      "id": "#145",
+      "split": "eval",
+      "iou_round1": 0.722,
+      "iou_round2": 0.4345,
+      "undo": {
+        "skin filter back on": 0.4345,
+        "no ellipse prior": 0.722,
+        "no blob splitting": 0.4345,
+        "no edge ranking": 0.4345,
+        "no shape/texture reject": 0.4345
+      },
+      "best_undo": "no ellipse prior",
+      "best_undo_trial": "T13",
+      "recovered": 0.2875
+    }
+  ],
+  "variants": [
+    "skin filter back on",
+    "no ellipse prior",
+    "no blob splitting",
+    "no edge ranking",
+    "no shape/texture reject"
+  ],
+  "variant_trials": {
+    "skin filter back on": "T12",
+    "no ellipse prior": "T13",
+    "no blob splitting": "T14",
+    "no edge ranking": "T15c",
+    "no shape/texture reject": "T16"
+  },
+  "best_undo_counts": {
+    "skin filter back on": 1,
+    "no ellipse prior": 5,
+    "no blob splitting": 1,
+    "no edge ranking": 0,
+    "no shape/texture reject": 0
+  },
+  "n_images": 7,
+  "still_zero": [
+    {
+      "id": "#27",
+      "split": "dev",
+      "sat_loss": 0.002,
+      "iou_no_saturation": 0.0,
+      "cause": "ash camouflage",
+      "note": "ash-dusted egg on ash; nothing egg-shaped"
+    },
+    {
+      "id": "#30",
+      "split": "dev",
+      "sat_loss": 0.001,
+      "iou_no_saturation": 0.0,
+      "cause": "white / pale background",
+      "note": "white bag, nothing found"
+    },
+    {
+      "id": "#78",
+      "split": "dev",
+      "sat_loss": 0.001,
+      "iou_no_saturation": 0.0,
+      "cause": "ash camouflage",
+      "note": "ash-dusted egg on ash"
+    },
+    {
+      "id": "#116",
+      "split": "dev",
+      "sat_loss": 0.01,
+      "iou_no_saturation": 0.0,
+      "cause": "white / pale background",
+      "note": "white fridge tray"
+    },
+    {
+      "id": "#155",
+      "split": "dev",
+      "sat_loss": 0.038,
+      "iou_no_saturation": 0.0,
+      "cause": "white / pale background",
+      "note": "white wall behind the hand; nothing found"
+    },
+    {
+      "id": "#160",
+      "split": "dev",
+      "sat_loss": 0.461,
+      "iou_no_saturation": 0.0,
+      "cause": "colour gate removes egg",
+      "note": "63% of the egg inside the skin box (egg on palm)"
+    },
+    {
+      "id": "#161",
+      "split": "dev",
+      "sat_loss": 0.262,
+      "iou_no_saturation": 0.6904,
+      "cause": "white / pale background",
+      "note": "pale wall picked; gate also removes 39%"
+    },
+    {
+      "id": "#20",
+      "split": "eval",
+      "sat_loss": 0.762,
+      "iou_no_saturation": 0.0,
+      "cause": "colour gate removes egg",
+      "note": "dim room: 84% of the egg inside the skin/sat gate"
+    },
+    {
+      "id": "#24",
+      "split": "eval",
+      "sat_loss": 0.966,
+      "iou_no_saturation": 0.0,
+      "cause": "colour gate removes egg",
+      "note": "backlit egg looks brown: 98% removed"
+    },
+    {
+      "id": "#44",
+      "split": "eval",
+      "sat_loss": 0.861,
+      "iou_no_saturation": 0.0,
+      "cause": "colour gate removes egg",
+      "note": "backlit close-up: 87% removed"
+    },
+    {
+      "id": "#139",
+      "split": "eval",
+      "sat_loss": 0.204,
+      "iou_no_saturation": 0.0,
+      "cause": "white / pale background",
+      "note": "pale wall behind; nothing found"
+    }
+  ],
+  "still_zero_by_split": {
+    "dev": 7,
+    "eval": 4
+  },
+  "still_zero_sat_high": 3,
+  "sat_high": 0.5
+}

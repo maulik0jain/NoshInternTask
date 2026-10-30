@@ -1,0 +1,9 @@
+id: T12b
+extends: T11
+round: 2
+what: "skin filter only removes large skin regions that touch the image border"
+why: "Keep what the skin filter is for (hands come into the photo from the edge) without deleting egg-sized warm/cream regions in the middle of the image."
+changes:
+  skin: {mode: border_regions, min_region: 0.02, close: 7}
+decision: discarded
+reason: "Better than T11 but well below T12. On warm marble floors the floor itself is in the skin box and forms one big region touching the border, which takes the egg's warm side with it (#100: 0.22 vs 0.90 with T12, #140: 0.30 vs 0.91). Only 2 images are > 0.05 better than T12."

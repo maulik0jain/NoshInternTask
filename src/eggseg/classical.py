@@ -6,8 +6,10 @@ off with `enabled: false` so a trial changes exactly one thing.
 
     preprocess   gray-world white balance, CLAHE on L*, blur
     candidate    bright/white pixels: Otsu on a channel, or k-means in Lab
-    skin         remove skin-coloured pixels (YCbCr box, Chai & Ngan 1999)
+    skin         remove skin-coloured pixels (YCbCr box, Chai & Ngan 1999); optionally
+                 only large skin regions touching the border (hands), T12b
     saturation   keep only low-saturation pixels (eggs are white/cream)
+    grow         local Otsu around each found egg to add its shaded side (T13b)
     morphology   open -> close -> fill holes
     components   keep egg-shaped blobs (area, solidity, axis ratio, ellipse fit, border)
     grabcut      refine edges with GrabCut seeded from the mask (Rother 2004)
@@ -108,6 +110,23 @@ def skin(rgb, cb_range, cr_range):
     return (cb >= cb_range[0]) & (cb <= cb_range[1]) & (cr >= cr_range[0]) & (cr <= cr_range[1])
 
 
+def skin_regions(skin_mask, min_frac, close):
+    """Keep only skin regions that are large and touch the image border: hands and
+    arms enter the photo from the edge. A cream or warm-lit egg also falls inside the
+    skin box, but in the middle of the image and egg-sized, so it survives (T12b)."""
+    m = skin_mask.astype(np.uint8)
+    if close > 0:
+        m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, disk(close))
+    n, lab, stats, _ = cv2.connectedComponentsWithStats(m, connectivity=8)
+    h, w = skin_mask.shape
+    keep = np.zeros(n, bool)
+    for i in range(1, n):
+        x, y, bw, bh, area = stats[i]
+        on_border = x == 0 or y == 0 or x + bw >= w or y + bh >= h
+        keep[i] = on_border and area >= min_frac * h * w
+    return keep[lab] & skin_mask
+
+
 def low_saturation(rgb, s_max):
     """HSV saturation <= s_max (0-255): eggs are close to colourless."""
     return cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)[..., 1] <= s_max
@@ -152,6 +171,9 @@ def component_features(comp, img_shape, offset=(0, 0)):
          "axis_ratio": 99.0, "ellipse_iou": 0.0}
     pts = c.reshape(-1, 2) + (ox, oy)
     f["border_frac"] = float(((pts[:, 0] <= 1) | (pts[:, 1] <= 1) | (pts[:, 0] >= w - 2) | (pts[:, 1] >= h - 2)).mean())
+    rw, rh = cv2.minAreaRect(c)[1]
+    # area / min bounding rectangle: an ellipse is pi/4 = 0.785, a key cap or box ~1
+    f["rectangularity"] = area / (rw * rh) if rw * rh > 0 else 1.0
     if len(c) >= 5:
         (cx, cy), (a, b), ang = cv2.fitEllipse(c)  # least-squares ellipse (Fitzgibbon 1999)
         # A near-straight contour gives a degenerate, enormous ellipse: not an egg.
@@ -173,7 +195,8 @@ def component_features(comp, img_shape, offset=(0, 0)):
 def passes_shape(f, p):
     return (p["min_area"] <= f["area_frac"] <= p["max_area"] and f["solidity"] >= p["min_solidity"]
             and f["axis_ratio"] <= p["max_axis_ratio"] and f["ellipse_iou"] >= p.get("min_ellipse_iou", 0.0)
-            and f["border_frac"] <= p["max_border_frac"])
+            and f["border_frac"] <= p["max_border_frac"]
+            and (p.get("max_rectangularity") is None or f["rectangularity"] <= p["max_rectangularity"]))
 
 
 def filter_components(mask, p):
@@ -189,6 +212,46 @@ def filter_components(mask, p):
     return keep
 
 
+# ---------------------------------------------------------------- edge-based candidates
+def edge_ellipses(ch, edges, edge_dist, allowed, shape_p, p):
+    """Ellipses fitted to Canny edge chains (T15b). On a white bag the egg is as bright
+    as the background, so no threshold separates it, but its outline is still an edge.
+    Each long enough chain gets a least-squares ellipse; it becomes a candidate if
+    enough of its perimeter lies on edges and its inside is plausible egg (passes the
+    colour gate, not darker than most of the image). Score = edge support."""
+    h, w = ch.shape
+    cnts, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    dark = np.percentile(ch, p.get("edge_min_pct", 40))
+    out = []
+    for c in cnts:
+        if len(c) < p.get("edge_min_pts", 40):
+            continue
+        (cx, cy), (a, b), ang = cv2.fitEllipse(c)
+        if not (min(a, b) > 4 and max(a, b) <= max(h, w)):
+            continue
+        if not shape_p["min_area"] <= np.pi * a * b / 4 / (h * w) <= shape_p["max_area"]:
+            continue
+        if max(a, b) / min(a, b) > shape_p["max_axis_ratio"]:
+            continue
+        poly = cv2.ellipse2Poly((int(cx), int(cy)), (int(a / 2), int(b / 2)), int(ang), 0, 360, 4)
+        inside = (poly[:, 0] >= 0) & (poly[:, 0] < w) & (poly[:, 1] >= 0) & (poly[:, 1] < h)
+        if inside.mean() < 1 - shape_p["max_border_frac"]:
+            continue
+        support = float((edge_dist[poly[inside, 1], poly[inside, 0]] <= p.get("edge_tol", 2)).mean())
+        if support < p.get("edge_min_support", 0.6):
+            continue
+        full = np.zeros((h, w), np.uint8)
+        cv2.ellipse(full, ((cx, cy), (a, b), ang), 1, cv2.FILLED)
+        full = full > 0
+        if (allowed is not None and allowed[full].mean() < 0.7) or ch[full].mean() < dark:
+            continue
+        ys, xs = np.nonzero(full)
+        x0, y0 = xs.min(), ys.min()
+        crop = full[y0:ys.max() + 1, x0:xs.max() + 1]
+        out.append((support, int(crop.sum()), int(x0), int(y0), crop))
+    return out
+
+
 # ---------------------------------------------------------------- multi-threshold egg search
 def threshold_search(rgb, p, shape_p, allowed=None):
     """Try many thresholds instead of one (T7 showed one global threshold glues the
@@ -202,7 +265,40 @@ def threshold_search(rgb, p, shape_p, allowed=None):
     ch = channel(rgb, p["channel"], p.get("chroma_weight", 1.0))
     h, w = ch.shape
     lo, hi = np.percentile(ch, p["pct_range"])
+    gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
+    edge_w = p.get("edge_weight", 0.0)
+    edges = edge_dist = None
+    if edge_w > 0 or p.get("edge_candidates"):
+        edges = cv2.Canny(gray, *p.get("canny", [30, 90]))
+        edge_dist = cv2.distanceTransform((edges == 0).astype(np.uint8), cv2.DIST_L2, 3)
+    lap = np.abs(cv2.Laplacian(gray, cv2.CV_32F)) if p.get("max_texture") is not None else None
     cands = []  # (score, area, x, y, crop-mask)
+
+    def consider(crop, x, y):
+        """Score one blob (crop of the image at x, y); keep it if it looks like an egg."""
+        f = component_features(crop, (h, w), offset=(x, y))
+        if not passes_shape(f, shape_p):
+            return False
+        if lap is not None and lap[y:y + crop.shape[0], x:x + crop.shape[1]][crop].mean() > p["max_texture"]:
+            return False  # crinkled foil, printed keys: eggs are smooth (T16)
+        score = f["ellipse_iou"] * f["solidity"]
+        rank = score
+        if edge_w > 0:
+            # share of the blob outline lying on an image edge: a threshold cut through a
+            # flat white bag has no edge under it, a real egg outline does (T15)
+            cnts, _ = cv2.findContours(crop.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            pts = max(cnts, key=len).reshape(-1, 2) + (x, y)
+            support = float((edge_dist[pts[:, 1], pts[:, 0]] <= p.get("edge_tol", 2)).mean())
+            rank = score * (1 - edge_w + edge_w * support)
+            if not p.get("edge_rank_only"):
+                # T15: the weighted score also faces the min_score cut. It lowers every
+                # score, so real eggs fell below the cut; T15c only ranks by it.
+                score = rank
+        if score >= p["min_score"]:
+            cands.append((rank, int(crop.sum()), x, y, crop))
+            return True
+        return False
+
     for t in np.linspace(lo, hi, p["levels"]):
         m = ch >= t
         if allowed is not None:
@@ -214,11 +310,19 @@ def threshold_search(rgb, p, shape_p, allowed=None):
             if not shape_p["min_area"] <= area / (h * w) <= shape_p["max_area"]:
                 continue  # cheap reject before the expensive features
             crop = fill_holes(lab[y:y + bh, x:x + bw] == i)
-            f = component_features(crop, (h, w), offset=(x, y))
-            if passes_shape(f, shape_p):
-                score = f["ellipse_iou"] * f["solidity"]
-                if score >= p["min_score"]:
-                    cands.append((score, int(crop.sum()), x, y, crop))
+            if consider(crop, x, y) or not p.get("split_merged"):
+                continue
+            # Touching eggs form one non-egg-shaped blob that would be thrown away here,
+            # before the watershed stage ever sees it: split it now, score each piece (T14).
+            if area < 2 * shape_p["min_area"] * h * w:
+                continue
+            pieces = split_instances(crop, {"peak_rel": p.get("split_peak_rel", 0.6),
+                                            "min_core_px": p.get("split_min_core_px", 30)})
+            for k in range(1, pieces.max() + 1 if pieces.max() > 1 else 1):
+                if (pieces == k).any():  # a core can lose all its pixels to its neighbours
+                    consider(pieces == k, x, y)
+    if p.get("edge_candidates"):
+        cands += edge_ellipses(ch, edges, edge_dist, allowed, shape_p, p)
 
     def full(c):
         out = np.zeros((h, w), bool)
@@ -247,6 +351,39 @@ def threshold_search(rgb, p, shape_p, allowed=None):
     return picked
 
 
+# ---------------------------------------------------------------- growth
+def scaled_ellipse_mask(shape, ell, scale):
+    (cx, cy), (a, b), ang = ell
+    m = np.zeros(shape, np.uint8)
+    cv2.ellipse(m, ((cx, cy), (a * scale, b * scale), ang), 1, cv2.FILLED)
+    return m > 0
+
+
+def grow_local(ch, mask, allowed, p):
+    """Add the shaded side of each found egg (T13b). The search keeps the lit cap,
+    because the global threshold that isolates the egg also cuts off its shaded half.
+    Here the threshold is chosen locally: Otsu on the pixels inside the egg's fitted
+    ellipse enlarged by roi_scale (egg vs the background right next to it); pixels
+    above it, connected to the egg and inside the ellipse enlarged by keep_scale,
+    are added."""
+    n, lab = cv2.connectedComponents(mask.astype(np.uint8), connectivity=8)
+    out = mask.copy()
+    for i in range(1, n):
+        comp = lab == i
+        f = component_features(comp, mask.shape)
+        if "ellipse" not in f:
+            continue
+        roi = scaled_ellipse_mask(mask.shape, f["ellipse"], p["roi_scale"])
+        t, _ = cv2.threshold(ch[roi].reshape(-1, 1), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        cand = (ch >= t) & scaled_ellipse_mask(mask.shape, f["ellipse"], p["keep_scale"])
+        if p.get("respect_gate", True) and allowed is not None:
+            cand &= allowed
+        n2, lab2 = cv2.connectedComponents((cand | comp).astype(np.uint8), connectivity=8)
+        ids = np.unique(lab2[comp])
+        out |= np.isin(lab2, ids[ids > 0])
+    return out
+
+
 # ---------------------------------------------------------------- refinement
 def grabcut_refine(rgb, mask, p):
     """GrabCut (Rother 2004, a Boykov-Jolly graph cut with GMM colour models), seeded
@@ -257,6 +394,14 @@ def grabcut_refine(rgb, mask, p):
     m8 = mask.astype(np.uint8)
     gc = np.full(mask.shape, cv2.GC_PR_BGD, np.uint8)
     gc[m8 > 0] = cv2.GC_PR_FGD
+    if p.get("ellipse_prior"):
+        # T13: the enlarged fitted ellipse of each egg also starts as "probably egg", so
+        # the shaded side is in the egg colour model from the first iteration
+        n, lab = cv2.connectedComponents(m8, connectivity=8)
+        for i in range(1, n):
+            f = component_features(lab == i, mask.shape)
+            if "ellipse" in f:
+                gc[scaled_ellipse_mask(mask.shape, f["ellipse"], p["ellipse_prior"])] = cv2.GC_PR_FGD
     gc[cv2.erode(m8, disk(p["erode"])) > 0] = cv2.GC_FGD
     gc[cv2.dilate(m8, disk(p["bg_dilate"])) == 0] = cv2.GC_BGD
     if not (gc == cv2.GC_FGD).any():  # blob too small to erode: keep it as probable fg only
@@ -345,7 +490,10 @@ def segment(rgb, cfg):
     img = preprocess(rgb, cfg["preprocess"])
     allowed = np.ones(rgb.shape[:2], bool)  # pixels the colour filters say could be egg
     if cfg["skin"]["enabled"]:
-        allowed &= ~skin(img, cfg["skin"]["cb"], cfg["skin"]["cr"])
+        sk = skin(img, cfg["skin"]["cb"], cfg["skin"]["cr"])
+        if cfg["skin"].get("mode", "all") == "border_regions":
+            sk = skin_regions(sk, cfg["skin"]["min_region"], cfg["skin"].get("close", 7))
+        allowed &= ~sk
     if cfg["saturation"]["enabled"]:
         allowed &= low_saturation(img, cfg["saturation"]["s_max"])
     if cfg["candidate"]["method"] == "search":
@@ -360,6 +508,8 @@ def segment(rgb, cfg):
                                  cfg["components"], allowed)
     else:
         m = candidate(img, cfg["candidate"]) & allowed
+    if cfg.get("grow", {}).get("enabled"):
+        m = grow_local(channel(img, cfg["candidate"]["channel"]), m, allowed, cfg["grow"])
     if cfg["morphology"]["enabled"]:
         m = morphology(m, cfg["morphology"])
     if cfg["components"]["enabled"]:

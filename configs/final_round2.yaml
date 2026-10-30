@@ -1,0 +1,4 @@
+# Round-2 pipeline (improvements from the Task 3 analysis), chosen on dev only:
+# best dev mean IoU among the round-2 trials in experiments/LOG.md.
+trial: T18
+note: "Second use of the eval split. The round-2 changes were designed after looking at round-1 failures, eval images included, so this eval number is optimistic. The clean, one-shot eval result is round 1 (results/final_eval, trial T11)."

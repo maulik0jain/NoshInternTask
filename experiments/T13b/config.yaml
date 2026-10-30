@@ -1,0 +1,9 @@
+id: T13b
+extends: T12
+round: 2
+what: "Local Otsu growth around each found egg before GrabCut"
+why: "Same failure as T13, different fix: the threshold that isolates the egg globally is too high for its shaded side. Re-threshold locally (Otsu inside the egg's ellipse x1.4) and add connected pixels inside the ellipse x1.15."
+changes:
+  grow: {enabled: true, roi_scale: 1.4, keep_scale: 1.15}
+decision: discarded
+reason: "Helps (T12 0.609 -> 0.633) but less than T13 (0.646), with lower boundary F1 and instance F1: a local Otsu threshold still cuts the shaded side wherever it is darker than the surface beside it, while GrabCut's colour model can include it."

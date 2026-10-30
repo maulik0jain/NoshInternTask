@@ -1,0 +1,31 @@
+{
+  "base": "T17",
+  "param": "candidate.max_texture",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 3.5,
+      "iou_mean": 0.6657,
+      "iou_median": 0.7424,
+      "boundary_f1": 0.5453,
+      "instance_f1": 0.6638,
+      "empty": 3
+    },
+    {
+      "value": 5.0,
+      "iou_mean": 0.6602,
+      "iou_median": 0.7275,
+      "boundary_f1": 0.54,
+      "instance_f1": 0.6473,
+      "empty": 2
+    },
+    {
+      "value": 8.0,
+      "iou_mean": 0.6636,
+      "iou_median": 0.7265,
+      "boundary_f1": 0.538,
+      "instance_f1": 0.6295,
+      "empty": 2
+    }
+  ]
+}

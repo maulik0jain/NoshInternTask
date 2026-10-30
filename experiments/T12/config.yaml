@@ -1,0 +1,9 @@
+id: T12
+extends: T11
+round: 2
+what: "skin filter off"
+why: "Round-1 analysis: in 12 images the skin box removes >= 40% of the egg (cream eggs, warm light, backlit eggs); those images average IoU 0.29. The skin filter was accepted in T3, when the candidate was one Otsu threshold that grabbed whole hands. The egg-shape search should reject hands on its own."
+changes:
+  skin: {enabled: false}
+decision: kept
+reason: "IoU 0.589 -> 0.609. The shape search already rejects hands (not egg-shaped), so the skin box mostly removed warm-lit egg pixels: #100 0.22 -> 0.90, #140 0.30 -> 0.91 (same trend as the round-1 ablation)."

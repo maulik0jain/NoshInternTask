@@ -21,6 +21,18 @@ Decision rule: keep a change if dev mean IoU goes up; if IoU ties, keep it only 
 | T10 | + distance-transform watershed to split touching eggs into separate instances | 0.566 | 0.654 | 0.894 | 0.605 | 0.445 | 0.618 | 11 | kept |
 | T11 | Fallback pass with a looser shape score (0.65) for images where the search found nothing | 0.589 | 0.660 | 0.833 | 0.639 | 0.458 | 0.569 | 2 | kept |
 | T11b | Fallback pass returns at most 1 egg | 0.579 | 0.660 | 0.821 | 0.618 | 0.456 | 0.603 | 2 | discarded |
+| T12 | skin filter off | 0.609 | 0.667 | 0.835 | 0.657 | 0.477 | 0.573 | 2 | kept |
+| T12b | skin filter only removes large skin regions that touch the image border | 0.592 | 0.660 | 0.835 | 0.642 | 0.462 | 0.571 | 2 | discarded |
+| T13 | GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg' | 0.646 | 0.717 | 0.807 | 0.721 | 0.517 | 0.615 | 2 | kept |
+| T13b | Local Otsu growth around each found egg before GrabCut | 0.633 | 0.727 | 0.823 | 0.691 | 0.493 | 0.588 | 2 | discarded |
+| T13c | T13 + local Otsu growth (both shaded-side fixes together) | 0.645 | 0.716 | 0.788 | 0.738 | 0.502 | 0.626 | 2 | discarded |
+| T14 | Split non-egg-shaped blobs with watershed inside the search and score each piece | 0.650 | 0.717 | 0.804 | 0.740 | 0.524 | 0.617 | 2 | kept |
+| T15 | Egg score also rewards blob outlines that lie on Canny edges (weight 0.5) | 0.339 | 0.000 | 0.685 | 0.379 | 0.306 | 0.406 | 33 | discarded |
+| T15b | Add ellipses fitted to Canny edge chains as extra egg candidates | 0.573 | 0.647 | 0.705 | 0.728 | 0.462 | 0.477 | 2 | discarded |
+| T15c | Edge support only ranks candidates; the 0.80 cut stays on the plain shape score | 0.652 | 0.727 | 0.801 | 0.737 | 0.523 | 0.608 | 2 | kept |
+| T16 | Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5) | 0.655 | 0.727 | 0.818 | 0.720 | 0.527 | 0.639 | 2 | kept |
+| T17 | All kept round-2 changes together: T13 + T14 + T15c + T16 | 0.660 | 0.728 | 0.802 | 0.744 | 0.540 | 0.647 | 2 | kept |
+| T18 | T17 with edge weight 0.3 (from sweep T17_edge_weight) | 0.669 | 0.732 | 0.811 | 0.744 | 0.544 | 0.658 | 2 | kept |
 
 ## Trials
 
@@ -152,6 +164,102 @@ Decision rule: keep a change if dev mean IoU goes up; if IoU ties, keep it only 
 - **Dev:** IoU 0.579 (median 0.660), Dice 0.667, P 0.821, R 0.618, BF1 0.456, instance F1 0.603, empty masks 2
 - **Decision:** discarded - Instance F1 recovers most of what T11 lost, but IoU falls. Only 4 dev images change, all with 1 GT egg: on these hard images the best-scoring fallback blob is often not the egg (#118: the egg was one of T11's 3 blobs, the cap kept a background one). The score can't rank egg vs background here, so capping doesn't help. IoU first -> T11 stays final.
 
+### T12 - skin filter off
+
+- **Builds on:** T11
+- **Why:** Round-1 analysis: in 12 images the skin box removes >= 40% of the egg (cream eggs, warm light, backlit eggs); those images average IoU 0.29. The skin filter was accepted in T3, when the candidate was one Otsu threshold that grabbed whole hands. The egg-shape search should reject hands on its own.
+- **Params changed:** `{"skin": {"enabled": false}}`
+- **Dev:** IoU 0.609 (median 0.667), Dice 0.696, P 0.835, R 0.657, BF1 0.477, instance F1 0.573, empty masks 2
+- **Decision:** kept - IoU 0.589 -> 0.609. The shape search already rejects hands (not egg-shaped), so the skin box mostly removed warm-lit egg pixels: #100 0.22 -> 0.90, #140 0.30 -> 0.91 (same trend as the round-1 ablation).
+
+### T12b - skin filter only removes large skin regions that touch the image border
+
+- **Builds on:** T11
+- **Why:** Keep what the skin filter is for (hands come into the photo from the edge) without deleting egg-sized warm/cream regions in the middle of the image.
+- **Params changed:** `{"skin": {"mode": "border_regions", "min_region": 0.02, "close": 7}}`
+- **Dev:** IoU 0.592 (median 0.660), Dice 0.683, P 0.835, R 0.642, BF1 0.462, instance F1 0.571, empty masks 2
+- **Decision:** discarded - Better than T11 but well below T12. On warm marble floors the floor itself is in the skin box and forms one big region touching the border, which takes the egg's warm side with it (#100: 0.22 vs 0.90 with T12, #140: 0.30 vs 0.91). Only 2 images are > 0.05 better than T12.
+
+### T13 - GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg'
+
+- **Builds on:** T12
+- **Why:** 15 round-1 failures are 'shaded side missed': the search keeps the lit cap and GrabCut only partly grows it. Marking the enlarged ellipse as probable egg puts the shaded side into the egg colour model from the start.
+- **Params changed:** `{"grabcut": {"ellipse_prior": 1.15}}`
+- **Dev:** IoU 0.646 (median 0.717), Dice 0.726, P 0.807, R 0.721, BF1 0.517, instance F1 0.615, empty masks 2
+- **Decision:** kept - Recall 0.657 -> 0.721 and boundary F1 up: the shaded side now gets into GrabCut's egg colour model. Precision drops a little (the ellipse is slightly larger than some eggs). Beats the T13b alternative.
+
+### T13b - Local Otsu growth around each found egg before GrabCut
+
+- **Builds on:** T12
+- **Why:** Same failure as T13, different fix: the threshold that isolates the egg globally is too high for its shaded side. Re-threshold locally (Otsu inside the egg's ellipse x1.4) and add connected pixels inside the ellipse x1.15.
+- **Params changed:** `{"grow": {"enabled": true, "roi_scale": 1.4, "keep_scale": 1.15}}`
+- **Dev:** IoU 0.633 (median 0.727), Dice 0.717, P 0.823, R 0.691, BF1 0.493, instance F1 0.588, empty masks 2
+- **Decision:** discarded - Helps (T12 0.609 -> 0.633) but less than T13 (0.646), with lower boundary F1 and instance F1: a local Otsu threshold still cuts the shaded side wherever it is darker than the surface beside it, while GrabCut's colour model can include it.
+
+### T13c - T13 + local Otsu growth (both shaded-side fixes together)
+
+- **Builds on:** T13
+- **Why:** T13 and T13b attack the same failure differently; check whether they add up.
+- **Params changed:** `{"grow": {"enabled": true, "roi_scale": 1.4, "keep_scale": 1.15}}`
+- **Dev:** IoU 0.645 (median 0.716), Dice 0.727, P 0.788, R 0.738, BF1 0.502, instance F1 0.626, empty masks 2
+- **Decision:** discarded - No gain over T13 alone (IoU 0.645 vs 0.646, boundary F1 lower). Once GrabCut has the ellipse prior, the extra pixels from local growth are mostly ones GrabCut already adds, plus some background (precision down).
+
+### T14 - Split non-egg-shaped blobs with watershed inside the search and score each piece
+
+- **Builds on:** T13
+- **Why:** Touching eggs merge into one blob that fails the egg-shape score and is thrown away before the watershed stage ever sees it (round-1 #144: 2 of 3 eggs missed).
+- **Params changed:** `{"candidate": {"split_merged": true, "split_peak_rel": 0.6, "split_min_core_px": 30}}`
+- **Dev:** IoU 0.650 (median 0.717), Dice 0.732, P 0.804, R 0.740, BF1 0.524, instance F1 0.617, empty masks 2
+- **Decision:** kept - Small IoU gain (0.646 -> 0.650) and recall up. Its target #144 is unchanged (0.27); the gain comes from other touching eggs, e.g. #136 now has 2 of 3 eggs matched instead of 1. Also #111 0.35 -> 0.98 (single egg on a pale surface, probably joined to it at the threshold where the whole egg shows up).
+
+### T15 - Egg score also rewards blob outlines that lie on Canny edges (weight 0.5)
+
+- **Builds on:** T13
+- **Why:** 18 round-1 failures are white / pale backgrounds: a threshold cut through a flat white bag has no image edge under it, a real egg outline does. Weighting the score by edge support should prefer real eggs over bag patches.
+- **Params changed:** `{"candidate": {"edge_weight": 0.5, "edge_tol": 2, "canny": [30, 90]}}`
+- **Dev:** IoU 0.339 (median 0.000), Dice 0.379, P 0.685, R 0.379, BF1 0.306, instance F1 0.406, empty masks 33
+- **Decision:** discarded - Failed: IoU 0.339 and 33 empty masks. Design flaw, not a bad idea: multiplying the score by (0.5 + 0.5 * edge support) lowers every score, so most real eggs fell below the 0.80 cut that was tuned for the plain score. Fixed in T15c (edge support only ranks).
+
+### T15b - Add ellipses fitted to Canny edge chains as extra egg candidates
+
+- **Builds on:** T13
+- **Why:** On a white background no threshold separates the egg at all, so the search has nothing to score. The outline is still an edge: fit ellipses to edge chains, keep those with >= 60% of the perimeter on edges.
+- **Params changed:** `{"candidate": {"edge_candidates": true, "edge_min_support": 0.6, "edge_min_pts": 40, "canny": [30, 90]}}`
+- **Dev:** IoU 0.573 (median 0.647), Dice 0.663, P 0.705, R 0.728, BF1 0.462, instance F1 0.477, empty masks 2
+- **Decision:** discarded - Failed: IoU 0.646 -> 0.573. On its targets it changed nothing (white bag 0.36 -> 0.36, fridge tray and rice unchanged). Instead textured backgrounds produced many edge-chain ellipses: ash 0.38 -> 0.15 (predicted eggs 15 -> 29), towel 0.65 -> 0.36.
+
+### T15c - Edge support only ranks candidates; the 0.80 cut stays on the plain shape score
+
+- **Builds on:** T13
+- **Why:** T15's idea (prefer blobs whose outline lies on image edges, not threshold cuts through a white bag) without its flaw (weighted scores fell below the cut).
+- **Params changed:** `{"candidate": {"edge_weight": 0.5, "edge_rank_only": true, "edge_tol": 2, "canny": [30, 90]}}`
+- **Dev:** IoU 0.652 (median 0.727), Dice 0.729, P 0.801, R 0.737, BF1 0.523, instance F1 0.608, empty masks 2
+- **Decision:** kept - IoU 0.646 -> 0.652, boundary F1 up: among candidates that already pass the shape cut, the one whose outline sits on real edges wins, instead of a threshold cut through a white background. Instance F1 slightly down (0.615 -> 0.608).
+
+### T16 - Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5)
+
+- **Builds on:** T13
+- **Why:** Round-1 false eggs on keyboard keys, foil and steel. Measured on the dev GT eggs: 99% have rectangularity <= 0.83 (an ellipse is 0.785) and texture <= 4.6, so both limits keep real eggs.
+- **Params changed:** `{"components": {"max_rectangularity": 0.9}, "candidate": {"max_texture": 5.0}}`
+- **Dev:** IoU 0.655 (median 0.727), Dice 0.733, P 0.818, R 0.720, BF1 0.527, instance F1 0.639, empty masks 2
+- **Decision:** kept - IoU 0.646 -> 0.655 and instance F1 0.615 -> 0.639: key caps, foil and other rectangular or crinkled blobs no longer pass as eggs, and the limits (from the dev GT eggs) don't touch real eggs.
+
+### T17 - All kept round-2 changes together: T13 + T14 + T15c + T16
+
+- **Builds on:** T16
+- **Why:** T14, T15c and T16 were each tested alone on top of T13. Check that they add up when combined.
+- **Params changed:** `{"candidate": {"split_merged": true, "split_peak_rel": 0.6, "split_min_core_px": 30, "edge_weight": 0.5, "edge_rank_only": true, "edge_tol": 2, "canny": [30, 90]}}`
+- **Dev:** IoU 0.660 (median 0.728), Dice 0.733, P 0.802, R 0.744, BF1 0.540, instance F1 0.647, empty masks 2
+- **Decision:** kept - The changes add up: IoU 0.660 (best), boundary F1 0.540, instance F1 0.647, all above each single change. Base for the round-2 sweeps; the final round-2 pipeline is T18.
+
+### T18 - T17 with edge weight 0.3 (from sweep T17_edge_weight)
+
+- **Builds on:** T17
+- **Why:** Sweep on T17: edge weight 0.3 gave the best dev IoU and instance F1. Texture limit stays 5.0: 3.5 scored about the same but started rejecting real eggs (one more empty mask), and 5.0 is the limit backed by the dev GT measurement.
+- **Params changed:** `{"candidate": {"edge_weight": 0.3}}`
+- **Dev:** IoU 0.669 (median 0.732), Dice 0.742, P 0.811, R 0.744, BF1 0.544, instance F1 0.658, empty masks 2
+- **Decision:** kept - Best dev IoU of both rounds (0.669, median 0.732), instance F1 0.658. Final round-2 pipeline (configs/final_round2.yaml).
+
 ## Parameter sweeps (dev)
 
 ### T10_peak_rel: `watershed.peak_rel` on top of T10
@@ -171,6 +279,30 @@ Decision rule: keep a change if dev mean IoU goes up; if IoU ties, keep it only 
 | 0.6 | 0.588 | 0.660 | 0.458 | 0.563 | 2 |
 | 0.65 | 0.589 | 0.660 | 0.458 | 0.569 | 2 |
 | 0.72 | 0.579 | 0.660 | 0.456 | 0.582 | 2 |
+
+### T13_ellipse_prior: `grabcut.ellipse_prior` on top of T13
+
+| Value | IoU mean | IoU median | Boundary F1 | Instance F1 | Empty |
+|---|---|---|---|---|---|
+| 1.05 | 0.637 | 0.725 | 0.515 | 0.598 | 2 |
+| 1.15 | 0.646 | 0.717 | 0.517 | 0.615 | 2 |
+| 1.3 | 0.636 | 0.715 | 0.499 | 0.594 | 2 |
+
+### T17_edge_weight: `candidate.edge_weight` on top of T17
+
+| Value | IoU mean | IoU median | Boundary F1 | Instance F1 | Empty |
+|---|---|---|---|---|---|
+| 0.3 | 0.669 | 0.732 | 0.544 | 0.658 | 2 |
+| 0.5 | 0.660 | 0.728 | 0.540 | 0.647 | 2 |
+| 0.8 | 0.661 | 0.728 | 0.540 | 0.650 | 2 |
+
+### T17_max_texture: `candidate.max_texture` on top of T17
+
+| Value | IoU mean | IoU median | Boundary F1 | Instance F1 | Empty |
+|---|---|---|---|---|---|
+| 3.5 | 0.666 | 0.742 | 0.545 | 0.664 | 3 |
+| 5.0 | 0.660 | 0.728 | 0.540 | 0.647 | 2 |
+| 8.0 | 0.664 | 0.727 | 0.538 | 0.629 | 2 |
 
 ### T4_s_max: `saturation.s_max` on top of T4
 

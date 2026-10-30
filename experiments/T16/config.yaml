@@ -1,0 +1,10 @@
+id: T16
+extends: T13
+round: 2
+what: "Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5)"
+why: "Round-1 false eggs on keyboard keys, foil and steel. Measured on the dev GT eggs: 99% have rectangularity <= 0.83 (an ellipse is 0.785) and texture <= 4.6, so both limits keep real eggs."
+changes:
+  components: {max_rectangularity: 0.9}
+  candidate: {max_texture: 5.0}
+decision: kept
+reason: "IoU 0.646 -> 0.655 and instance F1 0.615 -> 0.639: key caps, foil and other rectangular or crinkled blobs no longer pass as eggs, and the limits (from the dev GT eggs) don't touch real eggs."

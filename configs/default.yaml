@@ -22,7 +22,22 @@ pipeline:
     fallback_min_score: null  # if set: second, looser pass for images where nothing was found (T11)
     fallback_max_eggs: null   # cap on eggs the fallback may return (T11b)
     max_eggs: null            # cap on eggs per image for the main search (null = no cap)
-  skin: {enabled: false, cb: [77, 127], cr: [133, 173]}   # Chai & Ngan 1999 box
+    # round 2 (T12+), all off by default so round-1 trials reproduce exactly
+    split_merged: false       # T14: split non-egg-shaped blobs with watershed, score the pieces
+    split_peak_rel: 0.6
+    split_min_core_px: 30
+    edge_weight: 0.0          # T15: score *= (1 - w + w * share of outline on a Canny edge)
+    edge_rank_only: false     # T15c: edge support only ranks candidates, the min_score cut uses the plain shape score
+    edge_tol: 2               # px
+    canny: [30, 90]
+    edge_candidates: false    # T15b: add ellipses fitted to edge chains as candidates
+    edge_min_support: 0.6     # share of the ellipse perimeter on edges
+    edge_min_pts: 40
+    edge_min_pct: 40          # ellipse inside must not be darker than this percentile of the image
+    max_texture: null         # T16: mean |Laplacian| inside a blob; eggs are smooth
+  skin: {enabled: false, cb: [77, 127], cr: [133, 173],   # Chai & Ngan 1999 box
+         mode: all, min_region: 0.02, close: 7}          # border_regions (T12b): only big skin regions on the border
+  grow: {enabled: false, roi_scale: 1.4, keep_scale: 1.15, respect_gate: true}   # T13b local Otsu growth
   saturation: {enabled: false, s_max: 60}
   morphology: {enabled: false, open: 3, close: 7, fill_holes: true}
   components:
@@ -33,6 +48,8 @@ pipeline:
     max_axis_ratio: 2.2       # long/short ellipse axis; real eggs ~1.2-1.5 seen from above
     min_ellipse_iou: 0.0
     max_border_frac: 0.35     # share of the outline lying on the image border
-  grabcut: {enabled: false, iters: 5, erode: 10, bg_dilate: 25, fill_holes: true}
+    max_rectangularity: null  # T16: area / min bounding rect; ellipse = 0.785, key cap ~ 1
+  grabcut: {enabled: false, iters: 5, erode: 10, bg_dilate: 25, fill_holes: true,
+            ellipse_prior: null}    # T13: scale of the fitted ellipse marked "probably egg"
   ellipse: {enabled: false, min_fit_iou: 0.9, mode: replace}
   watershed: {enabled: false, peak_rel: 0.6, min_core_px: 30}

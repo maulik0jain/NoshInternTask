@@ -1,0 +1,139 @@
+{
+  "round1_trial": "T11",
+  "round2_trial": "T18",
+  "round2_note": "Second use of the eval split. The round-2 changes were designed after looking at round-1 failures, eval images included, so this eval number is optimistic. The clean, one-shot eval result is round 1 (results/final_eval, trial T11).",
+  "change": 0.1,
+  "splits": {
+    "dev": {
+      "round1": {
+        "iou_mean": 0.5888,
+        "iou_median": 0.6601,
+        "dice": 0.6805,
+        "precision": 0.8329,
+        "recall": 0.6392,
+        "boundary_f1": 0.4582,
+        "instance_f1": 0.5692,
+        "count_exact": 0.6706,
+        "empty": 2,
+        "n_good": 31,
+        "n_zero": 8,
+        "images": 85
+      },
+      "round2": {
+        "iou_mean": 0.6693,
+        "iou_median": 0.7317,
+        "dice": 0.7416,
+        "precision": 0.8108,
+        "recall": 0.7439,
+        "boundary_f1": 0.5437,
+        "instance_f1": 0.6583,
+        "count_exact": 0.7294,
+        "empty": 2,
+        "n_good": 39,
+        "n_zero": 7,
+        "images": 85
+      },
+      "improved": 30,
+      "worse": 4,
+      "round1_failed": {
+        "n": 47,
+        "iou_round1": 0.354,
+        "iou_round2": 0.485,
+        "improved": 20,
+        "worse": 1
+      },
+      "round1_fine": {
+        "n": 38,
+        "iou_round1": 0.88,
+        "iou_round2": 0.898,
+        "improved": 10,
+        "worse": 3
+      }
+    },
+    "eval": {
+      "round1": {
+        "iou_mean": 0.6181,
+        "iou_median": 0.8169,
+        "dice": 0.6827,
+        "precision": 0.8236,
+        "recall": 0.6834,
+        "boundary_f1": 0.4895,
+        "instance_f1": 0.7541,
+        "count_exact": 0.8,
+        "empty": 2,
+        "n_good": 13,
+        "n_zero": 4,
+        "images": 25
+      },
+      "round2": {
+        "iou_mean": 0.6134,
+        "iou_median": 0.7226,
+        "dice": 0.6799,
+        "precision": 0.7666,
+        "recall": 0.7307,
+        "boundary_f1": 0.5401,
+        "instance_f1": 0.6897,
+        "count_exact": 0.92,
+        "empty": 2,
+        "n_good": 11,
+        "n_zero": 4,
+        "images": 25
+      },
+      "improved": 3,
+      "worse": 3,
+      "round1_failed": {
+        "n": 11,
+        "iou_round1": 0.248,
+        "iou_round2": 0.265,
+        "improved": 1,
+        "worse": 0
+      },
+      "round1_fine": {
+        "n": 14,
+        "iou_round1": 0.909,
+        "iou_round2": 0.887,
+        "improved": 2,
+        "worse": 3
+      }
+    }
+  },
+  "round1_failures_by_cause": {
+    "white / pale background": {
+      "n": 18,
+      "iou_round1": 0.216,
+      "iou_round2": 0.274
+    },
+    "shaded side missed": {
+      "n": 15,
+      "iou_round1": 0.524,
+      "iou_round2": 0.659
+    },
+    "colour gate removes egg": {
+      "n": 10,
+      "iou_round1": 0.217,
+      "iou_round2": 0.459
+    },
+    "egg partly hidden": {
+      "n": 5,
+      "iou_round1": 0.358,
+      "iou_round2": 0.515
+    },
+    "bright object picked": {
+      "n": 5,
+      "iou_round1": 0.502,
+      "iou_round2": 0.51
+    },
+    "ash camouflage": {
+      "n": 4,
+      "iou_round1": 0.225,
+      "iou_round2": 0.222
+    },
+    "touching eggs": {
+      "n": 1,
+      "iou_round1": 0.228,
+      "iou_round2": 0.273
+    }
+  },
+  "fixed_round1_failures": 12,
+  "round1_failures": 58
+}

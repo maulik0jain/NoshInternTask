@@ -1,0 +1,9 @@
+id: T18
+extends: T17
+round: 2
+what: "T17 with edge weight 0.3 (from sweep T17_edge_weight)"
+why: "Sweep on T17: edge weight 0.3 gave the best dev IoU and instance F1. Texture limit stays 5.0: 3.5 scored about the same but started rejecting real eggs (one more empty mask), and 5.0 is the limit backed by the dev GT measurement."
+changes:
+  candidate: {edge_weight: 0.3}
+decision: kept
+reason: "Best dev IoU of both rounds (0.669, median 0.732), instance F1 0.658. Final round-2 pipeline (configs/final_round2.yaml)."

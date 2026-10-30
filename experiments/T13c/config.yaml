@@ -1,0 +1,9 @@
+id: T13c
+extends: T13
+round: 2
+what: "T13 + local Otsu growth (both shaded-side fixes together)"
+why: "T13 and T13b attack the same failure differently; check whether they add up."
+changes:
+  grow: {enabled: true, roi_scale: 1.4, keep_scale: 1.15}
+decision: discarded
+reason: "No gain over T13 alone (IoU 0.645 vs 0.646, boundary F1 lower). Once GrabCut has the ellipse prior, the extra pixels from local growth are mostly ones GrabCut already adds, plus some background (precision down)."

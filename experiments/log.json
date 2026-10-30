@@ -2,6 +2,7 @@
   "trials": [
     {
       "id": "T0",
+      "round": 1,
       "extends": "default",
       "what": "Otsu threshold on grayscale (baseline)",
       "why": "Eggs are usually the brightest thing in the photo; Otsu picks the bright/dark split with no tuning.",
@@ -19,6 +20,7 @@
     },
     {
       "id": "T1",
+      "round": 1,
       "extends": "T0",
       "what": "Otsu on CIE Lab L* instead of grayscale",
       "why": "L* is perceptual lightness and ignores colour, so e.g. a saturated pink bowl is not \"brighter\" than it looks.",
@@ -40,6 +42,7 @@
     },
     {
       "id": "T2",
+      "round": 1,
       "extends": "T1",
       "what": "+ gray-world white balance and CLAHE on L*",
       "why": "Warm bulbs tint white eggs cream; CLAHE lifts eggs in dim/backlit photos.",
@@ -66,6 +69,7 @@
     },
     {
       "id": "T3",
+      "round": 1,
       "extends": "T0",
       "what": "+ remove skin pixels (YCbCr box, Chai & Ngan 1999)",
       "why": "14 images have a hand; a lit palm is as bright as the egg and gets swallowed by Otsu.",
@@ -87,6 +91,7 @@
     },
     {
       "id": "T4",
+      "round": 1,
       "extends": "T3",
       "what": "+ keep only low-saturation pixels (HSV S <= 60)",
       "why": "Eggs are white/cream (near-colourless); many bright backgrounds are coloured (pink bowl, green leaves, wood, rugs).",
@@ -109,6 +114,7 @@
     },
     {
       "id": "T5",
+      "round": 1,
       "extends": "T3",
       "what": "k-means (k=3) in Lab instead of Otsu; keep the brightest, least-coloured cluster",
       "why": "Otsu splits the histogram in two; with 3 clusters, egg / bright background / dark background can separate.",
@@ -132,6 +138,7 @@
     },
     {
       "id": "T5b",
+      "round": 1,
       "extends": "T5",
       "what": "k-means candidate + low-saturation filter (S <= 40, from the T4 sweep)",
       "why": "T4 and T5 helped separately; check whether they stack.",
@@ -154,6 +161,7 @@
     },
     {
       "id": "T6",
+      "round": 1,
       "extends": "T5b",
       "what": "+ morphology (open r=3, close r=7, fill holes)",
       "why": "Raw masks are speckled (ash, rug texture) and have holes at specular highlights and dirt marks.",
@@ -178,6 +186,7 @@
     },
     {
       "id": "T7",
+      "round": 1,
       "extends": "T6",
       "what": "+ connected-component filters (area, solidity, axis ratio, border contact)",
       "why": "Precision is the problem (~0.5); most false positives are big, irregular or border-hugging bright background regions.",
@@ -199,6 +208,7 @@
     },
     {
       "id": "T7b",
+      "round": 1,
       "extends": "T6",
       "what": "Multi-threshold egg search (24 thresholds, blobs scored by ellipse fit x solidity) replaces the single Otsu/k-means threshold",
       "why": "T7 failed because one global threshold glues the egg to bright background, so the shape filter throws both away (36 empty images). Trying many thresholds gives the egg a chance to separate at some level.",
@@ -224,6 +234,7 @@
     },
     {
       "id": "T7c",
+      "round": 1,
       "extends": "T7b",
       "what": "Search on Lab L* instead of grayscale (from the T7b channel sweep)",
       "why": "T1 rejected L* with a single Otsu threshold; with shape-scored multi-threshold search the comparison can come out differently, so it was re-tested.",
@@ -245,6 +256,7 @@
     },
     {
       "id": "T8",
+      "round": 1,
       "extends": "T7c",
       "what": "+ GrabCut refinement seeded from the mask (eroded = sure egg, >70 px outside = sure background)",
       "why": "The search under-segments (precision ~0.88, recall ~0.48) - it often keeps only the bright cap of the egg. GrabCut's colour models can grow the mask out to the real egg edge.",
@@ -269,6 +281,7 @@
     },
     {
       "id": "T9",
+      "round": 1,
       "extends": "T8",
       "what": "+ ellipse regularisation (blobs with ellipse IoU >= 0.9 are replaced by their fitted ellipse)",
       "why": "Eggs are near-elliptical from most viewpoints; snapping clean blobs to the ellipse should fix dents from highlights/shadows on the outline. Irregular blobs (eggs behind fingers/leaves) are left alone because the GT only covers the visible part.",
@@ -292,6 +305,7 @@
     },
     {
       "id": "T10",
+      "round": 1,
       "extends": "T8",
       "what": "+ distance-transform watershed to split touching eggs into separate instances",
       "why": "5 images have touching eggs; a merged blob counts as zero correct instances. Binary IoU barely changes; instance F1 should.",
@@ -315,6 +329,7 @@
     },
     {
       "id": "T11",
+      "round": 1,
       "extends": "T10",
       "what": "Fallback pass with a looser shape score (0.65) for images where the search found nothing",
       "why": "11 dev images still get an empty mask (IoU 0). The min_score sweep showed 0.6 leaves only 2 empty but hurts the other images, so the looser score is applied only where the strict pass found nothing.",
@@ -336,6 +351,7 @@
     },
     {
       "id": "T11b",
+      "round": 1,
       "extends": "T11",
       "what": "Fallback pass returns at most 1 egg",
       "why": "T11 removed 9 of 11 empty masks but its looser score also picked wrong blobs (precision and instance F1 down). An image that needs the fallback is a hard image; taking only its single best egg should keep the gain without the extra false eggs.",
@@ -353,6 +369,307 @@
       "recall": 0.6182,
       "bf1": 0.4562,
       "inst_f1": 0.6033,
+      "empty": 2
+    },
+    {
+      "id": "T12",
+      "round": 2,
+      "extends": "T11",
+      "what": "skin filter off",
+      "why": "Round-1 analysis: in 12 images the skin box removes >= 40% of the egg (cream eggs, warm light, backlit eggs); those images average IoU 0.29. The skin filter was accepted in T3, when the candidate was one Otsu threshold that grabbed whole hands. The egg-shape search should reject hands on its own.",
+      "changes": {
+        "skin": {
+          "enabled": false
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU 0.589 -> 0.609. The shape search already rejects hands (not egg-shaped), so the skin box mostly removed warm-lit egg pixels: #100 0.22 -> 0.90, #140 0.30 -> 0.91 (same trend as the round-1 ablation).",
+      "iou": 0.6088,
+      "iou_med": 0.6669,
+      "dice": 0.6957,
+      "precision": 0.8352,
+      "recall": 0.657,
+      "bf1": 0.4767,
+      "inst_f1": 0.5725,
+      "empty": 2
+    },
+    {
+      "id": "T12b",
+      "round": 2,
+      "extends": "T11",
+      "what": "skin filter only removes large skin regions that touch the image border",
+      "why": "Keep what the skin filter is for (hands come into the photo from the edge) without deleting egg-sized warm/cream regions in the middle of the image.",
+      "changes": {
+        "skin": {
+          "mode": "border_regions",
+          "min_region": 0.02,
+          "close": 7
+        }
+      },
+      "decision": "discarded",
+      "reason": "Better than T11 but well below T12. On warm marble floors the floor itself is in the skin box and forms one big region touching the border, which takes the egg's warm side with it (#100: 0.22 vs 0.90 with T12, #140: 0.30 vs 0.91). Only 2 images are > 0.05 better than T12.",
+      "iou": 0.5917,
+      "iou_med": 0.6601,
+      "dice": 0.6827,
+      "precision": 0.8345,
+      "recall": 0.6423,
+      "bf1": 0.4615,
+      "inst_f1": 0.5714,
+      "empty": 2
+    },
+    {
+      "id": "T13",
+      "round": 2,
+      "extends": "T12",
+      "what": "GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg'",
+      "why": "15 round-1 failures are 'shaded side missed': the search keeps the lit cap and GrabCut only partly grows it. Marking the enlarged ellipse as probable egg puts the shaded side into the egg colour model from the start.",
+      "changes": {
+        "grabcut": {
+          "ellipse_prior": 1.15
+        }
+      },
+      "decision": "kept",
+      "reason": "Recall 0.657 -> 0.721 and boundary F1 up: the shaded side now gets into GrabCut's egg colour model. Precision drops a little (the ellipse is slightly larger than some eggs). Beats the T13b alternative.",
+      "iou": 0.646,
+      "iou_med": 0.7168,
+      "dice": 0.726,
+      "precision": 0.8075,
+      "recall": 0.7208,
+      "bf1": 0.5171,
+      "inst_f1": 0.6154,
+      "empty": 2
+    },
+    {
+      "id": "T13b",
+      "round": 2,
+      "extends": "T12",
+      "what": "Local Otsu growth around each found egg before GrabCut",
+      "why": "Same failure as T13, different fix: the threshold that isolates the egg globally is too high for its shaded side. Re-threshold locally (Otsu inside the egg's ellipse x1.4) and add connected pixels inside the ellipse x1.15.",
+      "changes": {
+        "grow": {
+          "enabled": true,
+          "roi_scale": 1.4,
+          "keep_scale": 1.15
+        }
+      },
+      "decision": "discarded",
+      "reason": "Helps (T12 0.609 -> 0.633) but less than T13 (0.646), with lower boundary F1 and instance F1: a local Otsu threshold still cuts the shaded side wherever it is darker than the surface beside it, while GrabCut's colour model can include it.",
+      "iou": 0.6329,
+      "iou_med": 0.7266,
+      "dice": 0.7165,
+      "precision": 0.8229,
+      "recall": 0.6912,
+      "bf1": 0.4931,
+      "inst_f1": 0.5878,
+      "empty": 2
+    },
+    {
+      "id": "T13c",
+      "round": 2,
+      "extends": "T13",
+      "what": "T13 + local Otsu growth (both shaded-side fixes together)",
+      "why": "T13 and T13b attack the same failure differently; check whether they add up.",
+      "changes": {
+        "grow": {
+          "enabled": true,
+          "roi_scale": 1.4,
+          "keep_scale": 1.15
+        }
+      },
+      "decision": "discarded",
+      "reason": "No gain over T13 alone (IoU 0.645 vs 0.646, boundary F1 lower). Once GrabCut has the ellipse prior, the extra pixels from local growth are mostly ones GrabCut already adds, plus some background (precision down).",
+      "iou": 0.6446,
+      "iou_med": 0.7158,
+      "dice": 0.7273,
+      "precision": 0.7878,
+      "recall": 0.7379,
+      "bf1": 0.5016,
+      "inst_f1": 0.626,
+      "empty": 2
+    },
+    {
+      "id": "T14",
+      "round": 2,
+      "extends": "T13",
+      "what": "Split non-egg-shaped blobs with watershed inside the search and score each piece",
+      "why": "Touching eggs merge into one blob that fails the egg-shape score and is thrown away before the watershed stage ever sees it (round-1 #144: 2 of 3 eggs missed).",
+      "changes": {
+        "candidate": {
+          "split_merged": true,
+          "split_peak_rel": 0.6,
+          "split_min_core_px": 30
+        }
+      },
+      "decision": "kept",
+      "reason": "Small IoU gain (0.646 -> 0.650) and recall up. Its target #144 is unchanged (0.27); the gain comes from other touching eggs, e.g. #136 now has 2 of 3 eggs matched instead of 1. Also #111 0.35 -> 0.98 (single egg on a pale surface, probably joined to it at the threshold where the whole egg shows up).",
+      "iou": 0.6503,
+      "iou_med": 0.7168,
+      "dice": 0.7319,
+      "precision": 0.8036,
+      "recall": 0.7402,
+      "bf1": 0.5244,
+      "inst_f1": 0.6166,
+      "empty": 2
+    },
+    {
+      "id": "T15",
+      "round": 2,
+      "extends": "T13",
+      "what": "Egg score also rewards blob outlines that lie on Canny edges (weight 0.5)",
+      "why": "18 round-1 failures are white / pale backgrounds: a threshold cut through a flat white bag has no image edge under it, a real egg outline does. Weighting the score by edge support should prefer real eggs over bag patches.",
+      "changes": {
+        "candidate": {
+          "edge_weight": 0.5,
+          "edge_tol": 2,
+          "canny": [
+            30,
+            90
+          ]
+        }
+      },
+      "decision": "discarded",
+      "reason": "Failed: IoU 0.339 and 33 empty masks. Design flaw, not a bad idea: multiplying the score by (0.5 + 0.5 * edge support) lowers every score, so most real eggs fell below the 0.80 cut that was tuned for the plain score. Fixed in T15c (edge support only ranks).",
+      "iou": 0.3389,
+      "iou_med": 0.0,
+      "dice": 0.3789,
+      "precision": 0.6849,
+      "recall": 0.3786,
+      "bf1": 0.3063,
+      "inst_f1": 0.4063,
+      "empty": 33
+    },
+    {
+      "id": "T15b",
+      "round": 2,
+      "extends": "T13",
+      "what": "Add ellipses fitted to Canny edge chains as extra egg candidates",
+      "why": "On a white background no threshold separates the egg at all, so the search has nothing to score. The outline is still an edge: fit ellipses to edge chains, keep those with >= 60% of the perimeter on edges.",
+      "changes": {
+        "candidate": {
+          "edge_candidates": true,
+          "edge_min_support": 0.6,
+          "edge_min_pts": 40,
+          "canny": [
+            30,
+            90
+          ]
+        }
+      },
+      "decision": "discarded",
+      "reason": "Failed: IoU 0.646 -> 0.573. On its targets it changed nothing (white bag 0.36 -> 0.36, fridge tray and rice unchanged). Instead textured backgrounds produced many edge-chain ellipses: ash 0.38 -> 0.15 (predicted eggs 15 -> 29), towel 0.65 -> 0.36.",
+      "iou": 0.5731,
+      "iou_med": 0.6472,
+      "dice": 0.6633,
+      "precision": 0.7052,
+      "recall": 0.728,
+      "bf1": 0.4618,
+      "inst_f1": 0.4769,
+      "empty": 2
+    },
+    {
+      "id": "T15c",
+      "round": 2,
+      "extends": "T13",
+      "what": "Edge support only ranks candidates; the 0.80 cut stays on the plain shape score",
+      "why": "T15's idea (prefer blobs whose outline lies on image edges, not threshold cuts through a white bag) without its flaw (weighted scores fell below the cut).",
+      "changes": {
+        "candidate": {
+          "edge_weight": 0.5,
+          "edge_rank_only": true,
+          "edge_tol": 2,
+          "canny": [
+            30,
+            90
+          ]
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU 0.646 -> 0.652, boundary F1 up: among candidates that already pass the shape cut, the one whose outline sits on real edges wins, instead of a threshold cut through a white background. Instance F1 slightly down (0.615 -> 0.608).",
+      "iou": 0.6522,
+      "iou_med": 0.7265,
+      "dice": 0.7288,
+      "precision": 0.8007,
+      "recall": 0.7369,
+      "bf1": 0.5234,
+      "inst_f1": 0.608,
+      "empty": 2
+    },
+    {
+      "id": "T16",
+      "round": 2,
+      "extends": "T13",
+      "what": "Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5)",
+      "why": "Round-1 false eggs on keyboard keys, foil and steel. Measured on the dev GT eggs: 99% have rectangularity <= 0.83 (an ellipse is 0.785) and texture <= 4.6, so both limits keep real eggs.",
+      "changes": {
+        "components": {
+          "max_rectangularity": 0.9
+        },
+        "candidate": {
+          "max_texture": 5.0
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU 0.646 -> 0.655 and instance F1 0.615 -> 0.639: key caps, foil and other rectangular or crinkled blobs no longer pass as eggs, and the limits (from the dev GT eggs) don't touch real eggs.",
+      "iou": 0.6555,
+      "iou_med": 0.7265,
+      "dice": 0.7326,
+      "precision": 0.8182,
+      "recall": 0.7199,
+      "bf1": 0.5269,
+      "inst_f1": 0.6387,
+      "empty": 2
+    },
+    {
+      "id": "T17",
+      "round": 2,
+      "extends": "T16",
+      "what": "All kept round-2 changes together: T13 + T14 + T15c + T16",
+      "why": "T14, T15c and T16 were each tested alone on top of T13. Check that they add up when combined.",
+      "changes": {
+        "candidate": {
+          "split_merged": true,
+          "split_peak_rel": 0.6,
+          "split_min_core_px": 30,
+          "edge_weight": 0.5,
+          "edge_rank_only": true,
+          "edge_tol": 2,
+          "canny": [
+            30,
+            90
+          ]
+        }
+      },
+      "decision": "kept",
+      "reason": "The changes add up: IoU 0.660 (best), boundary F1 0.540, instance F1 0.647, all above each single change. Base for the round-2 sweeps; the final round-2 pipeline is T18.",
+      "iou": 0.6602,
+      "iou_med": 0.7275,
+      "dice": 0.7334,
+      "precision": 0.8016,
+      "recall": 0.7437,
+      "bf1": 0.54,
+      "inst_f1": 0.6473,
+      "empty": 2
+    },
+    {
+      "id": "T18",
+      "round": 2,
+      "extends": "T17",
+      "what": "T17 with edge weight 0.3 (from sweep T17_edge_weight)",
+      "why": "Sweep on T17: edge weight 0.3 gave the best dev IoU and instance F1. Texture limit stays 5.0: 3.5 scored about the same but started rejecting real eggs (one more empty mask), and 5.0 is the limit backed by the dev GT measurement.",
+      "changes": {
+        "candidate": {
+          "edge_weight": 0.3
+        }
+      },
+      "decision": "kept",
+      "reason": "Best dev IoU of both rounds (0.669, median 0.732), instance F1 0.658. Final round-2 pipeline (configs/final_round2.yaml).",
+      "iou": 0.6693,
+      "iou_med": 0.7317,
+      "dice": 0.7416,
+      "precision": 0.8108,
+      "recall": 0.7439,
+      "bf1": 0.5437,
+      "inst_f1": 0.6583,
       "empty": 2
     }
   ],
@@ -436,6 +753,102 @@
         }
       ],
       "name": "T11_fallback_min_score"
+    },
+    {
+      "base": "T13",
+      "param": "grabcut.ellipse_prior",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 1.05,
+          "iou_mean": 0.6372,
+          "iou_median": 0.7248,
+          "boundary_f1": 0.5155,
+          "instance_f1": 0.5984,
+          "empty": 2
+        },
+        {
+          "value": 1.15,
+          "iou_mean": 0.646,
+          "iou_median": 0.7168,
+          "boundary_f1": 0.5171,
+          "instance_f1": 0.6154,
+          "empty": 2
+        },
+        {
+          "value": 1.3,
+          "iou_mean": 0.6357,
+          "iou_median": 0.7151,
+          "boundary_f1": 0.4993,
+          "instance_f1": 0.5938,
+          "empty": 2
+        }
+      ],
+      "name": "T13_ellipse_prior"
+    },
+    {
+      "base": "T17",
+      "param": "candidate.edge_weight",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 0.3,
+          "iou_mean": 0.6693,
+          "iou_median": 0.7317,
+          "boundary_f1": 0.5437,
+          "instance_f1": 0.6583,
+          "empty": 2
+        },
+        {
+          "value": 0.5,
+          "iou_mean": 0.6602,
+          "iou_median": 0.7275,
+          "boundary_f1": 0.54,
+          "instance_f1": 0.6473,
+          "empty": 2
+        },
+        {
+          "value": 0.8,
+          "iou_mean": 0.6606,
+          "iou_median": 0.7275,
+          "boundary_f1": 0.5396,
+          "instance_f1": 0.65,
+          "empty": 2
+        }
+      ],
+      "name": "T17_edge_weight"
+    },
+    {
+      "base": "T17",
+      "param": "candidate.max_texture",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 3.5,
+          "iou_mean": 0.6657,
+          "iou_median": 0.7424,
+          "boundary_f1": 0.5453,
+          "instance_f1": 0.6638,
+          "empty": 3
+        },
+        {
+          "value": 5.0,
+          "iou_mean": 0.6602,
+          "iou_median": 0.7275,
+          "boundary_f1": 0.54,
+          "instance_f1": 0.6473,
+          "empty": 2
+        },
+        {
+          "value": 8.0,
+          "iou_mean": 0.6636,
+          "iou_median": 0.7265,
+          "boundary_f1": 0.538,
+          "instance_f1": 0.6295,
+          "empty": 2
+        }
+      ],
+      "name": "T17_max_texture"
     },
     {
       "base": "T4",

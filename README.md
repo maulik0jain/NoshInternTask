@@ -10,6 +10,7 @@ Egg segmentation: pretrained-model ground truth → classical image-processing s
 | Dev / eval split (4:1, grouped by scene) | done, frozen |
 | Task 2 — classical segmentation + experiment log | done ([experiments/LOG.md](experiments/LOG.md)) |
 | Task 3 — evaluation & analysis | done ([results/](results/)) |
+| Round 2 — the improvements from the Task 3 analysis (T12–T18) | done; round-1 results kept as they were ([results/round2/](results/round2/)) |
 | Task 4 — video tracking | next |
 
 ## Setup
@@ -54,8 +55,19 @@ python scripts/build_report.py             # report/report_template.html -> repo
 pytest tests/                              # metric sanity checks
 ```
 
-`final_eval.py` refuses to run a second time once eval results exist.
+`final_eval.py` refuses to run a second time once eval results exist in its output folder.
 Failure causes in `results/analysis/failure_labels.csv` are labelled by hand from the failure sheets.
+
+### Round 2 — improvements after the analysis
+
+Trials T12–T18 (dev only, same rules as Task 2). The round-1 results above are not touched;
+round 2 gets its own, second eval run into a separate folder.
+
+```bash
+python scripts/final_eval.py --config configs/final_round2.yaml --out results/final_eval_round2
+python scripts/compare_rounds.py           # round 1 vs round 2 tables + plots -> results/round2/
+python scripts/loss_check.py               # images that got worse, one round-2 change undone at a time
+```
 
 ## Layout
 
@@ -70,9 +82,11 @@ ground_truth/annotations.json  boxes, scores, areas, settings
 ground_truth_overrides.json  manual fixes from reviewing the overlays
 data/processed/attributes_manual.csv  hand labels per image (hand, background, lighting...) for Task 3
 src/eggseg/                  library: classical pipeline, metrics, config loading, plots
-configs/                     default pipeline (all stages off) + final.yaml (chosen trial)
-experiments/                 one folder per trial (T0..), sweeps/, LOG.md
-results/final_eval/          the single eval run: summary.json, per-image CSVs, predicted masks
+configs/                     default pipeline (all stages off) + final.yaml (round 1) + final_round2.yaml
+experiments/                 one folder per trial (T0..T18), sweeps/, LOG.md
+results/final_eval/          round-1 eval run (the clean one): summary.json, per-image CSVs, predicted masks
+results/final_eval_round2/   round-2 eval run (second look at eval)
+results/round2/              round 1 vs round 2 comparison, loss check
 results/analysis/            Task 3 tables, plots, failure sheets and labels
 results/ablation/            dev-only ablation of the final pipeline
 scripts/                     entry points

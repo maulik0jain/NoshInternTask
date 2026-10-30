@@ -1,6 +1,6 @@
 """Task 3 analysis of the final run (reads results/final_eval, never re-runs the method).
 
-    python scripts/analyze.py
+    python scripts/analyze.py [--final results/final_eval] [--out results/analysis]
 
 Writes results/analysis/:
   metrics_table.json        dev vs eval
@@ -12,6 +12,7 @@ Writes results/analysis/:
   failures/sheet_*.jpg      every image with IoU < FAIL_IOU, for labelling failure causes
   taxonomy.json             counts from failure_labels.csv (hand-made, one primary cause per failure)
 """
+import argparse
 import collections
 import csv
 import json
@@ -217,6 +218,12 @@ def failure_sheets(fails):
 
 
 def main():
+    global FINAL, OUT
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--final", default="results/final_eval")
+    ap.add_argument("--out", default="results/analysis")
+    a = ap.parse_args()
+    FINAL, OUT = ROOT / a.final, ROOT / a.out
     OUT.mkdir(parents=True, exist_ok=True)
     style()
     summary = json.loads((FINAL / "summary.json").read_text())

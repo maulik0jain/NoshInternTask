@@ -1,0 +1,9 @@
+id: T17
+extends: T16
+round: 2
+what: "All kept round-2 changes together: T13 + T14 + T15c + T16"
+why: "T14, T15c and T16 were each tested alone on top of T13. Check that they add up when combined."
+changes:
+  candidate: {split_merged: true, split_peak_rel: 0.6, split_min_core_px: 30, edge_weight: 0.5, edge_rank_only: true, edge_tol: 2, canny: [30, 90]}
+decision: kept
+reason: "The changes add up: IoU 0.660 (best), boundary F1 0.540, instance F1 0.647, all above each single change. Base for the round-2 sweeps; the final round-2 pipeline is T18."
