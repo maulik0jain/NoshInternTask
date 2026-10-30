@@ -1,0 +1,2582 @@
+{
+  "detector": "IDEA-Research/grounding-dino-base",
+  "prompt": "egg.",
+  "box_thr": 0.3,
+  "text_thr": 0.25,
+  "segmenter": "sam2.1_hiera_base_plus.pt",
+  "sam_cfg": "configs/sam2.1/sam2.1_hiera_b+.yaml",
+  "overrides": {
+    "train/egg/not_damaged_22_jpg.rf.427da4fa2858bf0484b607774c6077c5.jpg": {
+      "drop_boxes": [
+        [
+          318.8,
+          235.2,
+          409.8,
+          345.5
+        ]
+      ],
+      "reason": "reflection of the egg in the glossy lid, not an egg (det 0.36)"
+    },
+    "train/egg/not_damaged_39_jpg.rf.81c4c633444db832268298ddae1010d6.jpg": {
+      "drop_boxes": [
+        [
+          308.7,
+          174.7,
+          411.0,
+          322.2
+        ]
+      ],
+      "reason": "reflection of the egg in the glossy lid, not an egg (det 0.47)"
+    }
+  },
+  "images": [
+    {
+      "image": "test/egg/not_damaged_101_jpg.rf.479d12a2b41a5ec6d718dcdabd14b0c9.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            91.5,
+            142.4,
+            511.7,
+            444.5
+          ],
+          "det_score": 0.857,
+          "sam_score": 0.996,
+          "area_px": 92066
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_125_jpg.rf.b19353b1f84dcbef1ec088b850927bb3.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            224.1,
+            218.4,
+            378.8,
+            356.3
+          ],
+          "det_score": 0.419,
+          "sam_score": 0.98,
+          "area_px": 14270
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_14_jpg.rf.dc96559078b03433d2b65e5055904af1.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            126.6,
+            208.4,
+            373.4,
+            362.4
+          ],
+          "det_score": 0.844,
+          "sam_score": 0.988,
+          "area_px": 28889
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_152_jpg.rf.a57edb18d395ce87e23f7abccbd1ad69.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            168.7,
+            219.3,
+            368.1,
+            366.2
+          ],
+          "det_score": 0.862,
+          "sam_score": 0.988,
+          "area_px": 22291
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_153_jpg.rf.ea842e70f08e63e69bbcc74f1bc143a8.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            189.4,
+            234.2,
+            441.5,
+            432.6
+          ],
+          "det_score": 0.723,
+          "sam_score": 0.988,
+          "area_px": 35959
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_161_jpg.rf.fd216aa5e11e147fc1527478cceae94e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            134.6,
+            236.8,
+            477.2,
+            435.0
+          ],
+          "det_score": 0.866,
+          "sam_score": 0.992,
+          "area_px": 51422
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_1_jpg.rf.d74c98a14f068b48c1f58fd573361f1f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            148.6,
+            183.8,
+            484.7,
+            421.3
+          ],
+          "det_score": 0.883,
+          "sam_score": 0.992,
+          "area_px": 56838
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_30_jpg.rf.48e9261777355fe67139ac1c5eae596b.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            214.6,
+            260.8,
+            459.7,
+            464.4
+          ],
+          "det_score": 0.793,
+          "sam_score": 0.992,
+          "area_px": 37082
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_43_jpg.rf.66c31342150e751c30214786e72c8683.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            294.6,
+            169.1,
+            574.8,
+            452.1
+          ],
+          "det_score": 0.845,
+          "sam_score": 0.996,
+          "area_px": 60784
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_4_jpg.rf.36c78b63ea4710d9642651ac3292fd58.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            198.1,
+            13.6,
+            615.3,
+            327.0
+          ],
+          "det_score": 0.839,
+          "sam_score": 0.992,
+          "area_px": 97161
+        }
+      ]
+    },
+    {
+      "image": "test/egg/not_damaged_78_jpg.rf.d3a6e8624d192abc58ff7df9d5781bb5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            226.6,
+            211.2,
+            532.4,
+            462.6
+          ],
+          "det_score": 0.757,
+          "sam_score": 0.988,
+          "area_px": 58357
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_100_jpg.rf.5d780a6024004fa2f68741fa56ddf4c9.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            178.1,
+            145.4,
+            570.1,
+            539.3
+          ],
+          "det_score": 0.772,
+          "sam_score": 0.996,
+          "area_px": 117653
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_103_jpg.rf.c0bd961caec5acf3a6582c9cb2551634.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            195.7,
+            53.9,
+            447.0,
+            227.9
+          ],
+          "det_score": 0.655,
+          "sam_score": 0.992,
+          "area_px": 32750
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            271.9,
+            236.2,
+            476.4,
+            407.8
+          ],
+          "det_score": 0.655,
+          "sam_score": 0.992,
+          "area_px": 25833
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            278.4,
+            434.7,
+            461.9,
+            624.3
+          ],
+          "det_score": 0.668,
+          "sam_score": 0.992,
+          "area_px": 26075
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_104_jpg.rf.3bf8cb51d5ad8934390c8e2c3b79b32f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            199.8,
+            192.1,
+            409.0,
+            404.1
+          ],
+          "det_score": 0.82,
+          "sam_score": 0.984,
+          "area_px": 33571
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_105_jpg.rf.6b94b57d4e4cb521abbec55bb95c2a76.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            27.9,
+            371.1,
+            247.4,
+            499.0
+          ],
+          "det_score": 0.553,
+          "sam_score": 0.992,
+          "area_px": 20946
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            319.1,
+            129.8,
+            480.6,
+            284.7
+          ],
+          "det_score": 0.596,
+          "sam_score": 0.992,
+          "area_px": 18888
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            412.5,
+            278.3,
+            597.3,
+            419.7
+          ],
+          "det_score": 0.594,
+          "sam_score": 0.992,
+          "area_px": 19420
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_106_jpg.rf.4ab043b322cc9e55bdf788a4d69ae74b.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            204.7,
+            253.7,
+            454.9,
+            507.7
+          ],
+          "det_score": 0.843,
+          "sam_score": 0.988,
+          "area_px": 47039
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_108_jpg.rf.de0bd2447ade8d891625ac0dd055667a.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            259.5,
+            155.4,
+            404.9,
+            285.1
+          ],
+          "det_score": 0.796,
+          "sam_score": 0.988,
+          "area_px": 14316
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_10_jpg.rf.2347ffa54eea250ab240def10a3eb78f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            134.3,
+            269.5,
+            412.0,
+            470.1
+          ],
+          "det_score": 0.886,
+          "sam_score": 0.977,
+          "area_px": 28155
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_110_jpg.rf.2de10ae949146248df94e52f9065bdd8.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            70.2,
+            132.6,
+            368.4,
+            387.0
+          ],
+          "det_score": 0.849,
+          "sam_score": 0.992,
+          "area_px": 56767
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_111_jpg.rf.d56bdd5f452dfc3935b4d6962ed33309.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            193.7,
+            211.8,
+            469.3,
+            468.1
+          ],
+          "det_score": 0.83,
+          "sam_score": 0.988,
+          "area_px": 53388
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_112_jpg.rf.2ecb081cd9d32a7ff8c9f4db24e911b9.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            176.8,
+            186.1,
+            465.3,
+            378.5
+          ],
+          "det_score": 0.85,
+          "sam_score": 0.988,
+          "area_px": 41181
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_113_jpg.rf.75e3389c0809c7c0f42fbfd25219e65e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            19.5,
+            367.2,
+            268.6,
+            537.7
+          ],
+          "det_score": 0.665,
+          "sam_score": 0.984,
+          "area_px": 31870
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            301.7,
+            241.1,
+            462.4,
+            389.7
+          ],
+          "det_score": 0.727,
+          "sam_score": 0.984,
+          "area_px": 18036
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_114_jpg.rf.7ccf87a5610bafd963468463b2e2907c.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            26.3,
+            312.5,
+            278.4,
+            462.4
+          ],
+          "det_score": 0.68,
+          "sam_score": 0.988,
+          "area_px": 28646
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            343.9,
+            171.7,
+            540.4,
+            339.1
+          ],
+          "det_score": 0.723,
+          "sam_score": 0.988,
+          "area_px": 24528
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_116_jpg.rf.43fecd96347e2129115fceed65986cc9.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            398.3,
+            323.2,
+            552.8,
+            493.1
+          ],
+          "det_score": 0.655,
+          "sam_score": 0.98,
+          "area_px": 19547
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_117_jpg.rf.d25ded9e7408f9b89b3cfb3de581f6a6.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            249.1,
+            110.3,
+            520.6,
+            286.0
+          ],
+          "det_score": 0.489,
+          "sam_score": 0.961,
+          "area_px": 28258
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            302.7,
+            295.8,
+            478.5,
+            508.9
+          ],
+          "det_score": 0.377,
+          "sam_score": 0.973,
+          "area_px": 24272
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_118_jpg.rf.3e17ba84bcb3b57ebbf743b145c5ae27.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            211.9,
+            239.4,
+            480.1,
+            495.2
+          ],
+          "det_score": 0.867,
+          "sam_score": 0.98,
+          "area_px": 50997
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_121_jpg.rf.0506fe180f5fed88ae65348130fb5192.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            29.6,
+            203.3,
+            189.3,
+            345.8
+          ],
+          "det_score": 0.643,
+          "sam_score": 0.984,
+          "area_px": 17071
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            267.3,
+            340.3,
+            436.2,
+            462.2
+          ],
+          "det_score": 0.655,
+          "sam_score": 0.992,
+          "area_px": 15250
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            473.6,
+            156.2,
+            628.6,
+            296.8
+          ],
+          "det_score": 0.657,
+          "sam_score": 0.992,
+          "area_px": 16522
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_123_jpg.rf.11d40a86277d3ab3fce1c5c6cbf14db0.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            208.0,
+            138.7,
+            378.4,
+            305.0
+          ],
+          "det_score": 0.753,
+          "sam_score": 0.977,
+          "area_px": 19874
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_124_jpg.rf.931f62b8d40a093039633b898e0e9114.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            307.7,
+            222.4,
+            495.2,
+            361.9
+          ],
+          "det_score": 0.451,
+          "sam_score": 0.949,
+          "area_px": 19036
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_127_jpg.rf.3a541bab7c9e2c2e43c2fdbf391617b5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            215.7,
+            243.9,
+            373.9,
+            392.8
+          ],
+          "det_score": 0.856,
+          "sam_score": 0.988,
+          "area_px": 17776
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_128_jpg.rf.95a7ef96dcc9e14fa7137708df6f2e60.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            24.3,
+            239.7,
+            299.7,
+            384.4
+          ],
+          "det_score": 0.691,
+          "sam_score": 0.984,
+          "area_px": 30815
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            394.3,
+            120.3,
+            628.1,
+            282.7
+          ],
+          "det_score": 0.709,
+          "sam_score": 0.988,
+          "area_px": 28465
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_129_jpg.rf.3cee5e92daed138fcdc13d9aa62c2785.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            2.5,
+            251.6,
+            275.0,
+            401.9
+          ],
+          "det_score": 0.657,
+          "sam_score": 0.988,
+          "area_px": 31423
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            353.3,
+            151.0,
+            554.0,
+            305.2
+          ],
+          "det_score": 0.701,
+          "sam_score": 0.988,
+          "area_px": 23243
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_12_jpg.rf.339e366cebec5c32e751e8500aa12f3e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            217.7,
+            226.5,
+            421.8,
+            450.5
+          ],
+          "det_score": 0.88,
+          "sam_score": 0.961,
+          "area_px": 22998
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_131_jpg.rf.4ac62f5b18b131bac463f705d0969147.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            158.7,
+            107.2,
+            539.7,
+            381.8
+          ],
+          "det_score": 0.832,
+          "sam_score": 0.988,
+          "area_px": 79281
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_132_jpg.rf.5deff743ad11d33750171617e116bd7a.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            142.4,
+            231.2,
+            315.6,
+            385.3
+          ],
+          "det_score": 0.629,
+          "sam_score": 0.988,
+          "area_px": 20059
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            366.3,
+            363.6,
+            522.7,
+            474.1
+          ],
+          "det_score": 0.644,
+          "sam_score": 0.988,
+          "area_px": 12934
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            478.1,
+            199.5,
+            604.5,
+            315.5
+          ],
+          "det_score": 0.651,
+          "sam_score": 0.988,
+          "area_px": 11091
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_134_jpg.rf.fb4e9c442527db9e71d4a95584773fa2.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            1.9,
+            343.7,
+            296.8,
+            507.3
+          ],
+          "det_score": 0.602,
+          "sam_score": 0.992,
+          "area_px": 36633
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            351.1,
+            90.4,
+            527.1,
+            259.1
+          ],
+          "det_score": 0.615,
+          "sam_score": 0.992,
+          "area_px": 22255
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            429.6,
+            265.1,
+            607.3,
+            401.9
+          ],
+          "det_score": 0.613,
+          "sam_score": 0.992,
+          "area_px": 18242
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_138_jpg.rf.4db6e0e16ddec73ff527d4efbb119f7a.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            197.4,
+            228.9,
+            495.9,
+            460.3
+          ],
+          "det_score": 0.865,
+          "sam_score": 0.988,
+          "area_px": 50992
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_139_jpg.rf.9f18c65b30035092401a5281a03b7124.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            116.4,
+            59.3,
+            351.6,
+            287.6
+          ],
+          "det_score": 0.835,
+          "sam_score": 0.992,
+          "area_px": 40731
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_13_jpg.rf.60964651b01aed5680a994ecbd7012ea.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            267.5,
+            158.9,
+            467.8,
+            282.2
+          ],
+          "det_score": 0.853,
+          "sam_score": 0.969,
+          "area_px": 15277
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_141_jpg.rf.67be7a06282cf025b53162b5a9df15ff.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            84.9,
+            213.1,
+            530.2,
+            472.4
+          ],
+          "det_score": 0.831,
+          "sam_score": 0.988,
+          "area_px": 87784
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_142_jpg.rf.5b29be6bd5a6cfc192f51a5b580c1a07.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            92.6,
+            264.4,
+            309.7,
+            431.0
+          ],
+          "det_score": 0.534,
+          "sam_score": 0.992,
+          "area_px": 27114
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            158.2,
+            85.2,
+            365.6,
+            282.7
+          ],
+          "det_score": 0.537,
+          "sam_score": 0.992,
+          "area_px": 27817
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            280.3,
+            160.1,
+            537.4,
+            357.4
+          ],
+          "det_score": 0.552,
+          "sam_score": 0.992,
+          "area_px": 37466
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_144_jpg.rf.a9435fb1769a2350dbdd400bcc46a4eb.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            31.5,
+            111.4,
+            351.0,
+            395.7
+          ],
+          "det_score": 0.56,
+          "sam_score": 0.992,
+          "area_px": 70290
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            142.8,
+            0.3,
+            403.4,
+            180.6
+          ],
+          "det_score": 0.557,
+          "sam_score": 0.984,
+          "area_px": 26804
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            337.4,
+            95.5,
+            633.7,
+            315.1
+          ],
+          "det_score": 0.57,
+          "sam_score": 0.992,
+          "area_px": 49930
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_146_jpg.rf.a7df655e36c3a2faab1c3f248081504d.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            157.1,
+            176.4,
+            463.2,
+            494.5
+          ],
+          "det_score": 0.846,
+          "sam_score": 0.992,
+          "area_px": 75010
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_148_jpg.rf.8a3e1c0e1dae236abe0e9a75a4882bda.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            65.7,
+            303.9,
+            314.3,
+            493.4
+          ],
+          "det_score": 0.583,
+          "sam_score": 0.992,
+          "area_px": 35812
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            117.8,
+            85.1,
+            362.1,
+            312.4
+          ],
+          "det_score": 0.59,
+          "sam_score": 0.996,
+          "area_px": 42088
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            291.4,
+            210.3,
+            561.6,
+            407.6
+          ],
+          "det_score": 0.606,
+          "sam_score": 0.992,
+          "area_px": 38839
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_151_jpg.rf.34a8c4ae80d0863cd228120235134ae2.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            157.1,
+            114.9,
+            403.1,
+            353.2
+          ],
+          "det_score": 0.862,
+          "sam_score": 0.992,
+          "area_px": 44070
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_154_jpg.rf.1ad087e824bbaae4f2c8218624f83c1a.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            162.8,
+            96.6,
+            462.1,
+            392.6
+          ],
+          "det_score": 0.852,
+          "sam_score": 0.996,
+          "area_px": 67282
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_155_jpg.rf.a65395f65d93bcd6cbf6bdab6d94e551.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            172.5,
+            219.8,
+            434.0,
+            365.7
+          ],
+          "det_score": 0.852,
+          "sam_score": 0.988,
+          "area_px": 28334
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_156_jpg.rf.6ae4742599d61d6120e5beb5d38bcf2e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            156.5,
+            247.5,
+            451.7,
+            414.8
+          ],
+          "det_score": 0.85,
+          "sam_score": 0.992,
+          "area_px": 37441
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_157_jpg.rf.b244a82199f2158510ccf485e54d98a2.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            93.9,
+            167.2,
+            473.6,
+            470.8
+          ],
+          "det_score": 0.885,
+          "sam_score": 0.996,
+          "area_px": 84769
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_159_jpg.rf.2bc51aa920c0031f8e311c52c762cded.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            34.9,
+            148.0,
+            349.5,
+            385.2
+          ],
+          "det_score": 0.831,
+          "sam_score": 0.992,
+          "area_px": 57458
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_15_jpg.rf.c7c6c90e16bcccd97696ed56f741d670.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            140.3,
+            195.6,
+            427.9,
+            495.8
+          ],
+          "det_score": 0.87,
+          "sam_score": 0.988,
+          "area_px": 63440
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_160_jpg.rf.64b7834918be5b72840ecee1e390157e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            169.6,
+            160.5,
+            393.1,
+            323.1
+          ],
+          "det_score": 0.855,
+          "sam_score": 0.992,
+          "area_px": 27785
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_162_jpg.rf.4255a3c6bb6b0a9a625d70a5b51a7df9.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            78.4,
+            142.0,
+            548.2,
+            407.8
+          ],
+          "det_score": 0.858,
+          "sam_score": 0.996,
+          "area_px": 94193
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_163_jpg.rf.eee95b2e3a2af8b228d81075f9b2f24d.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            174.3,
+            215.4,
+            488.3,
+            425.9
+          ],
+          "det_score": 0.867,
+          "sam_score": 0.992,
+          "area_px": 50070
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_164_jpg.rf.aeab74f44b77d69cb4884f8a55d4a5b8.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            59.5,
+            147.9,
+            472.9,
+            381.1
+          ],
+          "det_score": 0.86,
+          "sam_score": 0.992,
+          "area_px": 73163
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_16_jpg.rf.133bb95ee3eacad7aecf2ab4cd1e1ff4.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            182.7,
+            169.0,
+            533.5,
+            387.1
+          ],
+          "det_score": 0.817,
+          "sam_score": 0.992,
+          "area_px": 58850
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_17_jpg.rf.7298154b15cab2942d3351120a4337d5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            209.2,
+            209.9,
+            492.6,
+            503.9
+          ],
+          "det_score": 0.86,
+          "sam_score": 0.996,
+          "area_px": 64088
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_18_jpg.rf.bc3fb0b05f8e3f72d25ae44db40362c0.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            215.1,
+            246.7,
+            452.4,
+            417.4
+          ],
+          "det_score": 0.849,
+          "sam_score": 0.992,
+          "area_px": 31017
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_19_jpg.rf.b68555e4ce0c87f7f6a9f9d441a47a08.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            79.2,
+            49.5,
+            456.7,
+            383.1
+          ],
+          "det_score": 0.837,
+          "sam_score": 0.996,
+          "area_px": 97559
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_20_jpg.rf.5e8498e31e0e596d64f6185f7c56534f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            161.8,
+            139.4,
+            340.0,
+            299.6
+          ],
+          "det_score": 0.849,
+          "sam_score": 0.984,
+          "area_px": 20672
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_21_jpg.rf.a584f5d526fa26469cc144a40a3134da.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            101.8,
+            116.1,
+            549.8,
+            381.6
+          ],
+          "det_score": 0.732,
+          "sam_score": 0.992,
+          "area_px": 89291
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_22_jpg.rf.427da4fa2858bf0484b607774c6077c5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            363.3,
+            240.2,
+            482.5,
+            361.8
+          ],
+          "det_score": 0.667,
+          "sam_score": 0.984,
+          "area_px": 11015
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_24_jpg.rf.a557aeb67c480dc55479509a77b4e160.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            150.7,
+            195.3,
+            448.8,
+            394.0
+          ],
+          "det_score": 0.846,
+          "sam_score": 0.992,
+          "area_px": 43032
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_27_jpg.rf.9eabbf76d6ac2d4caccb38b11e0d28ad.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            227.2,
+            212.5,
+            535.0,
+            465.9
+          ],
+          "det_score": 0.752,
+          "sam_score": 0.984,
+          "area_px": 58341
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_28_jpg.rf.a7e8555e9e2b27a796da5d502582db24.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            257.6,
+            58.3,
+            441.8,
+            226.9
+          ],
+          "det_score": 0.782,
+          "sam_score": 0.992,
+          "area_px": 23806
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_29_jpg.rf.b15d563685f9a249436a706a816cec07.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            278.3,
+            104.8,
+            638.9,
+            473.1
+          ],
+          "det_score": 0.845,
+          "sam_score": 0.996,
+          "area_px": 101583
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_2_jpg.rf.a4629fbffb9457cd3dda5a1dfc6e5365.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            150.7,
+            98.8,
+            436.8,
+            306.6
+          ],
+          "det_score": 0.863,
+          "sam_score": 0.992,
+          "area_px": 44593
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_31_jpg.rf.7a5340cc049f94d06b26fa34850535ab.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            146.9,
+            267.8,
+            525.6,
+            478.0
+          ],
+          "det_score": 0.772,
+          "sam_score": 0.992,
+          "area_px": 60365
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_32_jpg.rf.15f5702d8602844d8d866d229e674c89.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            266.3,
+            258.1,
+            434.1,
+            420.8
+          ],
+          "det_score": 0.832,
+          "sam_score": 0.984,
+          "area_px": 20436
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_33_jpg.rf.0d5860269868461da778265b77ee13b2.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            288.5,
+            130.4,
+            556.1,
+            400.7
+          ],
+          "det_score": 0.809,
+          "sam_score": 0.992,
+          "area_px": 54061
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_34_jpg.rf.4be2a53f051e4372100c90f2d36ea129.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            99.8,
+            144.0,
+            548.7,
+            392.1
+          ],
+          "det_score": 0.784,
+          "sam_score": 0.992,
+          "area_px": 84518
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_35_jpg.rf.fe6e06dca50c525194a8edc282489e2a.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            13.4,
+            227.5,
+            611.6,
+            573.0
+          ],
+          "det_score": 0.673,
+          "sam_score": 0.992,
+          "area_px": 156437
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_36_jpg.rf.4968de1c56728d9f7325771e3a7f7e3e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            96.9,
+            127.2,
+            480.7,
+            353.2
+          ],
+          "det_score": 0.65,
+          "sam_score": 0.992,
+          "area_px": 63134
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_37_jpg.rf.73b8cff8dacc52197fd7fdd958397507.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            186.7,
+            298.1,
+            534.4,
+            562.0
+          ],
+          "det_score": 0.865,
+          "sam_score": 0.996,
+          "area_px": 67654
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_39_jpg.rf.81c4c633444db832268298ddae1010d6.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            374.2,
+            169.2,
+            536.4,
+            331.4
+          ],
+          "det_score": 0.654,
+          "sam_score": 0.988,
+          "area_px": 19990
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_3_jpg.rf.d68fc8de8607c2495eb8c832c1e24078.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            170.8,
+            101.6,
+            538.2,
+            366.7
+          ],
+          "det_score": 0.84,
+          "sam_score": 0.992,
+          "area_px": 71374
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_41_jpg.rf.630408063dc3fdfa9a9a7f49e1c1d93c.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            72.6,
+            253.7,
+            414.2,
+            485.7
+          ],
+          "det_score": 0.797,
+          "sam_score": 0.992,
+          "area_px": 60599
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_42_jpg.rf.6626de5325fbf9ad4fec739b2a4e29f3.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            128.4,
+            20.2,
+            346.1,
+            156.0
+          ],
+          "det_score": 0.721,
+          "sam_score": 0.977,
+          "area_px": 17875
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_44_jpg.rf.a4dbaabec5b64e4c34d874a6870964be.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            1.9,
+            61.7,
+            559.4,
+            374.0
+          ],
+          "det_score": 0.757,
+          "sam_score": 0.98,
+          "area_px": 132613
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_49_jpg.rf.78a86245d3715c60d39d47045a323711.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            40.1,
+            148.7,
+            441.7,
+            391.0
+          ],
+          "det_score": 0.865,
+          "sam_score": 0.996,
+          "area_px": 74493
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_50_jpg.rf.b9e65c2fcdb435269f67c9d7ade8ca89.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            156.6,
+            180.3,
+            410.0,
+            370.3
+          ],
+          "det_score": 0.854,
+          "sam_score": 0.992,
+          "area_px": 37018
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_52_jpg.rf.d62840582d63156f7e346b41ab8895d5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            213.9,
+            95.6,
+            408.7,
+            292.4
+          ],
+          "det_score": 0.862,
+          "sam_score": 0.988,
+          "area_px": 28466
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_55_jpg.rf.73873084ba51dd4e5ab40033b6003190.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            295.5,
+            156.2,
+            517.0,
+            320.7
+          ],
+          "det_score": 0.869,
+          "sam_score": 0.992,
+          "area_px": 27453
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_5_jpg.rf.395cc7ec9b988f25e77e403ef537737e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            186.1,
+            262.8,
+            478.7,
+            478.0
+          ],
+          "det_score": 0.855,
+          "sam_score": 0.984,
+          "area_px": 47116
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_62_jpg.rf.f34bc5162dc72f41ba60d3f5056cc49b.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            207.7,
+            297.4,
+            417.1,
+            461.0
+          ],
+          "det_score": 0.754,
+          "sam_score": 0.984,
+          "area_px": 26352
+        }
+      ]
+    },
+    {
+      "image": "train/egg/not_damaged_95_jpg.rf.0806f2b78a5bc571cd36453998060b58.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            166.9,
+            41.4,
+            443.4,
+            257.4
+          ],
+          "det_score": 0.85,
+          "sam_score": 0.992,
+          "area_px": 45813
+        }
+      ]
+    },
+    {
+      "image": "train/Unlabeled/not_damaged_135_jpg.rf.a6d81ffb82470e031fb3ab469c8f0db2.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            324.7,
+            248.4,
+            493.4,
+            390.5
+          ],
+          "det_score": 0.483,
+          "sam_score": 0.918,
+          "area_px": 17915
+        }
+      ]
+    },
+    {
+      "image": "train/Unlabeled/not_damaged_145_jpg.rf.5147bfde42f30a27504377fd5ef13b05.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            278.4,
+            286.9,
+            434.8,
+            406.2
+          ],
+          "det_score": 0.514,
+          "sam_score": 0.926,
+          "area_px": 12800
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_102_jpg.rf.8d754cbc174c6cb6fb1b5c1929edcbb1.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            128.3,
+            41.4,
+            439.5,
+            363.9
+          ],
+          "det_score": 0.852,
+          "sam_score": 0.996,
+          "area_px": 76433
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_107_jpg.rf.8497e164672ad2319ef9ea157023304e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            184.0,
+            154.4,
+            496.4,
+            437.3
+          ],
+          "det_score": 0.757,
+          "sam_score": 0.988,
+          "area_px": 65351
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_109_jpg.rf.4d74eb94b1d03ebd3e7c442e58699304.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            160.5,
+            136.5,
+            504.2,
+            332.2
+          ],
+          "det_score": 0.844,
+          "sam_score": 0.988,
+          "area_px": 49999
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_115_jpg.rf.5e04f25a50022be8a5f0dbcfe42bc26f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            95.0,
+            81.0,
+            388.1,
+            282.8
+          ],
+          "det_score": 0.65,
+          "sam_score": 0.992,
+          "area_px": 44261
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            187.8,
+            262.7,
+            475.2,
+            432.1
+          ],
+          "det_score": 0.68,
+          "sam_score": 0.992,
+          "area_px": 36822
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_119_jpg.rf.6758625c4b939166ca105d0509fc569e.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            95.6,
+            209.3,
+            402.2,
+            516.7
+          ],
+          "det_score": 0.871,
+          "sam_score": 0.988,
+          "area_px": 71199
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_11_jpg.rf.95e1bc4944748cfd1a56fe23a42b6ae8.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            177.4,
+            141.1,
+            394.9,
+            335.9
+          ],
+          "det_score": 0.863,
+          "sam_score": 0.965,
+          "area_px": 26653
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_120_jpg.rf.dfe91ad8ce891c84e495a8d59bbe01f5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            260.9,
+            188.8,
+            587.4,
+            435.1
+          ],
+          "det_score": 0.817,
+          "sam_score": 0.988,
+          "area_px": 60811
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_122_jpg.rf.b44d8e5a76cadeff9b2d8eaa85309d09.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            112.2,
+            96.1,
+            435.0,
+            281.9
+          ],
+          "det_score": 0.733,
+          "sam_score": 0.988,
+          "area_px": 45123
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_126_jpg.rf.2c3342cf9ca7ab55f6682ef198e98bbd.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            207.1,
+            183.3,
+            464.6,
+            455.2
+          ],
+          "det_score": 0.415,
+          "sam_score": 0.984,
+          "area_px": 51775
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_130_jpg.rf.7289d26d022f33aa74b3517f40d6a127.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            170.5,
+            246.4,
+            498.0,
+            442.1
+          ],
+          "det_score": 0.793,
+          "sam_score": 0.988,
+          "area_px": 48657
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_133_jpg.rf.a386f448c321cfb45a902bab446a0536.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            8.2,
+            33.4,
+            173.6,
+            194.4
+          ],
+          "det_score": 0.627,
+          "sam_score": 0.992,
+          "area_px": 19608
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            23.4,
+            225.2,
+            212.6,
+            363.1
+          ],
+          "det_score": 0.636,
+          "sam_score": 0.992,
+          "area_px": 19556
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            412.6,
+            224.8,
+            627.6,
+            355.9
+          ],
+          "det_score": 0.614,
+          "sam_score": 0.992,
+          "area_px": 21096
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_136_jpg.rf.b91466d91f3e0005beb0e42acc9d5b83.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            158.7,
+            363.8,
+            480.3,
+            573.0
+          ],
+          "det_score": 0.647,
+          "sam_score": 0.992,
+          "area_px": 50183
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            178.5,
+            200.4,
+            400.3,
+            367.8
+          ],
+          "det_score": 0.643,
+          "sam_score": 0.992,
+          "area_px": 27622
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            244.2,
+            53.1,
+            406.8,
+            205.5
+          ],
+          "det_score": 0.649,
+          "sam_score": 0.988,
+          "area_px": 18775
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_140_jpg.rf.5a28b6a69e229bf384854ec1e98b3f19.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 3,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            258.8,
+            -0.6,
+            435.3,
+            187.3
+          ],
+          "det_score": 0.662,
+          "sam_score": 0.992,
+          "area_px": 26109
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            274.0,
+            208.6,
+            476.6,
+            384.1
+          ],
+          "det_score": 0.647,
+          "sam_score": 0.992,
+          "area_px": 26837
+        },
+        {
+          "id": 3,
+          "box_xyxy": [
+            310.4,
+            396.7,
+            545.4,
+            580.7
+          ],
+          "det_score": 0.661,
+          "sam_score": 0.988,
+          "area_px": 32640
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_143_jpg.rf.ddf38df15f549405285b01245a2ace36.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            123.8,
+            260.6,
+            485.8,
+            465.5
+          ],
+          "det_score": 0.784,
+          "sam_score": 0.988,
+          "area_px": 55295
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_147_jpg.rf.f96813b608c83c8ca5fadbe68c1eefdb.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 2,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            74.5,
+            331.2,
+            309.3,
+            463.0
+          ],
+          "det_score": 0.656,
+          "sam_score": 0.984,
+          "area_px": 23184
+        },
+        {
+          "id": 2,
+          "box_xyxy": [
+            385.7,
+            221.0,
+            582.9,
+            364.3
+          ],
+          "det_score": 0.695,
+          "sam_score": 0.988,
+          "area_px": 21108
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_149_jpg.rf.c3c35299246e8c667ee33f02855a6e99.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            144.2,
+            286.4,
+            388.7,
+            442.9
+          ],
+          "det_score": 0.828,
+          "sam_score": 0.988,
+          "area_px": 29377
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_150_jpg.rf.c58ad3cfc0417f557be06b685008bb60.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            126.4,
+            225.0,
+            379.8,
+            383.6
+          ],
+          "det_score": 0.839,
+          "sam_score": 0.984,
+          "area_px": 31016
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_158_jpg.rf.344b69defda5c12d2f73f77ab479c93c.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            174.8,
+            123.9,
+            437.6,
+            389.4
+          ],
+          "det_score": 0.839,
+          "sam_score": 0.992,
+          "area_px": 50128
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_25_jpg.rf.9a2e0ec799b7cfe4b89e93c2bdf7896f.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            193.9,
+            219.3,
+            487.5,
+            445.3
+          ],
+          "det_score": 0.86,
+          "sam_score": 0.992,
+          "area_px": 50269
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_40_jpg.rf.71ddd6e202abb9dd3dd4721b6d408cba.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            115.7,
+            327.3,
+            388.4,
+            490.0
+          ],
+          "det_score": 0.713,
+          "sam_score": 0.988,
+          "area_px": 33298
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_45_jpg.rf.afe41bdac424f6a6b81d8a809fdf73e0.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            80.2,
+            47.2,
+            332.5,
+            284.5
+          ],
+          "det_score": 0.804,
+          "sam_score": 0.992,
+          "area_px": 46209
+        }
+      ]
+    },
+    {
+      "image": "valid/egg/not_damaged_6_jpg.rf.1b79fa07c23ef838f19c9a226c9022f5.jpg",
+      "width": 640,
+      "height": 640,
+      "num_eggs": 1,
+      "eggs": [
+        {
+          "id": 1,
+          "box_xyxy": [
+            152.7,
+            30.6,
+            454.2,
+            206.3
+          ],
+          "det_score": 0.82,
+          "sam_score": 0.992,
+          "area_px": 40187
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "train/egg/not_damaged_22_jpg.rf.427da4fa2858bf0484b607774c6077c5.jpg": {
+    "drop_boxes": [[318.8, 235.2, 409.8, 345.5]],
+    "reason": "reflection of the egg in the glossy lid, not an egg (det 0.36)"
+  },
+  "train/egg/not_damaged_39_jpg.rf.81c4c633444db832268298ddae1010d6.jpg": {
+    "drop_boxes": [[308.7, 174.7, 411.0, 322.2]],
+    "reason": "reflection of the egg in the glossy lid, not an egg (det 0.47)"
+  }
+}

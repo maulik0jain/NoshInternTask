@@ -1,0 +1,10 @@
+# tested versions in comments
+torch>=2.5.1            # 2.6.0+cu124
+torchvision             # 0.21.0+cu124
+transformers>=4.51      # 5.4.0 (needs the `threshold=` arg of grounded post-processing)
+opencv-python           # 5.0.0
+numpy                   # 2.5.3
+pillow                  # 12.1.1
+scikit-learn            # 1.7.2
+gdown                   # 6.1.0
+sam2 @ git+https://github.com/facebookresearch/sam2.git

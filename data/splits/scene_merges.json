@@ -1,0 +1,11 @@
+{
+  "_note": "Manual merges after looking at the auto-clusters (DINOv2, cosine 0.3). Each list = source photo ids shot in the same physical setup; their clusters are merged into one group.",
+  "steel pot / kitchen": [113, 124, 149, 153],
+  "laptop keyboard": [17, 19],
+  "fridge egg tray": [42, 116],
+  "white hospital bag + egg holder": [109, 123, 104, 30, 106, 32],
+  "pink bowl + cherry lid": [21, 22, 40],
+  "painted container lid": [108, 120, 110],
+  "grey floor": [28, 29],
+  "striped towel + green rug": [5, 3]
+}
