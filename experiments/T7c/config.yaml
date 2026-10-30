@@ -1,0 +1,8 @@
+id: T7c
+extends: T7b
+what: Search on Lab L* instead of grayscale (from the T7b channel sweep)
+why: T1 rejected L* with a single Otsu threshold; with shape-scored multi-threshold search the comparison can come out differently, so it was re-tested.
+changes:
+  candidate: {channel: L}
+decision: kept
+reason: "IoU up vs T7b: the channel sweep reverses the T1 result once candidates are chosen by shape."

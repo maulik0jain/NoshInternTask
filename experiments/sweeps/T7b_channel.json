@@ -1,0 +1,31 @@
+{
+  "base": "T7b",
+  "param": "candidate.channel",
+  "split": "dev",
+  "runs": [
+    {
+      "value": "gray",
+      "iou_mean": 0.4475,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2493,
+      "instance_f1": 0.4732,
+      "empty": 12
+    },
+    {
+      "value": "L",
+      "iou_mean": 0.4638,
+      "iou_median": 0.483,
+      "boundary_f1": 0.257,
+      "instance_f1": 0.4935,
+      "empty": 11
+    },
+    {
+      "value": "whiteness",
+      "iou_mean": 0.4551,
+      "iou_median": 0.4726,
+      "boundary_f1": 0.2515,
+      "instance_f1": 0.4741,
+      "empty": 13
+    }
+  ]
+}

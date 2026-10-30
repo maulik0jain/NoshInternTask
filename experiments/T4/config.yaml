@@ -1,0 +1,8 @@
+id: T4
+extends: T3
+what: + keep only low-saturation pixels (HSV S <= 60)
+why: Eggs are white/cream (near-colourless); many bright backgrounds are coloured (pink bowl, green leaves, wood, rugs).
+changes:
+  saturation: {enabled: true, s_max: 60}
+decision: kept
+reason: "IoU up vs T3. Sweep T4_s_max: 25 and 40 tie, 40 used from T5b on because it is gentler on cream eggs."

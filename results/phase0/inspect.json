@@ -1,0 +1,134 @@
+{
+  "zip": {
+    "path": "data/egg_dataset.zip",
+    "sha256": "c2c2aca6407a72b065f0dff0b801c352acdb50eb843915396237cafcf8d7485a",
+    "files": 112,
+    "extensions": {
+      ".txt": 2,
+      ".jpg": 110
+    },
+    "non_image_files": [
+      "README.dataset.txt",
+      "README.roboflow.txt"
+    ],
+    "annotation_like_files": []
+  },
+  "images": {
+    "count": 110,
+    "per_folder": {
+      "test/egg": 11,
+      "train/egg": 75,
+      "train/Unlabeled": 2,
+      "valid/egg": 22
+    },
+    "resolutions": {
+      "640x640": 110
+    },
+    "pil_modes": {
+      "RGB": 110
+    },
+    "file_kb": {
+      "min": 15.8,
+      "median": 32.0,
+      "max": 96.5
+    }
+  },
+  "filenames": {
+    "match_roboflow_pattern": 110,
+    "example": "not_damaged_101_jpg.rf.479d12a2b41a5ec6d718dcdabd14b0c9.jpg",
+    "unique_sources": 110,
+    "sources_with_multiple_images": {},
+    "unique_rf_hashes": 110,
+    "byte_identical_files": 0,
+    "source_prefixes": {
+      "not_damaged": 110
+    }
+  },
+  "brightness_mean_Lstar": {
+    "min": 24.1,
+    "p10": 34.1,
+    "median": 49.6,
+    "p90": 64.4,
+    "max": 73.3
+  },
+  "random30_sources": [
+    "not_damaged_4",
+    "not_damaged_10",
+    "not_damaged_11",
+    "not_damaged_12",
+    "not_damaged_13",
+    "not_damaged_21",
+    "not_damaged_22",
+    "not_damaged_24",
+    "not_damaged_28",
+    "not_damaged_29",
+    "not_damaged_32",
+    "not_damaged_39",
+    "not_damaged_42",
+    "not_damaged_45",
+    "not_damaged_49",
+    "not_damaged_103",
+    "not_damaged_109",
+    "not_damaged_110",
+    "not_damaged_123",
+    "not_damaged_130",
+    "not_damaged_131",
+    "not_damaged_138",
+    "not_damaged_140",
+    "not_damaged_141",
+    "not_damaged_146",
+    "not_damaged_154",
+    "not_damaged_159",
+    "not_damaged_160",
+    "not_damaged_161",
+    "not_damaged_163"
+  ],
+  "variety_manual_labels": {
+    "labelled_images": 110,
+    "unlabelled_images": [],
+    "egg_count": {
+      "1": 92,
+      "2": 7,
+      "3": 11
+    },
+    "egg_colour": {
+      "brown": 1,
+      "cream": 11,
+      "white": 98
+    },
+    "hand": {
+      "no": 96,
+      "yes": 14
+    },
+    "touching": {
+      "no": 105,
+      "yes": 5
+    },
+    "lighting": {
+      "backlit": 2,
+      "dim": 1,
+      "normal": 107
+    },
+    "background": {
+      "ash": 6,
+      "blue_bowl": 2,
+      "cloth": 7,
+      "floor": 4,
+      "foil": 4,
+      "fridge_tray": 3,
+      "hand": 14,
+      "keyboard": 4,
+      "leaves": 5,
+      "marble": 15,
+      "painted_container": 7,
+      "pink_bowl": 6,
+      "red_bowl": 1,
+      "rice": 3,
+      "rug": 3,
+      "steel_pot": 10,
+      "tiles": 2,
+      "towel": 4,
+      "white_bag": 10
+    }
+  }
+}

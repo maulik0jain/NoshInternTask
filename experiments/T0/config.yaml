@@ -1,0 +1,7 @@
+id: T0
+extends: default
+what: Otsu threshold on grayscale (baseline)
+why: Eggs are usually the brightest thing in the photo; Otsu picks the bright/dark split with no tuning.
+changes: {}
+decision: baseline
+reason: "Reference point. High recall but low precision: Otsu takes every bright region, not just the egg."

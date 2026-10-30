@@ -1,0 +1,39 @@
+{
+  "base": "T7b",
+  "param": "saturation.s_max",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 40,
+      "iou_mean": 0.4475,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2493,
+      "instance_f1": 0.4732,
+      "empty": 12
+    },
+    {
+      "value": 60,
+      "iou_mean": 0.4472,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2454,
+      "instance_f1": 0.4609,
+      "empty": 12
+    },
+    {
+      "value": 90,
+      "iou_mean": 0.4431,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2386,
+      "instance_f1": 0.4589,
+      "empty": 12
+    },
+    {
+      "value": 255,
+      "iou_mean": 0.4419,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2354,
+      "instance_f1": 0.4492,
+      "empty": 12
+    }
+  ]
+}

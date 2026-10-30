@@ -1,0 +1,38 @@
+# Full pipeline with every optional stage OFF. Trials extend this and switch
+# stages on one at a time (see experiments/*/config.yaml).
+pipeline:
+  preprocess:
+    white_balance: false      # gray-world
+    clahe: {enabled: false, clip: 2.0, tile: 8}
+    blur: 5                   # Gaussian kernel (odd); smooths sensor noise / shell texture before thresholding
+  candidate:
+    method: otsu              # otsu | kmeans | search
+    channel: gray             # gray | L | whiteness   (otsu and search)
+    chroma_weight: 1.0        # whiteness = L* - w * chroma
+    k: 3                      # kmeans only
+    samples: 20000
+    seed: 0
+    # search only (multi-threshold egg search, T7b)
+    levels: 24                # thresholds tried, evenly spaced between two percentiles of the channel
+    pct_range: [20, 99.5]
+    open: 3                   # opening at each level, cuts 1-2 px bridges between egg and background
+    min_score: 0.80           # ellipse_iou * solidity a blob needs to count as an egg candidate
+    score_tol: 0.03           # among nested candidates within this score of the best, take the largest
+    max_overlap: 0.2          # a new egg may overlap already-picked eggs by at most this fraction
+    fallback_min_score: null  # if set: second, looser pass for images where nothing was found (T11)
+    fallback_max_eggs: null   # cap on eggs the fallback may return (T11b)
+    max_eggs: null            # cap on eggs per image for the main search (null = no cap)
+  skin: {enabled: false, cb: [77, 127], cr: [133, 173]}   # Chai & Ngan 1999 box
+  saturation: {enabled: false, s_max: 60}
+  morphology: {enabled: false, open: 3, close: 7, fill_holes: true}
+  components:
+    enabled: false
+    min_area: 0.003           # fraction of the image (0.3% ~ a 40 px egg at 640x640)
+    max_area: 0.6
+    min_solidity: 0.85        # area / convex-hull area; eggs are convex
+    max_axis_ratio: 2.2       # long/short ellipse axis; real eggs ~1.2-1.5 seen from above
+    min_ellipse_iou: 0.0
+    max_border_frac: 0.35     # share of the outline lying on the image border
+  grabcut: {enabled: false, iters: 5, erode: 10, bg_dilate: 25, fill_holes: true}
+  ellipse: {enabled: false, min_fit_iou: 0.9, mode: replace}
+  watershed: {enabled: false, peak_rel: 0.6, min_core_px: 30}

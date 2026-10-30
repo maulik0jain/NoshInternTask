@@ -1,0 +1,52 @@
+preprocess:
+  white_balance: false
+  clahe:
+    enabled: false
+    clip: 2.0
+    tile: 8
+  blur: 5
+candidate:
+  method: otsu
+  channel: L
+  chroma_weight: 1.0
+  k: 3
+  samples: 20000
+  seed: 0
+skin:
+  enabled: false
+  cb:
+  - 77
+  - 127
+  cr:
+  - 133
+  - 173
+saturation:
+  enabled: false
+  s_max: 60
+morphology:
+  enabled: false
+  open: 3
+  close: 7
+  fill_holes: true
+components:
+  enabled: false
+  min_area: 0.003
+  max_area: 0.6
+  min_solidity: 0.85
+  max_axis_ratio: 2.2
+  min_ellipse_iou: 0.0
+  max_border_frac: 0.35
+grabcut:
+  enabled: false
+  iters: 5
+  erode: 10
+  bg_dilate: 25
+  fill_holes: true
+ellipse:
+  enabled: false
+  min_fit_iou: 0.9
+  mode: replace
+watershed:
+  enabled: false
+  peak_rel: 0.6
+  min_core_px: 30

@@ -1,0 +1,8 @@
+id: T1
+extends: T0
+what: Otsu on CIE Lab L* instead of grayscale
+why: L* is perceptual lightness and ignores colour, so e.g. a saturated pink bowl is not "brighter" than it looks.
+changes:
+  candidate: {channel: L}
+decision: discarded
+reason: "IoU fell (vs T0). With one global threshold, L* lets in even more bright background. Re-tested later inside the multi-threshold search (T7c), where it won."

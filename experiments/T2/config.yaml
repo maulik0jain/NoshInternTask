@@ -1,0 +1,10 @@
+id: T2
+extends: T1
+what: + gray-world white balance and CLAHE on L*
+why: Warm bulbs tint white eggs cream; CLAHE lifts eggs in dim/backlit photos.
+changes:
+  preprocess:
+    white_balance: true
+    clahe: {enabled: true, clip: 2.0, tile: 8}
+decision: discarded
+reason: "IoU fell sharply. Gray-world shifts colours in scenes dominated by one colour (pink bowl, green leaves), and CLAHE brightens the background as much as the egg, so Otsu took more background."

@@ -1,0 +1,59 @@
+image,split,iou,gate_loss,cause,note
+train/egg/not_damaged_3_jpg.rf.d68fc8de8607c2495eb8c832c1e24078.jpg,dev,0.451,0.096,white / pale background,white towel; only the egg centre kept
+test/egg/not_damaged_4_jpg.rf.36c78b63ea4710d9642651ac3292fd58.jpg,dev,0.495,0.0,white / pale background,white towel; lower half merges
+train/egg/not_damaged_5_jpg.rf.395cc7ec9b988f25e77e403ef537737e.jpg,dev,0.357,0.001,white / pale background,white towel; also a glass picked
+valid/egg/not_damaged_11_jpg.rf.95e1bc4944748cfd1a56fe23a42b6ae8.jpg,dev,0.116,0.044,egg partly hidden,egg under leaves
+train/egg/not_damaged_13_jpg.rf.60964651b01aed5680a994ecbd7012ea.jpg,dev,0.430,0.009,egg partly hidden,egg under grass
+train/egg/not_damaged_16_jpg.rf.133bb95ee3eacad7aecf2ab4cd1e1ff4.jpg,dev,0.320,0.093,white / pale background,left half merges with white earphones
+train/egg/not_damaged_18_jpg.rf.bc3fb0b05f8e3f72d25ae44db40362c0.jpg,dev,0.431,0.448,bright object picked,keyboard keys picked (gate also removes 45%)
+train/egg/not_damaged_27_jpg.rf.9eabbf76d6ac2d4caccb38b11e0d28ad.jpg,dev,0.0,0.164,ash camouflage,ash-dusted egg on ash; nothing egg-shaped
+train/egg/not_damaged_29_jpg.rf.b15d563685f9a249436a706a816cec07.jpg,dev,0.578,0.426,colour gate removes egg,warm shaded half inside the skin box
+test/egg/not_damaged_30_jpg.rf.48e9261777355fe67139ac1c5eae596b.jpg,dev,0.0,0.247,white / pale background,"white bag, nothing found"
+train/egg/not_damaged_35_jpg.rf.fe6e06dca50c525194a8edc282489e2a.jpg,dev,0.52,0.345,shaded side missed,left half in shade
+train/egg/not_damaged_36_jpg.rf.4968de1c56728d9f7325771e3a7f7e3e.jpg,dev,0.256,0.021,ash camouflage,whole ash patch taken
+train/egg/not_damaged_41_jpg.rf.630408063dc3fdfa9a9a7f49e1c1d93c.jpg,dev,0.642,0.133,ash camouflage,ash around the egg taken
+train/egg/not_damaged_42_jpg.rf.6626de5325fbf9ad4fec739b2a4e29f3.jpg,dev,0.390,0.033,egg partly hidden,behind fridge-tray bar
+test/egg/not_damaged_43_jpg.rf.66c31342150e751c30214786e72c8683.jpg,dev,0.383,0.292,bright object picked,keyboard keys picked
+train/egg/not_damaged_50_jpg.rf.b9e65c2fcdb435269f67c9d7ade8ca89.jpg,dev,0.347,0.48,colour gate removes egg,half the egg inside the skin box
+train/egg/not_damaged_52_jpg.rf.d62840582d63156f7e346b41ab8895d5.jpg,dev,0.517,0.023,shaded side missed,"lower half in shade, earphone cable"
+train/egg/not_damaged_55_jpg.rf.73873084ba51dd4e5ab40033b6003190.jpg,dev,0.68,0.202,shaded side missed,lower right in shade
+test/egg/not_damaged_78_jpg.rf.d3a6e8624d192abc58ff7df9d5781bb5.jpg,dev,0.0,0.139,ash camouflage,ash-dusted egg on ash
+train/egg/not_damaged_100_jpg.rf.5d780a6024004fa2f68741fa56ddf4c9.jpg,dev,0.222,0.881,colour gate removes egg,88% of the egg inside the skin box
+valid/egg/not_damaged_102_jpg.rf.8d754cbc174c6cb6fb1b5c1929edcbb1.jpg,dev,0.536,0.19,shaded side missed,right half in shade (hand-held)
+train/egg/not_damaged_103_jpg.rf.c0bd961caec5acf3a6582c9cb2551634.jpg,dev,0.654,0.209,shaded side missed,shaded side of all 3 eggs
+train/egg/not_damaged_105_jpg.rf.6b94b57d4e4cb521abbec55bb95c2a76.jpg,dev,0.696,0.045,bright object picked,steel plate picked; all 3 eggs found
+train/egg/not_damaged_106_jpg.rf.4ab043b322cc9e55bdf788a4d69ae74b.jpg,dev,0.0,0.004,white / pale background,white bag picked instead of the egg
+valid/egg/not_damaged_107_jpg.rf.8497e164672ad2319ef9ea157023304e.jpg,dev,0.660,0.008,white / pale background,white rice; shaded side merges
+valid/egg/not_damaged_109_jpg.rf.4d74eb94b1d03ebd3e7c442e58699304.jpg,dev,0.384,0.492,colour gate removes egg,half the egg inside the skin box (white bag)
+train/egg/not_damaged_111_jpg.rf.d56bdd5f452dfc3935b4d6962ed33309.jpg,dev,0.340,0.558,colour gate removes egg,56% of the egg inside the skin box (white bag)
+train/egg/not_damaged_112_jpg.rf.2ecb081cd9d32a7ff8c9f4db24e911b9.jpg,dev,0.674,0.032,white / pale background,white bag; left side merges
+train/egg/not_damaged_116_jpg.rf.43fecd96347e2129115fceed65986cc9.jpg,dev,0.0,0.036,white / pale background,white fridge tray
+train/egg/not_damaged_117_jpg.rf.d25ded9e7408f9b89b3cfb3de581f6a6.jpg,dev,0.255,0.091,egg partly hidden,eggs behind fridge-tray bars
+train/egg/not_damaged_118_jpg.rf.3e17ba84bcb3b57ebbf743b145c5ae27.jpg,dev,0.564,0.088,bright object picked,foil picked (fallback pass)
+valid/egg/not_damaged_119_jpg.rf.6758625c4b939166ca105d0509fc569e.jpg,dev,0.422,0.174,shaded side missed,left half in shade
+train/egg/not_damaged_123_jpg.rf.11d40a86277d3ab3fce1c5c6cbf14db0.jpg,dev,0.006,0.004,white / pale background,white bag picked (fallback pass)
+test/egg/not_damaged_125_jpg.rf.b19353b1f84dcbef1ec088b850927bb3.jpg,dev,0.004,0.004,white / pale background,white bag picked
+valid/egg/not_damaged_126_jpg.rf.2c3342cf9ca7ab55f6682ef198e98bbd.jpg,dev,0.400,0.001,white / pale background,white rice; shaded side merges
+train/egg/not_damaged_131_jpg.rf.4ac62f5b18b131bac463f705d0969147.jpg,dev,0.416,0.11,shaded side missed,lower half in shade
+valid/egg/not_damaged_140_jpg.rf.5a28b6a69e229bf384854ec1e98b3f19.jpg,dev,0.297,0.614,colour gate removes egg,"61% of the eggs inside the skin box (cream eggs, warm light)"
+train/egg/not_damaged_142_jpg.rf.5b29be6bd5a6cfc192f51a5b580c1a07.jpg,dev,0.517,0.226,shaded side missed,shaded side of each egg
+valid/egg/not_damaged_143_jpg.rf.ddf38df15f549405285b01245a2ace36.jpg,dev,0.189,0.039,white / pale background,white bag; only a small part found
+train/egg/not_damaged_144_jpg.rf.a9435fb1769a2350dbdd400bcc46a4eb.jpg,dev,0.228,0.298,touching eggs,"3 touching eggs, merged blob not egg-shaped; 2 missed"
+train/egg/not_damaged_146_jpg.rf.a7df655e36c3a2faab1c3f248081504d.jpg,dev,0.377,0.264,shaded side missed,left half in shade
+train/egg/not_damaged_151_jpg.rf.34a8c4ae80d0863cd228120235134ae2.jpg,dev,0.661,0.118,shaded side missed,"lower right in shade, tiles picked"
+train/egg/not_damaged_154_jpg.rf.1ad087e824bbaae4f2c8218624f83c1a.jpg,dev,0.592,0.0,shaded side missed,lower half in shade
+train/egg/not_damaged_155_jpg.rf.a65395f65d93bcd6cbf6bdab6d94e551.jpg,dev,0.0,0.077,white / pale background,white wall behind the hand; nothing found
+valid/egg/not_damaged_158_jpg.rf.344b69defda5c12d2f73f77ab479c93c.jpg,dev,0.600,0.056,shaded side missed,lower half in shade / fingers
+train/egg/not_damaged_160_jpg.rf.64b7834918be5b72840ecee1e390157e.jpg,dev,0.0,0.625,colour gate removes egg,63% of the egg inside the skin box (egg on palm)
+test/egg/not_damaged_161_jpg.rf.fd216aa5e11e147fc1527478cceae94e.jpg,dev,0.0,0.394,white / pale background,pale wall picked; gate also removes 39%
+train/egg/not_damaged_20_jpg.rf.5e8498e31e0e596d64f6185f7c56534f.jpg,eval,0.0,0.837,colour gate removes egg,dim room: 84% of the egg inside the skin/sat gate
+train/egg/not_damaged_24_jpg.rf.a557aeb67c480dc55479509a77b4e160.jpg,eval,0.0,0.976,colour gate removes egg,backlit egg looks brown: 98% removed
+train/egg/not_damaged_31_jpg.rf.7a5340cc049f94d06b26fa34850535ab.jpg,eval,0.306,0.193,shaded side missed,lower half in shade
+train/egg/not_damaged_44_jpg.rf.a4dbaabec5b64e4c34d874a6870964be.jpg,eval,0.0,0.868,colour gate removes egg,backlit close-up: 87% removed
+train/egg/not_damaged_110_jpg.rf.2de10ae949146248df94e52f9065bdd8.jpg,eval,0.221,0.183,white / pale background,pale wall taken with the egg
+train/Unlabeled/not_damaged_135_jpg.rf.a6d81ffb82470e031fb3ab469c8f0db2.jpg,eval,0.599,0.001,egg partly hidden,egg under boiling water
+train/egg/not_damaged_139_jpg.rf.9f18c65b30035092401a5281a03b7124.jpg,eval,0.0,0.257,white / pale background,pale wall behind; nothing found
+valid/egg/not_damaged_149_jpg.rf.c3c35299246e8c667ee33f02855a6e99.jpg,eval,0.102,0.048,white / pale background,pale tile wall; only a sliver found
+valid/egg/not_damaged_150_jpg.rf.c58ad3cfc0417f557be06b685008bb60.jpg,eval,0.510,0.035,shaded side missed,lower half in shade
+test/egg/not_damaged_153_jpg.rf.ea842e70f08e63e69bbcc74f1bc143a8.jpg,eval,0.436,0.0,bright object picked,bright steel / water picked
+train/egg/not_damaged_163_jpg.rf.eee95b2e3a2af8b228d81075f9b2f24d.jpg,eval,0.553,0.045,shaded side missed,lower half in shade

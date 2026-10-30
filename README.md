@@ -8,9 +8,9 @@ Egg segmentation: pretrained-model ground truth → classical image-processing s
 |---|---|
 | Task 1 — ground truth (Grounding DINO + SAM 2.1) | done |
 | Dev / eval split (4:1, grouped by scene) | done, frozen |
-| Task 2 — classical segmentation | next |
-| Task 3 — evaluation | — |
-| Task 4 — video tracking | — |
+| Task 2 — classical segmentation + experiment log | done ([experiments/LOG.md](experiments/LOG.md)) |
+| Task 3 — evaluation & analysis | done ([results/](results/)) |
+| Task 4 — video tracking | next |
 
 ## Setup
 
@@ -32,6 +32,31 @@ python scripts/make_split.py               # split  -> data/splits/split.csv
 
 The outputs of both are already committed. Re-running regenerates them.
 
+### Task 2 — classical segmentation (dev split only)
+
+```bash
+python scripts/run_experiment.py experiments/T11/config.yaml --worst 8   # one trial -> experiments/T11/
+python scripts/sweep.py experiments/T8/config.yaml grabcut.bg_dilate "[25, 45, 70]" --name T8_bg_dilate
+python scripts/build_log.py                # experiments/LOG.md + log.json + progress.png from the trial folders
+```
+
+Each trial folder holds `config.yaml` (what changed, why, decision, reason), `resolved.yaml`
+(full pipeline parameters), `results.json`, `per_image.csv` and worst-case panels. A trial
+`extends` another one and lists only its `changes`; `configs/default.yaml` has every stage off.
+
+### Task 3 — evaluation (the only run that touches eval)
+
+```bash
+python scripts/final_eval.py               # trial named in configs/final.yaml -> results/final_eval/
+python scripts/analyze.py                  # metrics table, plots, failure sheets -> results/analysis/
+python scripts/ablation.py                 # dev only: final pipeline with one stage off -> results/ablation/
+python scripts/build_report.py             # report/report_template.html -> report.html + report.pdf
+pytest tests/                              # metric sanity checks
+```
+
+`final_eval.py` refuses to run a second time once eval results exist.
+Failure causes in `results/analysis/failure_labels.csv` are labelled by hand from the failure sheets.
+
 ## Layout
 
 ```
@@ -43,7 +68,14 @@ ground_truth/instances/      instance ids (0 = background, 1..N = eggs, left to 
 ground_truth/overlays/       overlays for checking
 ground_truth/annotations.json  boxes, scores, areas, settings
 ground_truth_overrides.json  manual fixes from reviewing the overlays
-scripts/                     all code
+data/processed/attributes_manual.csv  hand labels per image (hand, background, lighting...) for Task 3
+src/eggseg/                  library: classical pipeline, metrics, config loading, plots
+configs/                     default pipeline (all stages off) + final.yaml (chosen trial)
+experiments/                 one folder per trial (T0..), sweeps/, LOG.md
+results/final_eval/          the single eval run: summary.json, per-image CSVs, predicted masks
+results/analysis/            Task 3 tables, plots, failure sheets and labels
+results/ablation/            dev-only ablation of the final pipeline
+scripts/                     entry points
 report/                      report source (HTML), figures, PDF
 ```
 

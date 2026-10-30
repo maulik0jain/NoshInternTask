@@ -1,0 +1,31 @@
+{
+  "base": "T9",
+  "param": "ellipse.min_fit_iou",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 0.9,
+      "iou_mean": 0.5607,
+      "iou_median": 0.6436,
+      "boundary_f1": 0.3307,
+      "instance_f1": 0.6079,
+      "empty": 11
+    },
+    {
+      "value": 0.95,
+      "iou_mean": 0.5645,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4125,
+      "instance_f1": 0.6079,
+      "empty": 11
+    },
+    {
+      "value": 0.97,
+      "iou_mean": 0.5647,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4196,
+      "instance_f1": 0.6079,
+      "empty": 11
+    }
+  ]
+}

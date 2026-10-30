@@ -1,0 +1,39 @@
+{
+  "base": "T7",
+  "param": "morphology.open",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 3,
+      "iou_mean": 0.3124,
+      "iou_median": 0.0,
+      "boundary_f1": 0.1843,
+      "instance_f1": 0.4824,
+      "empty": 36
+    },
+    {
+      "value": 7,
+      "iou_mean": 0.3248,
+      "iou_median": 0.1089,
+      "boundary_f1": 0.1879,
+      "instance_f1": 0.4751,
+      "empty": 32
+    },
+    {
+      "value": 11,
+      "iou_mean": 0.3676,
+      "iou_median": 0.3495,
+      "boundary_f1": 0.2021,
+      "instance_f1": 0.4706,
+      "empty": 25
+    },
+    {
+      "value": 15,
+      "iou_mean": 0.3618,
+      "iou_median": 0.3459,
+      "boundary_f1": 0.1974,
+      "instance_f1": 0.4683,
+      "empty": 24
+    }
+  ]
+}

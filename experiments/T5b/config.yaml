@@ -1,0 +1,8 @@
+id: T5b
+extends: T5
+what: k-means candidate + low-saturation filter (S <= 40, from the T4 sweep)
+why: T4 and T5 helped separately; check whether they stack.
+changes:
+  saturation: {enabled: true, s_max: 40}
+decision: kept
+reason: "T4 and T5 stack: IoU up again."

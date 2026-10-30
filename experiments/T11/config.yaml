@@ -1,0 +1,8 @@
+id: T11
+extends: T10
+what: Fallback pass with a looser shape score (0.65) for images where the search found nothing
+why: 11 dev images still get an empty mask (IoU 0). The min_score sweep showed 0.6 leaves only 2 empty but hurts the other images, so the looser score is applied only where the strict pass found nothing.
+changes:
+  candidate: {fallback_min_score: 0.65}
+decision: kept
+reason: "IoU up and empty masks 11 -> 2 (the two left, #30 and #155, are white eggs in front of a white bag / white wall: at every threshold the egg merges with the background, so no egg-shaped blob exists). Cost: instance F1 down, because on hard images the looser pass also returns non-egg blobs. Sweep T11_fallback_min_score: 0.65 has the best IoU; 0.72 gives better instance F1 but loses IoU."

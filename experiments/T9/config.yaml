@@ -1,0 +1,8 @@
+id: T9
+extends: T8
+what: + ellipse regularisation (blobs with ellipse IoU >= 0.9 are replaced by their fitted ellipse)
+why: Eggs are near-elliptical from most viewpoints; snapping clean blobs to the ellipse should fix dents from highlights/shadows on the outline. Irregular blobs (eggs behind fingers/leaves) are left alone because the GT only covers the visible part.
+changes:
+  ellipse: {enabled: true, min_fit_iou: 0.9, mode: replace}
+decision: discarded
+reason: "IoU slightly down and boundary F1 down a lot: real egg outlines are egg-shaped (one blunt end), not ellipses, so snapping moves correct edges. Stricter fit (sweep T9_min_fit_iou) still loses."

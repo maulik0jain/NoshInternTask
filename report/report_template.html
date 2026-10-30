@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nosh CV Intern Task - Report</title>
+<!-- TEMPLATE. Edit this file, then run: python scripts/build_report.py
+     Double-curly-brace placeholders are filled from experiments/log.json and results/*.json -->
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.42; color: #1d1d1d; background: #fff; max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 20pt; margin: 0 0 2px; }
+  h2 { font-size: 13.5pt; margin: 22px 0 6px; padding-bottom: 3px; border-bottom: 2px solid #222; }
+  h3 { font-size: 11pt; margin: 14px 0 4px; }
+  .sub { color: #555; margin-bottom: 12px; }
+  a { color: #1a5fb4; }
+  ul, ol { margin: 4px 0 8px; padding-left: 20px; }
+  li { margin: 2px 0; }
+  code { font-family: Consolas, monospace; font-size: 9.5pt; background: #f2f2f2; padding: 0 3px; }
+  table { border-collapse: collapse; margin: 6px 0 10px; width: 100%; page-break-inside: avoid; }
+  h3 { page-break-after: avoid; }
+  th, td { border: 1px solid #bbb; padding: 4px 7px; text-align: left; vertical-align: top; font-size: 9.8pt; }
+  th { background: #efefef; }
+  table.num td, table.num th { font-size: 8.8pt; padding: 3px 5px; }
+  table.narrow { width: auto; min-width: 55%; }
+  tr.dropped td { color: #6b6b6b; }
+  .status td:first-child { width: 58%; }
+  .done { color: #1b7f2a; font-weight: 600; }
+  .todo { color: #a15c00; font-weight: 600; }
+  span.kept, span.dropped { font-size: 8.5pt; font-weight: 600; padding: 0 5px; border-radius: 3px; margin-left: 4px; }
+  span.kept { background: #dfeaf8; color: #1a4f8f; }
+  span.dropped { background: #ececea; color: #555; }
+  .card { border: 1px solid #d6d6d6; border-radius: 4px; padding: 4px 9px 2px; margin: 6px 0; page-break-inside: avoid; }
+  .card ul { margin: 2px 0 4px; }
+  .card li { font-size: 9.6pt; margin: 1px 0; }
+  figure { margin: 8px 0 12px; text-align: center; page-break-inside: avoid; }
+  figure img { max-width: 100%; border: 1px solid #ccc; }
+  figcaption { font-size: 9pt; color: #555; margin-top: 3px; }
+  .note { border-left: 3px solid #999; padding: 2px 10px; color: #333; margin: 6px 0; }
+  .pb { page-break-before: always; }
+  pre { background: #f4f4f4; padding: 8px 10px; font-size: 8.6pt; white-space: pre-wrap; }
+  .refs li { font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+<h1>Nosh CV Intern Task — Report</h1>
+<div class="sub">Repo: <a href="https://github.com/maulik0jain/NoshInternTask">github.com/maulik0jain/NoshInternTask</a> &nbsp;·&nbsp; last updated 30 Oct 2026</div>
+
+<table class="status">
+  <tr><th>Part</th><th>Status</th></tr>
+  <tr><td>Task 1 — ground-truth masks with a pretrained model</td><td class="done">done</td></tr>
+  <tr><td>Task 2a — dev / eval split (4:1, leakage-aware)</td><td class="done">done, frozen</td></tr>
+  <tr><td>Task 2b — classical image-processing segmentation + experiment log</td><td class="done">done — {{log.trials|count}} trials, {{log.sweeps|count}} sweeps (§3)</td></tr>
+  <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU {{final.eval.iou.mean:.3f}} (§4)</td></tr>
+  <tr><td>Task 4 — video tracking (Drive link goes here)</td><td class="todo">next</td></tr>
+</table>
+
+<h3>Summary</h3>
+<ul>
+  <li>Ground truth: Grounding DINO (text "egg.") → boxes → SAM 2.1 masks, every overlay checked by eye</li>
+  <li>Split: whole scenes go to one side (85 dev / 25 eval), checked for near-duplicates across the split</li>
+  <li>Classical method: colour gate → <b>multi-threshold search for egg-shaped blobs</b> → GrabCut edge refinement → watershed split. No learning, all parameters picked on dev</li>
+  <li>Eval (run once): IoU <b>{{final.eval.iou.mean:.3f}}</b> (median {{final.eval.iou.median:.3f}}), Dice {{final.eval.dice.mean:.3f}}, boundary F1 {{final.eval.boundary_f1.mean:.3f}}; dev IoU {{final.dev.iou.mean:.3f}}</li>
+  <li>Main gap: eggs on white / pale backgrounds and partly hidden eggs — the method relies on "the egg is the brightest egg-shaped thing"</li>
+</ul>
+
+<h2>0. Dataset — quick facts</h2>
+<ul>
+  <li>110 images, all 640×640 (Roboflow resized with "stretch")</li>
+  <li>Roboflow <b>folder</b> export → class labels only. <b>No boxes, no masks.</b></li>
+  <li>README says no augmentation → checked: 110 unique source ids, 0 copies</li>
+  <li>1–3 eggs per image, almost all white eggs</li>
+  <li>Hard backgrounds: white bag, white egg trays, water in a steel pot, leaves, ash, hands, glossy lids</li>
+</ul>
+
+<h2>1. Task 1 — ground truth with pretrained models</h2>
+
+<h3>Model choice</h3>
+<ul>
+  <li>SAM 2.1 needs a prompt (point / box) — it doesn't find eggs on its own</li>
+  <li>Dataset has no boxes → <b>Grounding DINO</b> (open-vocabulary detector) turns the text <code>"egg."</code> into boxes</li>
+  <li>Each box → <b>SAM 2.1 Hiera Base+</b> → mask</li>
+  <li>Why not the lightest model: GT is made once, offline. Every GT mistake later counts as a mistake of my classical method → spend compute here</li>
+  <li>Why not SAM "segment everything": it also segments hands, floor, shadows → messy filtering</li>
+  <li>Also considered SAM 3 (text prompt built in) — heavier (~850M params) and gated weights; Grounding DINO + SAM 2.1 was enough</li>
+</ul>
+
+<h3>Pipeline</h3>
+<ol>
+  <li>Grounding DINO base, prompt <code>"egg."</code>, box thr 0.30, text thr 0.25</li>
+  <li>Box cleanup: NMS (IoU 0.5), drop boxes &gt;95% of the image, drop a "group" box that contains ≥2 other boxes</li>
+  <li>SAM 2.1, one mask per box (a box prompt isn't ambiguous → single-mask output)</li>
+  <li>Mask cleanup: clip to box (+6 px), fill holes (specular highlights), drop specks &lt;15% of the biggest piece</li>
+  <li>Drop duplicate masks (&gt;50% covered by a more confident egg)</li>
+  <li>Manual review overrides — 2 images, see below</li>
+  <li>Save binary mask, instance mask (ids left → right), overlay, <code>annotations.json</code></li>
+</ol>
+
+<h3 class="pb">Problems found while checking every overlay</h3>
+<table>
+  <tr><th>Problem</th><th>Cause</th><th>Fix</th></tr>
+  <tr><td>Output files had wrong names</td><td>Filenames have extra dots (<code>x_jpg.rf.&lt;hash&gt;.jpg</code>), <code>with_suffix</code> cut off the hash</td><td>Build names from the stem</td></tr>
+  <tr><td>2 images missing one egg (#14, #35)</td><td>Prompt <code>"an egg."</code> gave those eggs 0.28–0.29 (threshold 0.30)</td><td>Prompt <code>"egg."</code>: real eggs 0.55–0.62, junk ≤ 0.10</td></tr>
+  <tr><td>Egg cut by a fridge-tray bar lost a piece (#24)</td><td>Cleanup kept only the largest piece</td><td>Keep all pieces ≥ 15% of the largest</td></tr>
+  <tr><td>Egg's reflection in a glossy lid detected as an egg (#61, #74)</td><td>Looks like a faint egg (det 0.36 / 0.47). Any rule for it would be fitted to 2 images</td><td>Manual override file <code>ground_truth_overrides.json</code>, with reasons</td></tr>
+  <tr><td><b>Not fixed:</b> #17 — egg piece on the far side of a stem missing</td><td>SAM never segments that piece</td><td>Known GT error → shows up in Task 3</td></tr>
+</table>
+
+<figure><img src="figures/gt_prompt_fix.jpg" style="width:56%"><figcaption>Prompt fix: all three eggs found with <code>"egg."</code></figcaption></figure>
+<figure><img src="figures/gt_fixes.jpg" style="width:62%"><figcaption>Row 1: piece behind the bar kept. Row 2: reflection removed by override. Row 3: known GT limitation (not fixed).</figcaption></figure>
+
+<h3>Result</h3>
+<ul>
+  <li><b>110 images, 139 eggs</b> — 92 images with 1 egg, 7 with 2, 11 with 3</li>
+  <li>All 110 overlays checked by eye (full review sheet on the next page)</li>
+  <li>GT = <b>visible</b> egg pixels. Leaves / fingers on top of an egg are not egg</li>
+  <li>Known GT weak spots: eggs under leaves (#17), eggs partly hidden by tray bars</li>
+</ul>
+
+<figure class="pb"><img src="figures/gt_review_sheet.jpg"><figcaption>All 110 ground-truth overlays (colour = egg instance, white = detector box)</figcaption></figure>
+
+<h2 class="pb">2. Task 2a — dev / eval split (4:1)</h2>
+
+<h3>Why a random split is wrong here</h3>
+<ul>
+  <li>Photos were shot in sessions: same pot, same keyboard, same bag, same hand — different angles</li>
+  <li>Random split → same scene in dev and eval → tune thresholds on a scene, then "test" on the same scene → eval looks better than it is</li>
+  <li>Same idea as splitting by subject, not by frame</li>
+</ul>
+
+<h3>Steps</h3>
+<ol>
+  <li><b>Augmented copies</b>: strip <code>.rf.&lt;hash&gt;</code> → source id. 110 ids, 0 duplicates</li>
+  <li><b>Near-identical shots</b>: pHash (64-bit DCT), Hamming ≤ 10 → 1 pair, same group</li>
+  <li><b>Same scene</b>: DINOv2-small embeddings (CLS + mean patch), average-linkage clustering, cosine distance 0.30 → 35 groups
+    <ul><li>0.30 picked by looking at the groups. 0.40 merged marble floor with grey floor (19 images) and still split the pot</li></ul></li>
+  <li><b>Manual merges (8)</b>: same physical setup the embedding kept apart — pot, keyboard, fridge tray, white bag + holder, pink bowl, painted lid, grey floor, towel + rug → <code>scene_merges.json</code> → <b>19 groups</b></li>
+  <li><b>Split whole groups</b>. Rules: eval = 17–23% of images; multi-egg share within ±5 points of overall; then as many scenes as possible. Seeded search (seed 42)
+    <ul>
+      <li>Try 1: <code>StratifiedGroupKFold</code> → valid, but eval had only 4 scenes</li>
+      <li>Try 2: soft penalty → 7 scenes, but only 1 multi-egg image in eval (too easy) → made the multi-egg share a hard rule</li>
+    </ul></li>
+</ol>
+
+<h3>Result</h3>
+<table>
+  <tr><th></th><th>dev</th><th>eval</th></tr>
+  <tr><td>Images</td><td>85</td><td>25</td></tr>
+  <tr><td>Eggs</td><td>109</td><td>30</td></tr>
+  <tr><td>Scenes (groups)</td><td>14</td><td>5</td></tr>
+  <tr><td>Images with 2+ eggs</td><td>15%</td><td>20%</td></tr>
+</table>
+<ul>
+  <li>Eval scenes: steel pot (12, incl. 5 multi-egg), painted container (7), dark-room hand (3), blue bowl (2), red bowl (1)</li>
+  <li>85 : 25 = 77 / 23, not exactly 80 / 20 — whole groups don't divide evenly</li>
+</ul>
+
+<h3>Leakage check</h3>
+<p style="margin:2px 0">For each eval image: cosine similarity (DINOv2) to its most similar dev image.</p>
+<table>
+  <tr><th>Split</th><th>Mean of max similarity</th><th>Eval images with a near-twin in dev (&gt; 0.9)</th></tr>
+  <tr><td>Random split, same size</td><td>0.80</td><td>16%</td></tr>
+  <tr><td><b>Group split (used)</b></td><td><b>0.59</b></td><td><b>0%</b></td></tr>
+</table>
+<ul><li>pHash near-duplicate pairs across dev / eval: 0</li></ul>
+
+<h3>Rules from here on</h3>
+<ul>
+  <li>Split frozen in <code>data/splits/split.csv</code> (committed)</li>
+  <li>All Task 2 tuning and experiments on <b>dev only</b> — <code>run_experiment.py</code> and <code>sweep.py</code> can't even load eval</li>
+  <li>Eval touched <b>once</b>, by <code>final_eval.py</code>, which refuses to run a second time</li>
+</ul>
+
+<h3>Limitations</h3>
+<ul>
+  <li>Scene grouping is partly manual (my judgement) — every merge is listed in a file</li>
+  <li>Some scene types are only in dev (leaves, ash, bright-room hands, marble-floor multi-egg) → eval numbers say less about those</li>
+</ul>
+
+<figure><img src="figures/split_groups.jpg" style="width:86%"><figcaption>All 19 groups. Orange = eval, green = dev.</figcaption></figure>
+
+<h2 class="pb">3. Task 2b — classical segmentation</h2>
+
+<h3>Idea in one line</h3>
+<ul>
+  <li>An egg here = a <b>bright, almost colourless, egg-shaped</b> blob. No single threshold separates it from every background → try many thresholds, keep the blobs that look most like an ellipse, then fix their edges with GrabCut and split touching eggs with watershed</li>
+</ul>
+
+<figure><img src="figures/pipeline_stages.jpg" style="width:100%"><figcaption>Final pipeline ({{final.trial}}) stage by stage on dev image #136 (three touching eggs). Step 4 keeps only the lit part of each egg; GrabCut (5) grows it to the shaded edge; watershed (6) separates the two eggs GrabCut merged.</figcaption></figure>
+
+<h3>Final algorithm ({{final.trial}}) — stages and parameters</h3>
+<ol>
+  <li><b>Blur</b>: Gaussian {{final.pipeline.preprocess.blur}}×{{final.pipeline.preprocess.blur}} — shell texture and JPEG noise make ragged blob outlines</li>
+  <li><b>Colour gate</b> — remove pixels that can't be egg before any thresholding
+    <ul>
+      <li>Skin: YCbCr box Cb {{final.pipeline.skin.cb.0}}–{{final.pipeline.skin.cb.1}}, Cr {{final.pipeline.skin.cr.0}}–{{final.pipeline.skin.cr.1}} (Chai &amp; Ngan 1999) → hands / fingers out. <i>Turned out to also remove warm-lit egg pixels — see the §4 ablation</i></li>
+      <li>Saturation: HSV S ≤ {{final.pipeline.saturation.s_max}} → coloured bowls, leaves, pink lids out (eggs are white / grey)</li>
+    </ul></li>
+  <li><b>Multi-threshold egg search</b> on the Lab L* channel (my own stage, similar idea to MSER)
+    <ul>
+      <li>{{final.pipeline.candidate.levels}} thresholds, evenly spaced between the {{final.pipeline.candidate.pct_range.0}}th and {{final.pipeline.candidate.pct_range.1}}th percentile of L* in that image</li>
+      <li>At each: <code>L* ≥ t</code> AND colour gate → opening {{final.pipeline.candidate.open}} px (cuts thin bridges to background) → connected components → fill holes</li>
+      <li>Shape check per blob: area {{final.pipeline.components.min_area}}–{{final.pipeline.components.max_area}} of the image, solidity ≥ {{final.pipeline.components.min_solidity}}, axis ratio ≤ {{final.pipeline.components.max_axis_ratio}}, ≤ {{final.pipeline.components.max_border_frac}} of the outline on the image border</li>
+      <li><b>Egg score</b> = IoU(blob, its fitted ellipse) × solidity — an egg seen from above is ~1.0; background blobs are not. Keep score ≥ {{final.pipeline.candidate.min_score}}</li>
+      <li>Pick greedily, best score first. The same egg shows up at several thresholds (nested blobs) → take the <b>largest</b> one within {{final.pipeline.candidate.score_tol}} of the best score, so the egg isn't shrunk to its bright centre. Skip blobs that overlap a picked egg by &gt; {{final.pipeline.candidate.max_overlap}}</li>
+      <li>Fallback: if nothing reaches {{final.pipeline.candidate.min_score}}, search once more with score ≥ {{final.pipeline.candidate.fallback_min_score}} (only images that would otherwise be empty)</li>
+    </ul></li>
+  <li><b>Morphology</b>: opening {{final.pipeline.morphology.open}} px, closing {{final.pipeline.morphology.close}} px, fill holes (specular highlights inside eggs)</li>
+  <li><b>GrabCut</b> (Rother 2004) on the original colours, seeded from the mask
+    <ul>
+      <li>Mask eroded by {{final.pipeline.grabcut.erode}} px = sure egg · mask = probably egg · up to {{final.pipeline.grabcut.bg_dilate}} px around it = probably background · further away = sure background</li>
+      <li>{{final.pipeline.grabcut.iters}} iterations, fixed RNG seed; new blobs that don't touch the seed are dropped</li>
+      <li>Why: the search finds the lit part of the egg. The shaded side is often darker than parts of the background, so no threshold gets it — a colour model (GMM + graph cut) can</li>
+    </ul></li>
+  <li><b>Watershed</b> (Vincent &amp; Soille 1991) on the distance transform of each blob: cores = pixels ≥ {{final.pipeline.watershed.peak_rel}} × max distance (≥ {{final.pipeline.watershed.min_core_px}} px) → one instance per core. Splits touching eggs (needed for Task 4)</li>
+</ol>
+<ul>
+  <li>Output: binary mask + instance mask per image. {{final.eval.seconds_per_image:.2f}} s / image on CPU (most of it GrabCut)</li>
+  <li>Code: <code>src/eggseg/classical.py</code> (one small function per stage), parameters: <code>configs/default.yaml</code> + <code>experiments/{{final.trial}}/config.yaml</code></li>
+</ul>
+
+<h3>How I ran experiments</h3>
+<ul>
+  <li>Each trial = a folder <code>experiments/Tn/</code> with <code>config.yaml</code>: which trial it builds on, what changed, why, decision + reason (written after the run)</li>
+  <li><code>run_experiment.py</code> runs it on the <b>85 dev images</b> → <code>results.json</code>, per-image CSV, worst-case panels. Small parameter sweeps with <code>sweep.py</code>, also dev only</li>
+  <li><b>Decision rule</b> (fixed before starting): keep a change if dev mean IoU goes up; if IoU ties, keep only if boundary F1 or instance F1 improves</li>
+  <li>Metrics (same code as Task 3): IoU, Dice, pixel precision / recall, boundary F1 (2 px), instance F1 (match at IoU ≥ 0.5), number of empty predictions</li>
+  <li>Table and per-trial notes below are generated from those files (<code>build_log.py</code> → <code>experiments/LOG.md</code>), not typed</li>
+</ul>
+
+<figure><img src="../experiments/progress.png" style="width:92%"><figcaption>Dev mean IoU of every trial in the order I ran them. Grey = discarded.</figcaption></figure>
+
+<h3>Experiment log — all trials (dev, 85 images)</h3>
+{{@exp_table}}
+
+<h3>How the experiments led to the algorithm</h3>
+<ul>
+  <li><b>T0–T1: one global threshold.</b> Otsu on grey ({{trial.T0.iou:.3f}}) finds eggs (recall {{trial.T0.recall:.2f}}) but also every bright background (precision {{trial.T0.precision:.2f}}). L* alone was worse</li>
+  <li><b>T2: global colour fixes hurt</b> ({{trial.T2.iou:.3f}}) — gray-world and CLAHE brighten the background as much as the egg</li>
+  <li><b>T3–T5b: remove what can't be egg</b> — skin, then saturated colour, then k-means in Lab instead of Otsu. Small, steady gains ({{trial.T3.iou:.3f}} → {{trial.T5b.iou:.3f}}), precision still poor</li>
+  <li><b>T6–T7: clean-up and shape filters.</b> Morphology was a tie. Shape filters on the single-threshold mask <b>broke</b> it ({{trial.T7.iou:.3f}}, {{trial.T7.empty}} empty masks): the egg is often glued to bright background, so filtering throws the egg away with it → the threshold itself is the problem</li>
+  <li><b>T7b–T7c: search over thresholds with an egg-shape score</b> — the key change. Precision jumps ({{trial.T6.precision:.2f}} → {{trial.T7b.precision:.2f}}), IoU {{trial.T7c.iou:.3f}}. Now the failure flips to under-segmentation (recall {{trial.T7c.recall:.2f}})</li>
+  <li><b>T8: GrabCut</b> fixes exactly that — biggest single gain ({{trial.T7c.iou:.3f}} → {{trial.T8.iou:.3f}}, boundary F1 {{trial.T7c.bf1:.2f}} → {{trial.T8.bf1:.2f}})</li>
+  <li><b>T9: ellipse fitting</b> made edges worse (real eggs aren't perfect ellipses, partly hidden eggs even less) → discarded</li>
+  <li><b>T10: watershed</b> — no IoU change (as expected), instance F1 {{trial.T8.inst_f1:.3f}} → {{trial.T10.inst_f1:.3f}}</li>
+  <li><b>T11: fallback pass</b> for images with no egg found: empty masks {{trial.T10.empty}} → {{trial.T11.empty}}, IoU {{trial.T10.iou:.3f}} → {{trial.T11.iou:.3f}} — but more false eggs (instance F1 {{trial.T11.inst_f1:.3f}}); T11b tried to limit that and lost IoU</li>
+</ul>
+
+<h3>Parameter sweeps (dev)</h3>
+{{@sweep_table}}
+
+<h3 class="pb">Per-trial notes (what / why / params / result / decision)</h3>
+{{@trial_cards}}
+
+<h3>Things that didn't work (summary)</h3>
+<ul>
+  <li><b>Global colour normalisation</b> (gray-world, CLAHE) — T2</li>
+  <li><b>Shape filtering after a single threshold</b> — T7: correct idea, wrong place. Moved into the threshold search (T7b)</li>
+  <li><b>Ellipse replacement</b> of the final mask — T9 (and the min-fit sweep: only harmless when it almost never fires)</li>
+  <li><b>Capping the fallback to 1 egg</b> — T11b: fewer false eggs, but on those hard images the best-scoring blob is often not the egg</li>
+  <li>Bugs found on the way, each from looking at worst-case panels: GrabCut not repeatable (no RNG seed), GrabCut adding far-away background blobs, a degenerate <code>fitEllipse</code> result that tried to allocate 71 GB</li>
+</ul>
+
+<h2 class="pb">4. Task 3 — evaluation &amp; analysis</h2>
+
+<h3>Setup</h3>
+<ul>
+  <li>GT = Task 1 SAM 2.1 masks, prediction = final pipeline <b>{{final.trial}}</b>, frozen before eval was opened</li>
+  <li><code>final_eval.py</code> ran dev + eval <b>once</b> ({{final.run_at}}); <code>analyze.py</code> makes every number and plot below from its saved outputs</li>
+  <li>Metrics and why:
+    <ul>
+      <li>IoU / Dice — overall overlap, the "match Task 1 quality" number. Per image, then averaged (an empty prediction counts as 0)</li>
+      <li>Pixel precision / recall — tells over- vs under-segmentation apart</li>
+      <li>Boundary F1 at 2 px — edge quality; IoU is forgiving on big eggs</li>
+      <li>Instance precision / recall / F1 (match at IoU ≥ 0.5) and exact egg count — what Task 4 tracking needs</li>
+    </ul></li>
+</ul>
+
+<h3>Quantitative results</h3>
+{{@metrics_table}}
+<ul>
+  <li><b>Eval is a bit higher than dev</b> (IoU {{final.eval.iou.mean:.3f}} vs {{final.dev.iou.mean:.3f}}). Not tuning luck — scene mix: the hardest backgrounds (white bag, ash, fridge tray, all IoU ≤ {{fac.all.background.ash.iou_mean:.2f}}) are only in dev; eval's biggest scene is the steel pot ({{fac.eval.background.steel_pot.n}} images, IoU {{fac.eval.background.steel_pot.iou_mean:.2f}})</li>
+  <li><b>All-or-nothing</b>: mean ≪ median. Eval: {{tab.eval.n_good}} / {{tab.eval.images}} images at IoU ≥ 0.8, {{tab.eval.n_zero}} at exactly 0. Dev: {{tab.dev.n_good}} / {{tab.dev.images}} and {{tab.dev.n_zero}}. When the method finds the egg it's usually good; the mean is dragged down by misses</li>
+  <li><b>Under-segmentation, not false background</b>: pixel precision median {{final.eval.precision.median:.2f}} (eval), recall mean only {{final.eval.recall.mean:.2f}} → what's predicted is almost always egg, but part of the egg is missing</li>
+  <li><b>Edges</b>: boundary F1 {{final.eval.boundary_f1.mean:.2f}} — even good masks are often more than 2 px off SAM's edge, mostly on the shaded rim</li>
+  <li><b>Instances</b>: eval instance F1 {{final.eval.instance.f1:.2f}}, dev only {{final.dev.instance.f1:.2f}} — dev has keyboards, ash and white bags where extra blobs pass as eggs (instance precision {{final.dev.instance.precision:.2f}}; e.g. dev #18: 8 predicted eggs for 1 real). Egg count exactly right: {{final.eval.instance.count_exact:.0%}} of eval images</li>
+</ul>
+
+<figure><img src="../results/analysis/iou_hist.png" style="width:72%"><figcaption>Per-image IoU, dev vs eval (share of images per 0.1 bin).</figcaption></figure>
+
+<h3>What the error depends on</h3>
+<figure><img src="../results/analysis/iou_vs_factors.png" style="width:100%"><figcaption>Per-image IoU against number of eggs, image brightness and egg size. Spearman ρ (dev + eval): brightness {{fac.all.spearman_iou_vs_brightness}}, egg area {{fac.all.spearman_iou_vs_egg_area}}.</figcaption></figure>
+<ul>
+  <li><b>Colour-gate loss is the strongest factor</b> (ρ = {{fac.all.spearman_iou_vs_gate_loss}}): in {{fac.all.gate_loss.n_high}} images the skin / saturation gate throws away ≥ 40% of the egg before thresholding → mean IoU {{fac.all.gate_loss.iou_mean_high:.2f}} vs {{fac.all.gate_loss.iou_mean_low:.2f}} for the rest. Almost all of it is the <b>skin box</b>, not saturation (<code>diagnostics.csv</code>)</li>
+  <li><b>Hand in the image</b>: mean IoU {{fac.all.hand.yes.iou_mean:.2f}} vs {{fac.all.hand.no.iou_mean:.2f}}. On eval all {{fac.eval.hand.yes.n}} hand images score {{fac.eval.hand.yes.iou_mean:.0f}} — the dark-room / backlit shots</li>
+  <li><b>Brightness, egg size</b>: weak (ρ = {{fac.all.spearman_iou_vs_brightness}} and {{fac.all.spearman_iou_vs_egg_area}}). Bright images are often white backgrounds, hence the slight negative trend</li>
+  <li><b>Egg count</b>: multi-egg images do better (2 eggs {{fac.all.egg_count.2.iou_mean:.2f}}, 3 eggs {{fac.all.egg_count.3.iou_mean:.2f}}, 1 egg {{fac.all.egg_count.1.iou_mean:.2f}}) — they were shot on high-contrast surfaces (steel pot, marble), so this is a scene effect, not a count effect</li>
+</ul>
+
+<figure><img src="../results/analysis/iou_by_background.png" style="width:70%"><figcaption>Mean IoU by background type (my manual labels in <code>data/processed/attributes_manual.csv</code>, dev + eval).</figcaption></figure>
+
+<ul>
+  <li>Works: coloured or dark backgrounds — rug, steel pot, pink bowl (IoU ≥ {{fac.all.background.pink_bowl.iou_mean:.2f}})</li>
+  <li>Fails: backgrounds as bright and colourless as the egg — fridge tray {{fac.all.background.fridge_tray.iou_mean:.2f}}, white bag {{fac.all.background.white_bag.iou_mean:.2f}}, pale tiles {{fac.all.background.tiles.iou_mean:.2f}} — and ash {{fac.all.background.ash.iou_mean:.2f}} (egg dusted with the same grey). Red bowl is a single image</li>
+  <li>That's the core assumption of the method breaking: "egg = brightest, least-coloured, egg-shaped thing"</li>
+</ul>
+
+<h3>Failure taxonomy</h3>
+<ul>
+  <li>Failure = IoU &lt; {{tax.fail_iou_below}} → {{tax.failed_images}} images (dev + eval)</li>
+  <li>I looked at every one (sheets in <code>results/analysis/failures/</code>) and gave each <b>one primary cause</b> → <code>failure_labels.csv</code></li>
+</ul>
+{{@taxonomy_table}}
+<figure><img src="../results/analysis/failure_taxonomy.png" style="width:72%"><figcaption>Primary cause of each failed image.</figcaption></figure>
+<ul>
+  <li>How labelled: (1) if most of the error is missed egg (FN &gt; FP) and the colour gate removed ≥ 40% of the egg → "colour gate removes egg"; (2) otherwise by eye from the failure sheet. Notes per image in <code>failure_labels.csv</code></li>
+  <li><b>White / pale background</b> ({{tax.counts.white / pale background}}) — no threshold separates egg from bag / tray / wall; the blob that comes out isn't egg-shaped → egg missed, or the bag picked instead</li>
+  <li><b>Shaded side missed</b> ({{tax.counts.shaded side missed}}) — search keeps the lit half; the shaded half is darker than the surface next to it, and GrabCut only partly recovers it</li>
+  <li><b>Colour gate removes egg</b> ({{tax.counts.colour gate removes egg}}) — the Chai &amp; Ngan skin box also matches cream eggs, eggs under warm light, and backlit eggs. All 3 eval misses in the dark-room scene are this (84–98% of the egg removed)</li>
+  <li><b>Bright object picked</b> ({{tax.counts.bright object picked}}) — keyboard keys, foil, polished steel: bright, colourless and convex enough to pass the egg score</li>
+  <li><b>Egg partly hidden</b> ({{tax.counts.egg partly hidden}}) — leaves, tray bars, boiling water: the visible part isn't egg-shaped</li>
+  <li><b>Ash camouflage</b> ({{tax.counts.ash camouflage}}) — egg dusted with ash, lying on ash: same grey, same texture; either nothing egg-shaped is found or the ash patch is taken with the egg</li>
+  <li><b>Touching eggs</b> ({{tax.counts.touching eggs}}) — the merged blob of 3 touching eggs fails the shape score before watershed ever sees it</li>
+  <li><b>Bad GT</b>: 0 — no failure was caused by a wrong SAM mask (the known GT error, #17, is not among the failures)</li>
+</ul>
+
+<h3 class="pb">Worst eval images</h3>
+<ul><li>Columns: image · GT (SAM) · prediction · error map (<b style="color:#2f9e2f">green</b> = correct egg, <b style="color:#d42020">red</b> = false egg, <b style="color:#2860d8">blue</b> = missed egg)</li></ul>
+<figure><img src="../results/analysis/worst_eval_1.jpg" style="width:74%"><figcaption>Eval worst 1–4, rows top → bottom: #20, #24, #44, #139.</figcaption></figure>
+<ul>
+  <li><b>#20, #24, #44</b> — one scene: egg held up against a lamp / bright wall in a dark room. Backlit, the egg looks orange-brown → the skin box removes 84–98% of it → nothing egg-like is left (#44 keeps two finger blobs, #24 a wall switch, #20 nothing)</li>
+  <li><b>#139</b> — white egg against a pale wall: egg and wall merge at every threshold, so no blob is egg-shaped, even at the fallback score</li>
+</ul>
+<figure class="pb"><img src="../results/analysis/worst_eval_2.jpg" style="width:74%"><figcaption>Eval worst 5–8, rows top → bottom: #149, #110, #31, #153.</figcaption></figure>
+<ul>
+  <li><b>#149</b> — same as #139 with pale tiles: only a small highlight on the egg is kept</li>
+  <li><b>#110</b> — pale wall again; this time the wall itself is taken (big red area) together with a corner of the egg</li>
+  <li><b>#31</b> — lit top half found; the shaded lower half is not recovered by GrabCut</li>
+  <li><b>#153</b> — egg itself is right; a bright patch of steel / water next to it passes as a second egg</li>
+</ul>
+
+
+<h3 class="pb">Ablation — what each stage still adds (dev, after the eval run)</h3>
+<ul>
+  <li>Final pipeline with one stage switched off at a time, <b>dev only</b> (<code>ablation.py</code>). Several stages were accepted early, on top of a much simpler method — do they still help?</li>
+  <li>Run after the eval run, as part of this analysis → nothing here changes the reported pipeline or its eval numbers</li>
+</ul>
+{{@ablation_table}}
+<ul>
+  <li><b>GrabCut</b> is the most important stage: without it IoU {{abl:no GrabCut|iou_mean:.3f}}, boundary F1 {{abl:no GrabCut|boundary_f1:.3f}}</li>
+  <li><b>Fallback pass</b>: removing it gives back exactly T10 ({{abl:no fallback pass|empty}} empty masks) → the IoU / instance-F1 trade-off from the log</li>
+  <li><b>Watershed</b>: same IoU by design, instance F1 {{abl:no watershed|instance_f1:.3f}} → {{abl:final pipeline|instance_f1:.3f}}. Only 5 images have touching eggs</li>
+  <li><b>The skin filter now hurts</b>: without it dev IoU goes {{abl:final pipeline|iou_mean:.3f}} → {{abl:no skin filter|iou_mean:.3f}}. It helped in T3, when the candidate was one Otsu threshold that grabbed whole hands. The shape search ignores hands anyway (not egg-shaped), so the skin box now mostly deletes warm-lit egg pixels — the same thing the colour-gate diagnostic and the failure taxonomy show. Lesson: re-check early decisions once the pipeline around them changes</li>
+  <li>I did <b>not</b> switch it off in the final pipeline: that would be a change made after seeing eval results, and the eval run would no longer be a clean test. It's the first item below</li>
+</ul>
+
+<h3>Performance gaps → what I'd improve</h3>
+<ol>
+  <li><b>Colour gate</b> ({{tax.counts.colour gate removes egg}} failures + part of "shaded side"). Drop the skin box, or only remove skin regions that are large and touch the image border (hands come in from the edge). Dropping it alone: dev IoU {{abl:final pipeline|iou_mean:.3f}} → {{abl:no skin filter|iou_mean:.3f}} (ablation above)</li>
+  <li><b>White / pale backgrounds</b> ({{tax.counts.white / pale background}}, the biggest group). Brightness and colour carry no signal there → use edges and shading: an egg is a smooth closed outline with a soft shading gradient and a cast shadow. E.g. ellipse detection on edges (Hough / RANSAC on Canny), or a gradient term in the egg score</li>
+  <li><b>Shaded side missed</b> ({{tax.counts.shaded side missed}}). The search finds the lit cap; give GrabCut the cap's fitted ellipse (slightly enlarged) as "probably egg". T9 forced the ellipse as the final mask, which was too strong; as a GrabCut seed the colour model still decides</li>
+  <li><b>False eggs</b> on keys, foil, steel ({{tax.counts.bright object picked}}) and from the fallback pass. Add a check for straight edges / corners and high-frequency texture — eggs have neither</li>
+  <li><b>Touching eggs</b>: split merged blobs with watershed <i>before</i> the shape score, so 2–3 touching eggs aren't rejected as one non-egg blob</li>
+  <li><b>Evaluation itself</b>: GT is SAM pseudo-GT, so boundary F1 at 2 px also counts SAM's edge error; a few hand-drawn masks would show how much of the gap is the GT. Eval has only 5 scenes → per-scene numbers say more than the mean</li>
+</ol>
+<ul>
+  <li>Bottom line: the method does well when the egg is the brightest, least-coloured, egg-shaped thing in view (IoU ≥ 0.8 on {{tab.eval.n_good}} / {{tab.eval.images}} eval images), and fails completely when that's not true. Closing the rest of the gap to SAM needs cues beyond brightness — edges, shading, context</li>
+</ul>
+
+<h2>5. Task 4 — video tracking</h2>
+<ul><li>Next. Google Drive link to the output video will go here</li></ul>
+
+<h2>6. How to run</h2>
+<pre>pip install -r requirements.txt
+python scripts/download_assets.py          # SAM 2.1 checkpoint (+ dataset if missing)
+python scripts/task1_sam2_groundtruth.py   # Task 1  -> ground_truth/
+python scripts/make_split.py               # Task 2a -> data/splits/split.csv
+
+# Task 2b: one trial / a sweep (dev only)
+python scripts/run_experiment.py experiments/T11/config.yaml --worst 8
+python scripts/sweep.py experiments/T8/config.yaml grabcut.bg_dilate "[25, 45, 70]" --name T8_bg_dilate
+python scripts/build_log.py                # -> experiments/LOG.md, log.json, progress.png
+
+# Task 3: the single eval run, then analysis + this report
+python scripts/final_eval.py               # trial named in configs/final.yaml
+python scripts/analyze.py                  # -> results/analysis/
+python scripts/ablation.py                 # dev only -> results/ablation/
+python scripts/build_report.py             # -> report/report.html + report.pdf
+pytest tests/</pre>
+<ul><li>Tested on Windows 11, Python 3.13, PyTorch 2.6 + CUDA 12.4, RTX 4070 Laptop (8 GB). Task 2/3 need only OpenCV, NumPy, PyYAML, matplotlib (CPU)</li></ul>
+
+<h2>7. AI tools</h2>
+<ul>
+  <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures) and drafting this report</li>
+  <li>Decisions (what to try next, keep / discard, failure labels) were made by looking at dev results and worst-case panels; every number in this report is filled in by <code>build_report.py</code> from saved result files</li>
+</ul>
+
+<h2>8. References</h2>
+<ol class="refs">
+  <li>N. Otsu. A threshold selection method from gray-level histograms. IEEE Trans. SMC, 1979</li>
+  <li>D. Chai, K. N. Ngan. Face segmentation using skin-color map in videophone applications. IEEE Trans. CSVT, 1999</li>
+  <li>J. Matas et al. Robust wide-baseline stereo from maximally stable extremal regions (MSER). BMVC, 2002</li>
+  <li>A. Fitzgibbon, M. Pilu, R. Fisher. Direct least square fitting of ellipses. IEEE TPAMI, 1999</li>
+  <li>Y. Boykov, M.-P. Jolly. Interactive graph cuts for optimal boundary &amp; region segmentation. ICCV, 2001</li>
+  <li>C. Rother, V. Kolmogorov, A. Blake. "GrabCut": interactive foreground extraction using iterated graph cuts. SIGGRAPH, 2004</li>
+  <li>L. Vincent, P. Soille. Watersheds in digital spaces: an efficient algorithm based on immersion simulations. IEEE TPAMI, 1991</li>
+  <li>S. Liu et al. Grounding DINO: marrying DINO with grounded pre-training for open-set object detection. 2023</li>
+  <li>N. Ravi et al. SAM 2: Segment anything in images and videos. 2024</li>
+  <li>M. Oquab et al. DINOv2: learning robust visual features without supervision. 2023</li>
+</ol>
+
+</body>
+</html>

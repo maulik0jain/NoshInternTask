@@ -1,0 +1,68 @@
+{
+  "dev": {
+    "iou": {
+      "mean": 0.5888,
+      "median": 0.6601
+    },
+    "dice": {
+      "mean": 0.6805,
+      "median": 0.7952
+    },
+    "precision": {
+      "mean": 0.8329,
+      "median": 0.9897
+    },
+    "recall": {
+      "mean": 0.6392,
+      "median": 0.7651
+    },
+    "boundary_f1": {
+      "mean": 0.4582,
+      "median": 0.4649
+    },
+    "instance": {
+      "precision": 0.4901,
+      "recall": 0.6789,
+      "f1": 0.5692,
+      "count_exact": 0.6706
+    },
+    "empty_predictions": 2,
+    "images": 85,
+    "n_good": 31,
+    "n_poor": 32,
+    "n_zero": 8
+  },
+  "eval": {
+    "iou": {
+      "mean": 0.6181,
+      "median": 0.8169
+    },
+    "dice": {
+      "mean": 0.6827,
+      "median": 0.8992
+    },
+    "precision": {
+      "mean": 0.8236,
+      "median": 0.9942
+    },
+    "recall": {
+      "mean": 0.6834,
+      "median": 0.864
+    },
+    "boundary_f1": {
+      "mean": 0.4895,
+      "median": 0.5097
+    },
+    "instance": {
+      "precision": 0.7419,
+      "recall": 0.7667,
+      "f1": 0.7541,
+      "count_exact": 0.8
+    },
+    "empty_predictions": 2,
+    "images": 25,
+    "n_good": 13,
+    "n_poor": 8,
+    "n_zero": 4
+  }
+}

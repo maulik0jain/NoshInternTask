@@ -1,0 +1,39 @@
+{
+  "base": "T7b",
+  "param": "candidate.min_score",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 0.6,
+      "iou_mean": 0.4188,
+      "iou_median": 0.4256,
+      "boundary_f1": 0.2303,
+      "instance_f1": 0.3003,
+      "empty": 2
+    },
+    {
+      "value": 0.7,
+      "iou_mean": 0.4432,
+      "iou_median": 0.4378,
+      "boundary_f1": 0.2438,
+      "instance_f1": 0.3684,
+      "empty": 2
+    },
+    {
+      "value": 0.75,
+      "iou_mean": 0.4475,
+      "iou_median": 0.4536,
+      "boundary_f1": 0.2484,
+      "instance_f1": 0.412,
+      "empty": 4
+    },
+    {
+      "value": 0.8,
+      "iou_mean": 0.4475,
+      "iou_median": 0.466,
+      "boundary_f1": 0.2493,
+      "instance_f1": 0.4732,
+      "empty": 12
+    }
+  ]
+}

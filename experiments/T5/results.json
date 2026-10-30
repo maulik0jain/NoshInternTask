@@ -1,0 +1,57 @@
+{
+  "id": "T5",
+  "split": "dev",
+  "summary": {
+    "images": 85,
+    "empty_predictions": 0,
+    "iou": {
+      "mean": 0.4084,
+      "median": 0.3326
+    },
+    "dice": {
+      "mean": 0.5305,
+      "median": 0.4992
+    },
+    "precision": {
+      "mean": 0.5228,
+      "median": 0.4155
+    },
+    "recall": {
+      "mean": 0.7405,
+      "median": 0.7616
+    },
+    "boundary_f1": {
+      "mean": 0.1885,
+      "median": 0.1222
+    },
+    "instance": {
+      "precision": 0.0065,
+      "recall": 0.4771,
+      "f1": 0.0127,
+      "count_exact": 0.0471
+    },
+    "worst": [
+      {
+        "image": "train/egg/not_damaged_42_jpg.rf.6626de5325fbf9ad4fec739b2a4e29f3.jpg",
+        "iou": 0.0592
+      },
+      {
+        "image": "train/egg/not_damaged_39_jpg.rf.81c4c633444db832268298ddae1010d6.jpg",
+        "iou": 0.0633
+      },
+      {
+        "image": "train/egg/not_damaged_32_jpg.rf.15f5702d8602844d8d866d229e674c89.jpg",
+        "iou": 0.0713
+      },
+      {
+        "image": "train/egg/not_damaged_116_jpg.rf.43fecd96347e2129115fceed65986cc9.jpg",
+        "iou": 0.0732
+      },
+      {
+        "image": "train/egg/not_damaged_160_jpg.rf.64b7834918be5b72840ecee1e390157e.jpg",
+        "iou": 0.0811
+      }
+    ]
+  },
+  "seconds_per_image": 0.055
+}

@@ -1,0 +1,39 @@
+{
+  "base": "T10",
+  "param": "watershed.peak_rel",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 0.4,
+      "iou_mean": 0.5661,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4451,
+      "instance_f1": 0.6094,
+      "empty": 11
+    },
+    {
+      "value": 0.5,
+      "iou_mean": 0.5661,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4451,
+      "instance_f1": 0.6121,
+      "empty": 11
+    },
+    {
+      "value": 0.6,
+      "iou_mean": 0.5661,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4451,
+      "instance_f1": 0.618,
+      "empty": 11
+    },
+    {
+      "value": 0.7,
+      "iou_mean": 0.5661,
+      "iou_median": 0.6545,
+      "boundary_f1": 0.4451,
+      "instance_f1": 0.6034,
+      "empty": 11
+    }
+  ]
+}

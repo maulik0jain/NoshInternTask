@@ -1,0 +1,8 @@
+id: T8
+extends: T7c
+what: + GrabCut refinement seeded from the mask (eroded = sure egg, >70 px outside = sure background)
+why: The search under-segments (precision ~0.88, recall ~0.48) - it often keeps only the bright cap of the egg. GrabCut's colour models can grow the mask out to the real egg edge.
+changes:
+  grabcut: {enabled: true, iters: 5, erode: 10, bg_dilate: 70}   # 70 from the T8_bg_dilate sweep (25 -> 0.536, 70 -> 0.566)
+decision: kept
+reason: "Largest single gain: GrabCut grows the egg cap out to its real edge (recall and boundary F1 up). bg_dilate 70 chosen by sweep T8_bg_dilate. Two code fixes found here: fixed RNG seed (runs were not repeatable) and drop GrabCut blobs that don't touch the seed (they were new background objects)."

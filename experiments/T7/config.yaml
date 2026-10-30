@@ -1,0 +1,8 @@
+id: T7
+extends: T6
+what: + connected-component filters (area, solidity, axis ratio, border contact)
+why: Precision is the problem (~0.5); most false positives are big, irregular or border-hugging bright background regions.
+changes:
+  components: {enabled: true}
+decision: discarded
+reason: "IoU fell and 36 dev images got an empty mask: one global threshold glues the egg to bright background (ash, cables, white bag, towel), so the shape filter throws the egg away together with the background. Sweep T7_open: stronger opening helps but stays below T6."

@@ -1,0 +1,713 @@
+{
+  "trials": [
+    {
+      "id": "T0",
+      "extends": "default",
+      "what": "Otsu threshold on grayscale (baseline)",
+      "why": "Eggs are usually the brightest thing in the photo; Otsu picks the bright/dark split with no tuning.",
+      "changes": {},
+      "decision": "baseline",
+      "reason": "Reference point. High recall but low precision: Otsu takes every bright region, not just the egg.",
+      "iou": 0.3657,
+      "iou_med": 0.2734,
+      "dice": 0.486,
+      "precision": 0.4074,
+      "recall": 0.8786,
+      "bf1": 0.1575,
+      "inst_f1": 0.0078,
+      "empty": 0
+    },
+    {
+      "id": "T1",
+      "extends": "T0",
+      "what": "Otsu on CIE Lab L* instead of grayscale",
+      "why": "L* is perceptual lightness and ignores colour, so e.g. a saturated pink bowl is not \"brighter\" than it looks.",
+      "changes": {
+        "candidate": {
+          "channel": "L"
+        }
+      },
+      "decision": "discarded",
+      "reason": "IoU fell (vs T0). With one global threshold, L* lets in even more bright background. Re-tested later inside the multi-threshold search (T7c), where it won.",
+      "iou": 0.3404,
+      "iou_med": 0.256,
+      "dice": 0.4614,
+      "precision": 0.3726,
+      "recall": 0.8959,
+      "bf1": 0.1429,
+      "inst_f1": 0.0074,
+      "empty": 0
+    },
+    {
+      "id": "T2",
+      "extends": "T1",
+      "what": "+ gray-world white balance and CLAHE on L*",
+      "why": "Warm bulbs tint white eggs cream; CLAHE lifts eggs in dim/backlit photos.",
+      "changes": {
+        "preprocess": {
+          "white_balance": true,
+          "clahe": {
+            "enabled": true,
+            "clip": 2.0,
+            "tile": 8
+          }
+        }
+      },
+      "decision": "discarded",
+      "reason": "IoU fell sharply. Gray-world shifts colours in scenes dominated by one colour (pink bowl, green leaves), and CLAHE brightens the background as much as the egg, so Otsu took more background.",
+      "iou": 0.266,
+      "iou_med": 0.2056,
+      "dice": 0.3892,
+      "precision": 0.2817,
+      "recall": 0.8751,
+      "bf1": 0.0774,
+      "inst_f1": 0.0052,
+      "empty": 0
+    },
+    {
+      "id": "T3",
+      "extends": "T0",
+      "what": "+ remove skin pixels (YCbCr box, Chai & Ngan 1999)",
+      "why": "14 images have a hand; a lit palm is as bright as the egg and gets swallowed by Otsu.",
+      "changes": {
+        "skin": {
+          "enabled": true
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU and precision up vs T0; palms stop being swallowed with the egg.",
+      "iou": 0.3766,
+      "iou_med": 0.2897,
+      "dice": 0.496,
+      "precision": 0.4505,
+      "recall": 0.8149,
+      "bf1": 0.1594,
+      "inst_f1": 0.0075,
+      "empty": 0
+    },
+    {
+      "id": "T4",
+      "extends": "T3",
+      "what": "+ keep only low-saturation pixels (HSV S <= 60)",
+      "why": "Eggs are white/cream (near-colourless); many bright backgrounds are coloured (pink bowl, green leaves, wood, rugs).",
+      "changes": {
+        "saturation": {
+          "enabled": true,
+          "s_max": 60
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU up vs T3. Sweep T4_s_max: 25 and 40 tie, 40 used from T5b on because it is gentler on cream eggs.",
+      "iou": 0.3915,
+      "iou_med": 0.2921,
+      "dice": 0.5091,
+      "precision": 0.4702,
+      "recall": 0.8149,
+      "bf1": 0.1717,
+      "inst_f1": 0.0083,
+      "empty": 0
+    },
+    {
+      "id": "T5",
+      "extends": "T3",
+      "what": "k-means (k=3) in Lab instead of Otsu; keep the brightest, least-coloured cluster",
+      "why": "Otsu splits the histogram in two; with 3 clusters, egg / bright background / dark background can separate.",
+      "changes": {
+        "candidate": {
+          "method": "kmeans",
+          "k": 3,
+          "chroma_weight": 1.0
+        }
+      },
+      "decision": "kept",
+      "reason": "Better than Otsu (T4) as the candidate generator: IoU and precision up.",
+      "iou": 0.4084,
+      "iou_med": 0.3326,
+      "dice": 0.5305,
+      "precision": 0.5228,
+      "recall": 0.7405,
+      "bf1": 0.1885,
+      "inst_f1": 0.0127,
+      "empty": 0
+    },
+    {
+      "id": "T5b",
+      "extends": "T5",
+      "what": "k-means candidate + low-saturation filter (S <= 40, from the T4 sweep)",
+      "why": "T4 and T5 helped separately; check whether they stack.",
+      "changes": {
+        "saturation": {
+          "enabled": true,
+          "s_max": 40
+        }
+      },
+      "decision": "kept",
+      "reason": "T4 and T5 stack: IoU up again.",
+      "iou": 0.4147,
+      "iou_med": 0.3326,
+      "dice": 0.5357,
+      "precision": 0.5309,
+      "recall": 0.74,
+      "bf1": 0.1935,
+      "inst_f1": 0.0145,
+      "empty": 0
+    },
+    {
+      "id": "T6",
+      "extends": "T5b",
+      "what": "+ morphology (open r=3, close r=7, fill holes)",
+      "why": "Raw masks are speckled (ash, rug texture) and have holes at specular highlights and dirt marks.",
+      "changes": {
+        "morphology": {
+          "enabled": true,
+          "open": 3,
+          "close": 7,
+          "fill_holes": true
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU about the same, boundary F1 and instance F1 clearly up (fewer specks, filled highlights).",
+      "iou": 0.4158,
+      "iou_med": 0.3395,
+      "dice": 0.5364,
+      "precision": 0.5322,
+      "recall": 0.7589,
+      "bf1": 0.2164,
+      "inst_f1": 0.0912,
+      "empty": 0
+    },
+    {
+      "id": "T7",
+      "extends": "T6",
+      "what": "+ connected-component filters (area, solidity, axis ratio, border contact)",
+      "why": "Precision is the problem (~0.5); most false positives are big, irregular or border-hugging bright background regions.",
+      "changes": {
+        "components": {
+          "enabled": true
+        }
+      },
+      "decision": "discarded",
+      "reason": "IoU fell and 36 dev images got an empty mask: one global threshold glues the egg to bright background (ash, cables, white bag, towel), so the shape filter throws the egg away together with the background. Sweep T7_open: stronger opening helps but stays below T6.",
+      "iou": 0.3124,
+      "iou_med": 0.0,
+      "dice": 0.3652,
+      "precision": 0.7443,
+      "recall": 0.3489,
+      "bf1": 0.1843,
+      "inst_f1": 0.4824,
+      "empty": 36
+    },
+    {
+      "id": "T7b",
+      "extends": "T6",
+      "what": "Multi-threshold egg search (24 thresholds, blobs scored by ellipse fit x solidity) replaces the single Otsu/k-means threshold",
+      "why": "T7 failed because one global threshold glues the egg to bright background, so the shape filter throws both away (36 empty images). Trying many thresholds gives the egg a chance to separate at some level.",
+      "changes": {
+        "candidate": {
+          "method": "search",
+          "channel": "gray"
+        },
+        "components": {
+          "enabled": false
+        }
+      },
+      "decision": "kept",
+      "reason": "Best so far and precision up a lot; fixes the T7 failure mode. Sweeps: min_score 0.75 and 0.8 tie on mean IoU, 0.8 kept for its better median and instance F1; s_max 40 still best.",
+      "iou": 0.4475,
+      "iou_med": 0.466,
+      "dice": 0.5406,
+      "precision": 0.8795,
+      "recall": 0.4642,
+      "bf1": 0.2493,
+      "inst_f1": 0.4732,
+      "empty": 12
+    },
+    {
+      "id": "T7c",
+      "extends": "T7b",
+      "what": "Search on Lab L* instead of grayscale (from the T7b channel sweep)",
+      "why": "T1 rejected L* with a single Otsu threshold; with shape-scored multi-threshold search the comparison can come out differently, so it was re-tested.",
+      "changes": {
+        "candidate": {
+          "channel": "L"
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU up vs T7b: the channel sweep reverses the T1 result once candidates are chosen by shape.",
+      "iou": 0.4638,
+      "iou_med": 0.483,
+      "dice": 0.5647,
+      "precision": 0.9025,
+      "recall": 0.4827,
+      "bf1": 0.257,
+      "inst_f1": 0.4935,
+      "empty": 11
+    },
+    {
+      "id": "T8",
+      "extends": "T7c",
+      "what": "+ GrabCut refinement seeded from the mask (eroded = sure egg, >70 px outside = sure background)",
+      "why": "The search under-segments (precision ~0.88, recall ~0.48) - it often keeps only the bright cap of the egg. GrabCut's colour models can grow the mask out to the real egg edge.",
+      "changes": {
+        "grabcut": {
+          "enabled": true,
+          "iters": 5,
+          "erode": 10,
+          "bg_dilate": 70
+        }
+      },
+      "decision": "kept",
+      "reason": "Largest single gain: GrabCut grows the egg cap out to its real edge (recall and boundary F1 up). bg_dilate 70 chosen by sweep T8_bg_dilate. Two code fixes found here: fixed RNG seed (runs were not repeatable) and drop GrabCut blobs that don't touch the seed (they were new background objects).",
+      "iou": 0.5661,
+      "iou_med": 0.6545,
+      "dice": 0.6517,
+      "precision": 0.8942,
+      "recall": 0.605,
+      "bf1": 0.4451,
+      "inst_f1": 0.6079,
+      "empty": 11
+    },
+    {
+      "id": "T9",
+      "extends": "T8",
+      "what": "+ ellipse regularisation (blobs with ellipse IoU >= 0.9 are replaced by their fitted ellipse)",
+      "why": "Eggs are near-elliptical from most viewpoints; snapping clean blobs to the ellipse should fix dents from highlights/shadows on the outline. Irregular blobs (eggs behind fingers/leaves) are left alone because the GT only covers the visible part.",
+      "changes": {
+        "ellipse": {
+          "enabled": true,
+          "min_fit_iou": 0.9,
+          "mode": "replace"
+        }
+      },
+      "decision": "discarded",
+      "reason": "IoU slightly down and boundary F1 down a lot: real egg outlines are egg-shaped (one blunt end), not ellipses, so snapping moves correct edges. Stricter fit (sweep T9_min_fit_iou) still loses.",
+      "iou": 0.5607,
+      "iou_med": 0.6436,
+      "dice": 0.6483,
+      "precision": 0.8867,
+      "recall": 0.6032,
+      "bf1": 0.3307,
+      "inst_f1": 0.6079,
+      "empty": 11
+    },
+    {
+      "id": "T10",
+      "extends": "T8",
+      "what": "+ distance-transform watershed to split touching eggs into separate instances",
+      "why": "5 images have touching eggs; a merged blob counts as zero correct instances. Binary IoU barely changes; instance F1 should.",
+      "changes": {
+        "watershed": {
+          "enabled": true,
+          "peak_rel": 0.6,
+          "min_core_px": 30
+        }
+      },
+      "decision": "kept",
+      "reason": "Binary IoU unchanged (as expected), instance F1 up: touching eggs now come out as separate objects. Needed for Task 4 tracking.",
+      "iou": 0.5661,
+      "iou_med": 0.6545,
+      "dice": 0.6517,
+      "precision": 0.8942,
+      "recall": 0.605,
+      "bf1": 0.4451,
+      "inst_f1": 0.618,
+      "empty": 11
+    },
+    {
+      "id": "T11",
+      "extends": "T10",
+      "what": "Fallback pass with a looser shape score (0.65) for images where the search found nothing",
+      "why": "11 dev images still get an empty mask (IoU 0). The min_score sweep showed 0.6 leaves only 2 empty but hurts the other images, so the looser score is applied only where the strict pass found nothing.",
+      "changes": {
+        "candidate": {
+          "fallback_min_score": 0.65
+        }
+      },
+      "decision": "kept",
+      "reason": "IoU up and empty masks 11 -> 2 (the two left, #30 and #155, are white eggs in front of a white bag / white wall: at every threshold the egg merges with the background, so no egg-shaped blob exists). Cost: instance F1 down, because on hard images the looser pass also returns non-egg blobs. Sweep T11_fallback_min_score: 0.65 has the best IoU; 0.72 gives better instance F1 but loses IoU.",
+      "iou": 0.5888,
+      "iou_med": 0.6601,
+      "dice": 0.6805,
+      "precision": 0.8329,
+      "recall": 0.6392,
+      "bf1": 0.4582,
+      "inst_f1": 0.5692,
+      "empty": 2
+    },
+    {
+      "id": "T11b",
+      "extends": "T11",
+      "what": "Fallback pass returns at most 1 egg",
+      "why": "T11 removed 9 of 11 empty masks but its looser score also picked wrong blobs (precision and instance F1 down). An image that needs the fallback is a hard image; taking only its single best egg should keep the gain without the extra false eggs.",
+      "changes": {
+        "candidate": {
+          "fallback_max_eggs": 1
+        }
+      },
+      "decision": "discarded",
+      "reason": "Instance F1 recovers most of what T11 lost, but IoU falls. Only 4 dev images change, all with 1 GT egg: on these hard images the best-scoring fallback blob is often not the egg (#118: the egg was one of T11's 3 blobs, the cap kept a background one). The score can't rank egg vs background here, so capping doesn't help. IoU first -> T11 stays final.",
+      "iou": 0.5791,
+      "iou_med": 0.6601,
+      "dice": 0.6671,
+      "precision": 0.8214,
+      "recall": 0.6182,
+      "bf1": 0.4562,
+      "inst_f1": 0.6033,
+      "empty": 2
+    }
+  ],
+  "sweeps": [
+    {
+      "base": "T10",
+      "param": "watershed.peak_rel",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 0.4,
+          "iou_mean": 0.5661,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4451,
+          "instance_f1": 0.6094,
+          "empty": 11
+        },
+        {
+          "value": 0.5,
+          "iou_mean": 0.5661,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4451,
+          "instance_f1": 0.6121,
+          "empty": 11
+        },
+        {
+          "value": 0.6,
+          "iou_mean": 0.5661,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4451,
+          "instance_f1": 0.618,
+          "empty": 11
+        },
+        {
+          "value": 0.7,
+          "iou_mean": 0.5661,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4451,
+          "instance_f1": 0.6034,
+          "empty": 11
+        }
+      ],
+      "name": "T10_peak_rel"
+    },
+    {
+      "base": "T11",
+      "param": "candidate.fallback_min_score",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 0.55,
+          "iou_mean": 0.5884,
+          "iou_median": 0.6601,
+          "boundary_f1": 0.4582,
+          "instance_f1": 0.5606,
+          "empty": 2
+        },
+        {
+          "value": 0.6,
+          "iou_mean": 0.5884,
+          "iou_median": 0.6601,
+          "boundary_f1": 0.4582,
+          "instance_f1": 0.5627,
+          "empty": 2
+        },
+        {
+          "value": 0.65,
+          "iou_mean": 0.5888,
+          "iou_median": 0.6601,
+          "boundary_f1": 0.4582,
+          "instance_f1": 0.5692,
+          "empty": 2
+        },
+        {
+          "value": 0.72,
+          "iou_mean": 0.5791,
+          "iou_median": 0.6601,
+          "boundary_f1": 0.4562,
+          "instance_f1": 0.5817,
+          "empty": 2
+        }
+      ],
+      "name": "T11_fallback_min_score"
+    },
+    {
+      "base": "T4",
+      "param": "saturation.s_max",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 25,
+          "iou_mean": 0.3953,
+          "iou_median": 0.3266,
+          "boundary_f1": 0.1647,
+          "instance_f1": 0.0098,
+          "empty": 0
+        },
+        {
+          "value": 40,
+          "iou_mean": 0.3948,
+          "iou_median": 0.2993,
+          "boundary_f1": 0.1741,
+          "instance_f1": 0.0089,
+          "empty": 0
+        },
+        {
+          "value": 60,
+          "iou_mean": 0.3915,
+          "iou_median": 0.2921,
+          "boundary_f1": 0.1717,
+          "instance_f1": 0.0083,
+          "empty": 0
+        },
+        {
+          "value": 90,
+          "iou_mean": 0.3829,
+          "iou_median": 0.2919,
+          "boundary_f1": 0.1615,
+          "instance_f1": 0.0078,
+          "empty": 0
+        }
+      ],
+      "name": "T4_s_max"
+    },
+    {
+      "base": "T7",
+      "param": "morphology.open",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 3,
+          "iou_mean": 0.3124,
+          "iou_median": 0.0,
+          "boundary_f1": 0.1843,
+          "instance_f1": 0.4824,
+          "empty": 36
+        },
+        {
+          "value": 7,
+          "iou_mean": 0.3248,
+          "iou_median": 0.1089,
+          "boundary_f1": 0.1879,
+          "instance_f1": 0.4751,
+          "empty": 32
+        },
+        {
+          "value": 11,
+          "iou_mean": 0.3676,
+          "iou_median": 0.3495,
+          "boundary_f1": 0.2021,
+          "instance_f1": 0.4706,
+          "empty": 25
+        },
+        {
+          "value": 15,
+          "iou_mean": 0.3618,
+          "iou_median": 0.3459,
+          "boundary_f1": 0.1974,
+          "instance_f1": 0.4683,
+          "empty": 24
+        }
+      ],
+      "name": "T7_open"
+    },
+    {
+      "base": "T7b",
+      "param": "candidate.channel",
+      "split": "dev",
+      "runs": [
+        {
+          "value": "gray",
+          "iou_mean": 0.4475,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2493,
+          "instance_f1": 0.4732,
+          "empty": 12
+        },
+        {
+          "value": "L",
+          "iou_mean": 0.4638,
+          "iou_median": 0.483,
+          "boundary_f1": 0.257,
+          "instance_f1": 0.4935,
+          "empty": 11
+        },
+        {
+          "value": "whiteness",
+          "iou_mean": 0.4551,
+          "iou_median": 0.4726,
+          "boundary_f1": 0.2515,
+          "instance_f1": 0.4741,
+          "empty": 13
+        }
+      ],
+      "name": "T7b_channel"
+    },
+    {
+      "base": "T7b",
+      "param": "candidate.min_score",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 0.6,
+          "iou_mean": 0.4188,
+          "iou_median": 0.4256,
+          "boundary_f1": 0.2303,
+          "instance_f1": 0.3003,
+          "empty": 2
+        },
+        {
+          "value": 0.7,
+          "iou_mean": 0.4432,
+          "iou_median": 0.4378,
+          "boundary_f1": 0.2438,
+          "instance_f1": 0.3684,
+          "empty": 2
+        },
+        {
+          "value": 0.75,
+          "iou_mean": 0.4475,
+          "iou_median": 0.4536,
+          "boundary_f1": 0.2484,
+          "instance_f1": 0.412,
+          "empty": 4
+        },
+        {
+          "value": 0.8,
+          "iou_mean": 0.4475,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2493,
+          "instance_f1": 0.4732,
+          "empty": 12
+        }
+      ],
+      "name": "T7b_min_score"
+    },
+    {
+      "base": "T7b",
+      "param": "saturation.s_max",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 40,
+          "iou_mean": 0.4475,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2493,
+          "instance_f1": 0.4732,
+          "empty": 12
+        },
+        {
+          "value": 60,
+          "iou_mean": 0.4472,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2454,
+          "instance_f1": 0.4609,
+          "empty": 12
+        },
+        {
+          "value": 90,
+          "iou_mean": 0.4431,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2386,
+          "instance_f1": 0.4589,
+          "empty": 12
+        },
+        {
+          "value": 255,
+          "iou_mean": 0.4419,
+          "iou_median": 0.466,
+          "boundary_f1": 0.2354,
+          "instance_f1": 0.4492,
+          "empty": 12
+        }
+      ],
+      "name": "T7b_s_max"
+    },
+    {
+      "base": "T8",
+      "param": "grabcut.bg_dilate",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 15,
+          "iou_mean": 0.5155,
+          "iou_median": 0.5346,
+          "boundary_f1": 0.3941,
+          "instance_f1": 0.5541,
+          "empty": 11
+        },
+        {
+          "value": 25,
+          "iou_mean": 0.5363,
+          "iou_median": 0.5681,
+          "boundary_f1": 0.414,
+          "instance_f1": 0.5913,
+          "empty": 11
+        },
+        {
+          "value": 45,
+          "iou_mean": 0.5587,
+          "iou_median": 0.6006,
+          "boundary_f1": 0.4356,
+          "instance_f1": 0.614,
+          "empty": 11
+        },
+        {
+          "value": 70,
+          "iou_mean": 0.5661,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4451,
+          "instance_f1": 0.6079,
+          "empty": 11
+        },
+        {
+          "value": 100,
+          "iou_mean": 0.5633,
+          "iou_median": 0.651,
+          "boundary_f1": 0.4439,
+          "instance_f1": 0.6167,
+          "empty": 11
+        }
+      ],
+      "name": "T8_bg_dilate"
+    },
+    {
+      "base": "T9",
+      "param": "ellipse.min_fit_iou",
+      "split": "dev",
+      "runs": [
+        {
+          "value": 0.9,
+          "iou_mean": 0.5607,
+          "iou_median": 0.6436,
+          "boundary_f1": 0.3307,
+          "instance_f1": 0.6079,
+          "empty": 11
+        },
+        {
+          "value": 0.95,
+          "iou_mean": 0.5645,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4125,
+          "instance_f1": 0.6079,
+          "empty": 11
+        },
+        {
+          "value": 0.97,
+          "iou_mean": 0.5647,
+          "iou_median": 0.6545,
+          "boundary_f1": 0.4196,
+          "instance_f1": 0.6079,
+          "empty": 11
+        }
+      ],
+      "name": "T9_min_fit_iou"
+    }
+  ]
+}

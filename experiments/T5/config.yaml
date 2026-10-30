@@ -1,0 +1,8 @@
+id: T5
+extends: T3
+what: k-means (k=3) in Lab instead of Otsu; keep the brightest, least-coloured cluster
+why: Otsu splits the histogram in two; with 3 clusters, egg / bright background / dark background can separate.
+changes:
+  candidate: {method: kmeans, k: 3, chroma_weight: 1.0}
+decision: kept
+reason: "Better than Otsu (T4) as the candidate generator: IoU and precision up."

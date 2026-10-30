@@ -1,0 +1,39 @@
+{
+  "base": "T11",
+  "param": "candidate.fallback_min_score",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 0.55,
+      "iou_mean": 0.5884,
+      "iou_median": 0.6601,
+      "boundary_f1": 0.4582,
+      "instance_f1": 0.5606,
+      "empty": 2
+    },
+    {
+      "value": 0.6,
+      "iou_mean": 0.5884,
+      "iou_median": 0.6601,
+      "boundary_f1": 0.4582,
+      "instance_f1": 0.5627,
+      "empty": 2
+    },
+    {
+      "value": 0.65,
+      "iou_mean": 0.5888,
+      "iou_median": 0.6601,
+      "boundary_f1": 0.4582,
+      "instance_f1": 0.5692,
+      "empty": 2
+    },
+    {
+      "value": 0.72,
+      "iou_mean": 0.5791,
+      "iou_median": 0.6601,
+      "boundary_f1": 0.4562,
+      "instance_f1": 0.5817,
+      "empty": 2
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+id: T10
+extends: T8   # T9 (ellipse) was discarded
+what: + distance-transform watershed to split touching eggs into separate instances
+why: 5 images have touching eggs; a merged blob counts as zero correct instances. Binary IoU barely changes; instance F1 should.
+changes:
+  watershed: {enabled: true, peak_rel: 0.6, min_core_px: 30}
+decision: kept
+reason: "Binary IoU unchanged (as expected), instance F1 up: touching eggs now come out as separate objects. Needed for Task 4 tracking."

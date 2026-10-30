@@ -1,0 +1,246 @@
+{
+  "all": {
+    "egg_count": {
+      "1": {
+        "n": 92,
+        "iou_mean": 0.562
+      },
+      "2": {
+        "n": 7,
+        "iou_mean": 0.848
+      },
+      "3": {
+        "n": 11,
+        "iou_mean": 0.713
+      }
+    },
+    "hand": {
+      "no": {
+        "n": 96,
+        "iou_mean": 0.62
+      },
+      "yes": {
+        "n": 14,
+        "iou_mean": 0.427
+      }
+    },
+    "touching": {
+      "no": {
+        "n": 105,
+        "iou_mean": 0.59
+      },
+      "yes": {
+        "n": 5,
+        "iou_mean": 0.721
+      }
+    },
+    "lighting": {
+      "backlit": {
+        "n": 2,
+        "iou_mean": 0.0
+      },
+      "dim": {
+        "n": 1,
+        "iou_mean": 0.0
+      },
+      "normal": {
+        "n": 107,
+        "iou_mean": 0.612
+      }
+    },
+    "egg_colour": {
+      "brown": {
+        "n": 1,
+        "iou_mean": 0.0
+      },
+      "cream": {
+        "n": 11,
+        "iou_mean": 0.513
+      },
+      "white": {
+        "n": 98,
+        "iou_mean": 0.611
+      }
+    },
+    "background": {
+      "ash": {
+        "n": 6,
+        "iou_mean": 0.342
+      },
+      "blue_bowl": {
+        "n": 2,
+        "iou_mean": 0.708
+      },
+      "cloth": {
+        "n": 7,
+        "iou_mean": 0.717
+      },
+      "floor": {
+        "n": 4,
+        "iou_mean": 0.709
+      },
+      "foil": {
+        "n": 4,
+        "iou_mean": 0.56
+      },
+      "fridge_tray": {
+        "n": 3,
+        "iou_mean": 0.215
+      },
+      "hand": {
+        "n": 14,
+        "iou_mean": 0.427
+      },
+      "keyboard": {
+        "n": 4,
+        "iou_mean": 0.616
+      },
+      "leaves": {
+        "n": 5,
+        "iou_mean": 0.69
+      },
+      "marble": {
+        "n": 15,
+        "iou_mean": 0.708
+      },
+      "painted_container": {
+        "n": 7,
+        "iou_mean": 0.694
+      },
+      "pink_bowl": {
+        "n": 6,
+        "iou_mean": 0.824
+      },
+      "red_bowl": {
+        "n": 1,
+        "iou_mean": 0.306
+      },
+      "rice": {
+        "n": 3,
+        "iou_mean": 0.587
+      },
+      "rug": {
+        "n": 3,
+        "iou_mean": 0.857
+      },
+      "steel_pot": {
+        "n": 10,
+        "iou_mean": 0.826
+      },
+      "tiles": {
+        "n": 2,
+        "iou_mean": 0.307
+      },
+      "towel": {
+        "n": 4,
+        "iou_mean": 0.554
+      },
+      "white_bag": {
+        "n": 10,
+        "iou_mean": 0.325
+      }
+    },
+    "gate_loss": {
+      "median": 0.088,
+      "high_threshold": 0.4,
+      "n_high": 12,
+      "iou_mean_high": 0.286,
+      "iou_mean_low": 0.633
+    },
+    "spearman_iou_vs_gate_loss": -0.336,
+    "spearman_iou_vs_brightness": -0.264,
+    "spearman_iou_vs_egg_area": 0.128
+  },
+  "eval": {
+    "egg_count": {
+      "1": {
+        "n": 20,
+        "iou_mean": 0.538
+      },
+      "2": {
+        "n": 5,
+        "iou_mean": 0.939
+      }
+    },
+    "hand": {
+      "no": {
+        "n": 22,
+        "iou_mean": 0.702
+      },
+      "yes": {
+        "n": 3,
+        "iou_mean": 0.0
+      }
+    },
+    "touching": {
+      "no": {
+        "n": 25,
+        "iou_mean": 0.618
+      }
+    },
+    "lighting": {
+      "backlit": {
+        "n": 2,
+        "iou_mean": 0.0
+      },
+      "dim": {
+        "n": 1,
+        "iou_mean": 0.0
+      },
+      "normal": {
+        "n": 22,
+        "iou_mean": 0.702
+      }
+    },
+    "egg_colour": {
+      "brown": {
+        "n": 1,
+        "iou_mean": 0.0
+      },
+      "cream": {
+        "n": 3,
+        "iou_mean": 0.472
+      },
+      "white": {
+        "n": 21,
+        "iou_mean": 0.668
+      }
+    },
+    "background": {
+      "blue_bowl": {
+        "n": 2,
+        "iou_mean": 0.708
+      },
+      "hand": {
+        "n": 3,
+        "iou_mean": 0.0
+      },
+      "painted_container": {
+        "n": 7,
+        "iou_mean": 0.694
+      },
+      "red_bowl": {
+        "n": 1,
+        "iou_mean": 0.306
+      },
+      "steel_pot": {
+        "n": 10,
+        "iou_mean": 0.826
+      },
+      "tiles": {
+        "n": 2,
+        "iou_mean": 0.307
+      }
+    },
+    "gate_loss": {
+      "median": 0.035,
+      "high_threshold": 0.4,
+      "n_high": 3,
+      "iou_mean_high": 0.0,
+      "iou_mean_low": 0.702
+    },
+    "spearman_iou_vs_gate_loss": -0.532,
+    "spearman_iou_vs_brightness": 0.056,
+    "spearman_iou_vs_egg_area": 0.165
+  }
+}

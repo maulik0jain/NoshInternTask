@@ -1,0 +1,8 @@
+id: T11b
+extends: T11
+what: Fallback pass returns at most 1 egg
+why: T11 removed 9 of 11 empty masks but its looser score also picked wrong blobs (precision and instance F1 down). An image that needs the fallback is a hard image; taking only its single best egg should keep the gain without the extra false eggs.
+changes:
+  candidate: {fallback_max_eggs: 1}
+decision: discarded
+reason: "Instance F1 recovers most of what T11 lost, but IoU falls. Only 4 dev images change, all with 1 GT egg: on these hard images the best-scoring fallback blob is often not the egg (#118: the egg was one of T11's 3 blobs, the cap kept a background one). The score can't rank egg vs background here, so capping doesn't help. IoU first -> T11 stays final."

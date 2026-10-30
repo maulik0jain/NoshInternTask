@@ -1,0 +1,39 @@
+{
+  "base": "T4",
+  "param": "saturation.s_max",
+  "split": "dev",
+  "runs": [
+    {
+      "value": 25,
+      "iou_mean": 0.3953,
+      "iou_median": 0.3266,
+      "boundary_f1": 0.1647,
+      "instance_f1": 0.0098,
+      "empty": 0
+    },
+    {
+      "value": 40,
+      "iou_mean": 0.3948,
+      "iou_median": 0.2993,
+      "boundary_f1": 0.1741,
+      "instance_f1": 0.0089,
+      "empty": 0
+    },
+    {
+      "value": 60,
+      "iou_mean": 0.3915,
+      "iou_median": 0.2921,
+      "boundary_f1": 0.1717,
+      "instance_f1": 0.0083,
+      "empty": 0
+    },
+    {
+      "value": 90,
+      "iou_mean": 0.3829,
+      "iou_median": 0.2919,
+      "boundary_f1": 0.1615,
+      "instance_f1": 0.0078,
+      "empty": 0
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# The pipeline used for the one eval run (Task 3). Chosen on dev only:
+# best dev mean IoU in experiments/LOG.md.
+trial: T11

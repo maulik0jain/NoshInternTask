@@ -1,0 +1,8 @@
+id: T6
+extends: T5b
+what: + morphology (open r=3, close r=7, fill holes)
+why: Raw masks are speckled (ash, rug texture) and have holes at specular highlights and dirt marks.
+changes:
+  morphology: {enabled: true, open: 3, close: 7, fill_holes: true}
+decision: kept
+reason: "IoU about the same, boundary F1 and instance F1 clearly up (fewer specks, filled highlights)."

@@ -1,0 +1,9 @@
+id: T7b
+extends: T6
+what: Multi-threshold egg search (24 thresholds, blobs scored by ellipse fit x solidity) replaces the single Otsu/k-means threshold
+why: T7 failed because one global threshold glues the egg to bright background, so the shape filter throws both away (36 empty images). Trying many thresholds gives the egg a chance to separate at some level.
+changes:
+  candidate: {method: search, channel: gray}
+  components: {enabled: false}   # shape filtering now happens inside the search
+decision: kept
+reason: "Best so far and precision up a lot; fixes the T7 failure mode. Sweeps: min_score 0.75 and 0.8 tie on mean IoU, 0.8 kept for its better median and instance F1; s_max 40 still best."

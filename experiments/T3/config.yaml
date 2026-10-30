@@ -1,0 +1,8 @@
+id: T3
+extends: T0
+what: + remove skin pixels (YCbCr box, Chai & Ngan 1999)
+why: 14 images have a hand; a lit palm is as bright as the egg and gets swallowed by Otsu.
+changes:
+  skin: {enabled: true}
+decision: kept
+reason: "IoU and precision up vs T0; palms stop being swallowed with the egg."

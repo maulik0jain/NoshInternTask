@@ -1,0 +1,33 @@
+{
+  "fail_iou_below": 0.7,
+  "failed_images": 58,
+  "labelled": 58,
+  "unlabelled": [],
+  "counts": {
+    "white / pale background": 18,
+    "shaded side missed": 15,
+    "colour gate removes egg": 10,
+    "egg partly hidden": 5,
+    "bright object picked": 5,
+    "ash camouflage": 4,
+    "touching eggs": 1
+  },
+  "by_split": {
+    "dev": {
+      "white / pale background": 15,
+      "shaded side missed": 12,
+      "colour gate removes egg": 7,
+      "egg partly hidden": 4,
+      "bright object picked": 4,
+      "ash camouflage": 4,
+      "touching eggs": 1
+    },
+    "eval": {
+      "colour gate removes egg": 3,
+      "shaded side missed": 3,
+      "white / pale background": 3,
+      "egg partly hidden": 1,
+      "bright object picked": 1
+    }
+  }
+}
