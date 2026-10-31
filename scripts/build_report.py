@@ -34,6 +34,9 @@ SOURCES = {
     "loso": ROOT / "results" / "round3" / "loso.json",
     "r3": ROOT / "results" / "round3" / "check.json",
     "final3": ROOT / "results" / "final_eval_round3" / "summary.json",
+    "t4": ROOT / "results" / "task4" / "metrics_T21.json",
+    "t4h": ROOT / "results" / "task4" / "holdout.json",
+    "t4r1": ROOT / "results" / "task4" / "metrics_T11.json",
 }
 OPTION_LABEL = {"skin_off": "skin filter off", "ellipse_prior": "ellipse prior", "ellipse_clip": "ellipse prior + clip",
                 "split": "blob splitting", "edge_rank": "edge ranking", "shape_reject": "shape / texture reject"}
@@ -270,7 +273,72 @@ def predict_table(ctx):
     return "\n".join(rows) + "</table>"
 
 
+def track_table(ctx):
+    ms = (ctx["t4"], ctx["t4r1"])
+    rows = [("Reference eggs (SAM, summed over frames)", lambda m: m["reference_eggs"]),
+            ("Classical eggs (summed over frames)", lambda m: m["classical_eggs"]),
+            ("Recall — SAM eggs matched (IoU ≥ 0.5)", lambda m: f"{m['recall']:.3f}"),
+            ("Precision — classical eggs that match a SAM egg", lambda m: f"{m['precision']:.3f}"),
+            ("Mean IoU of matched eggs", lambda m: f"{m['mean_matched_iou']:.3f}"),
+            ("Mean IoU per frame, all eggs (frames with eggs)", lambda m: f"{m['mean_iou_egg_frames']:.3f}"),
+            ("Egg count exactly right (frames with eggs)", lambda m: f"{m['count_exact_egg_frames']:.3f}"),
+            ("ID switches", lambda m: m["id_switches"]), ("MOTA", lambda m: f"{m['mota']:.3f}"),
+            ("IDF1", lambda m: f"{m['idf1']:.3f}"),
+            ("Egg ids: SAM / classical", lambda m: f"{m['sam_ids']} / {m['classical_ids_total']}"),
+            ("False eggs in frames without eggs", lambda m: m["false_eggs_no_egg_frames"])]
+    head = ("<table class='num'><tr><th>vs SAM 2.1, every frame</th><th>T21 + tracker (round 3, planned)</th>"
+            "<th>T11 + tracker (round 1, after the fresh test)</th></tr>")
+    return head + "".join(f"<tr><td>{k}</td>" + "".join(f"<td>{f(m)}</td>" for m in ms) + "</tr>"
+                          for k, f in rows) + "</table>"
+
+
+def holdout_table(ctx):
+    h = ctx["t4h"]
+    rows = ["<table class='num narrow'><tr><th>Video frames (every 6th with an egg), no tracker</th><th>IoU mean</th>"
+            "<th>IoU median</th><th>90% interval (2 s blocks)</th><th>Frames with IoU &lt; 0.5</th></tr>"]
+    for r, v in h["rounds"].items():
+        rows.append(f"<tr><td>Round {r} ({v['trial']})</td><td>{fmt(v['iou_mean'])}</td><td>{fmt(v['iou_median'])}</td>"
+                    f"<td>{v['ci90'][0]:.3f} – {v['ci90'][1]:.3f}</td><td>{v['frames_below_half']} / {h['frames']}</td></tr>")
+    for k, v in h["deltas"].items():
+        b, a = k.split("_vs_")
+        rows.append(f"<tr><td>Round {b} − round {a}, same frames</td><td>{v['mean']:+.3f}</td><td></td>"
+                    f"<td>{v['ci90'][0]:+.3f} – {v['ci90'][1]:+.3f}</td><td></td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def holdout_path_table(ctx):
+    h, log = ctx["t4h"], trial_by_id(ctx)
+    rows = ["<table class='num'><tr><th>Round 3's path, one change per step</th><th>Change</th>"
+            "<th>Video IoU</th><th>Step Δ</th><th>90% interval</th><th>Dev scene Δ when kept</th></tr>"]
+    for r in h["round3_path"]:
+        t = log[r["trial"]]
+        d = "–" if "delta" not in r else f"{r['delta']:+.3f}"
+        c = "–" if "delta" not in r else f"{r['delta_ci90'][0]:+.3f} – {r['delta_ci90'][1]:+.3f}"
+        why = "–" if "delta" not in r else re.search(r"[+-]\d\.\d{3}", t["reason"])[0]
+        what = "round-1 pipeline" if "delta" not in r else re.sub(r" on (T\d+|the round-1 pipeline).*", "",
+                                                                   t["what"].split(": ")[-1])
+        rows.append(f"<tr><td>{r['trial']}</td><td>{what}</td>"
+                    f"<td>{r['iou_mean']:.3f}</td><td>{d}</td><td>{c}</td><td>{why}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def track_errors_table(ctx):
+    m = ctx["t4"]
+    rows = ["<table class='num'><tr><th>Error, one cause each</th><th>Count</th><th>Share</th><th>When (s)</th></tr>"]
+    for g, label, total in (("missed", "Missed SAM eggs", m["missed"]), ("false", "False classical eggs", m["false"])):
+        rows.append(f"<tr><td colspan=4><b>{label}: {total}</b></td></tr>")
+        for k, v in m["errors"][g].items():
+            if not v["n"]:
+                continue
+            when = ", ".join(f"{p:.0f}–{q:.0f}" if q - p >= 1 else f"{p:.0f}" for p, q in v["when_s"][:5])
+            when += " …" if len(v["when_s"]) > 5 else ""
+            rows.append(f"<tr><td>{k}</td><td>{v['n']}</td><td>{v['share']:.0%}</td><td>{when}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
 BLOCKS = {
+    "track_table": track_table, "holdout_table": holdout_table, "track_errors_table": track_errors_table,
+    "holdout_path_table": holdout_path_table,
     "scene_rule_table": scene_rule_table, "selection_table": selection_table, "loso_table": loso_table,
     "stability_table": stability_table, "predict_table": predict_table,
     "exp_table_r3": lambda c: exp_table(c, 3), "trial_cards_r3": lambda c: trial_cards(c, 3),

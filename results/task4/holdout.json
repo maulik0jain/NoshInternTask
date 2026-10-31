@@ -1,0 +1,98 @@
+{
+  "step": 6,
+  "frames": 131,
+  "block_frames": 48,
+  "rounds": {
+    "1": {
+      "trial": "T11",
+      "iou_mean": 0.8682,
+      "iou_median": 0.9568,
+      "ci90": [
+        0.8108,
+        0.92
+      ],
+      "frames_below_half": 4
+    },
+    "2": {
+      "trial": "T18",
+      "iou_mean": 0.6774,
+      "iou_median": 0.6971,
+      "ci90": [
+        0.613,
+        0.7395
+      ],
+      "frames_below_half": 29
+    },
+    "3": {
+      "trial": "T21",
+      "iou_mean": 0.6813,
+      "iou_median": 0.6971,
+      "ci90": [
+        0.6155,
+        0.7463
+      ],
+      "frames_below_half": 28
+    }
+  },
+  "deltas": {
+    "3_vs_1": {
+      "mean": -0.1869,
+      "ci90": [
+        -0.2534,
+        -0.1229
+      ]
+    },
+    "3_vs_2": {
+      "mean": 0.0039,
+      "ci90": [
+        0.0012,
+        0.0073
+      ]
+    },
+    "2_vs_1": {
+      "mean": -0.1907,
+      "ci90": [
+        -0.2615,
+        -0.1284
+      ]
+    }
+  },
+  "round3_path": [
+    {
+      "trial": "T11",
+      "iou_mean": 0.8682
+    },
+    {
+      "trial": "T19",
+      "iou_mean": 0.8115,
+      "delta": -0.0567,
+      "delta_ci90": [
+        -0.0983,
+        -0.022
+      ]
+    },
+    {
+      "trial": "T20",
+      "iou_mean": 0.8115,
+      "delta": 0.0,
+      "delta_ci90": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "trial": "T21",
+      "iou_mean": 0.6813,
+      "delta": -0.1302,
+      "delta_ci90": [
+        -0.192,
+        -0.0701
+      ]
+    }
+  ],
+  "skin_box_share": {
+    "egg": 0.0654,
+    "below_egg": 0.9475,
+    "rest": 0.4879
+  }
+}

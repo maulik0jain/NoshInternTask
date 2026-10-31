@@ -54,7 +54,7 @@
   <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU 0.618 (§4)</td></tr>
   <tr><td>Round 2 — the five improvements from §4, tried on dev</td><td class="done">done — dev IoU 0.589 → 0.669, eval 0.618 → 0.613 (§5)</td></tr>
   <tr><td>Round 3 — stopping the overfitting (scene rule, leave-one-scene-out)</td><td class="done">done — held-out-scene estimate 0.615, eval 0.612 (§6)</td></tr>
-  <tr><td>Task 4 — video tracking (Drive link goes here)</td><td class="todo">next</td></tr>
+  <tr><td>Task 4 — video tracking (videos: <span class="todo"><!-- DRIVE -->Drive link to be added<!-- /DRIVE --></span>)</td><td class="done">done — vs SAM 2.1: MOTA 0.159, IDF1 0.216, matched-egg IoU 0.910 (§7)</td></tr>
 </table>
 
 <h3>Summary</h3>
@@ -66,6 +66,8 @@
   <li>Main gap: eggs on white / pale backgrounds and partly hidden eggs — the method relies on "the egg is the brightest egg-shaped thing"</li>
   <li><b>Round 2</b> (§5): the improvements from the Task 3 analysis, tried one by one on dev → dev IoU 0.589 → 0.669; eval 0.618 → 0.613 → the dev gain did not carry over to the unseen eval scenes. Round 1 stays the clean eval number</li>
   <li><b>Round 3</b> (§6): decide per scene and check the selection by leave-one-scene-out → the held-out-scene estimate (0.615) matched eval (0.612); round 2's dev number had overshot by 0.056. Same eval as before, with 3 changes instead of 5 and an honest estimate</li>
+  <li><b>Task 4</b> (§7): SAM 2.1 video tracking is the reference. T21 + my tracker: MOTA 0.159, IDF1 0.216. The errors are in the segmentation (touching eggs merged with their reflections on a glossy table, an egg under the hand), not in the tracking</li>
+  <li><b>Video as a fresh test</b>: round 1 beats rounds 2/3 here (IoU 0.868 vs 0.681). The skin filter rounds 2/3 turned off is what keeps the reflections out → one more sign the dev decisions don't carry to new scenes</li>
 </ul>
 
 <h2>0. Dataset — quick facts</h2>
@@ -716,12 +718,135 @@
   <li>The overfitting here was in the <b>number</b>, not a method that falls apart: the in-sample dev IoU promised a gain that unseen scenes don't show. The fix that worked: judge and report on held-out scenes (LOSO), never on the scenes the choices were made on</li>
   <li>Of round 2's 0.056 gap, the selection explains about 0.023 (LOSO). The rest is that eval scenes are different from dev ones → more varied dev scenes or new cues would help; a stricter rule doesn't</li>
   <li>My stricter keep rule was not the fix I expected: with 14 scenes it decides less stably. Worth retrying only with more scenes</li>
-  <li>Final pipeline: <b>T21</b> — three changes instead of five, same eval, an honest estimate. Used for Task 4</li>
+  <li>Final pipeline: <b>T21</b> — three changes instead of five, same eval, an honest estimate. Used for Task 4, where round 1 does clearly better (§7)</li>
 </ul>
 
 
 <h2 class="pb">7. Task 4 — video tracking</h2>
-<ul><li>Next. Google Drive link to the output video will go here</li></ul>
+<ul>
+  <li><b>Output videos (Google Drive): <span class="todo"><!-- DRIVE -->link to be added<!-- /DRIVE --></span></b></li>
+  <li>Five videos, 1280×720, 24 fps: <code>sam2_tracking.mp4</code> (reference), <code>classical_T21_tracking.mp4</code> (planned pipeline + tracker), <code>side_by_side_T21.mp4</code>, and the round-1 versions <code>classical_T11_tracking.mp4</code>, <code>side_by_side_T11.mp4</code> (run after the fresh test, below)</li>
+  <li>Same colour = same egg: each classical id takes the colour of the SAM egg it follows most</li>
+</ul>
+
+<h3>The video</h3>
+<ul>
+  <li>"Raw and Boiled Egg Spinning" (Mocomi, YouTube): 60 s, 24 fps, 1920×1080 → processed at 1280×720</li>
+  <li>Egg scene: frames 222–1004 (783 of 1440 frames). Two white eggs on a dark table; a hand spins them, picks them up and covers them; white text labels ("Raw Egg", "Plane surface") over the scene. Title cards before and after, closed by an iris wipe</li>
+  <li>A scene none of rounds 1–3 has seen → also used as a fresh test (below)</li>
+</ul>
+
+<h3>Reference: SAM 2.1 video tracking</h3>
+<ul>
+  <li>Same models as Task 1: Grounding DINO ("egg.") → boxes → SAM 2.1 Hiera Base+, but its <b>video predictor</b>: a memory of past frames carries each egg's mask forward, so each egg keeps one id</li>
+  <li>All 1440 frames don't fit in this laptop's memory → chunks of 48 frames (2 s). The masks on a chunk's last frame are the prompts for the next chunk, so ids carry over. Grounding DINO runs again at every chunk start for new eggs; while nothing is tracked it scans every 6th frame</li>
+  <li>Result: 2 ids in the whole video, both eggs, so no id changes and nothing on the title cards or text labels</li>
+  <li>SAM is the reference, not the truth (as in Task 1): in fast spins and under the hand its masks can be off too</li>
+</ul>
+
+<h3>My tracker, on top of T21</h3>
+<ul>
+  <li>Per frame: the round-3 pipeline T21 (unchanged — same code and parameters as Tasks 2–3) → egg instances</li>
+  <li>Match frame to frame: Hungarian assignment on mask IoU between a track's last mask shifted by its velocity and each new egg. No overlap but close (≤ 1.5 egg diameters + speed × frames missed) → weak match, so a fast-spinning egg is still followed</li>
+  <li>A new egg gets an id only after 3 frames in a row → one-frame false eggs never get an id</li>
+  <li>A lost egg keeps its id for 2 s (48 frames) → same id when it comes back from under the hand</li>
+  <li>No appearance model: the two eggs look the same, so position and motion are all there is</li>
+</ul>
+
+<h3>Results vs SAM 2.1</h3>
+<table class='num'><tr><th>vs SAM 2.1, every frame</th><th>T21 + tracker (round 3, planned)</th><th>T11 + tracker (round 1, after the fresh test)</th></tr><tr><td>Reference eggs (SAM, summed over frames)</td><td>1562</td><td>1562</td></tr><tr><td>Classical eggs (summed over frames)</td><td>1413</td><td>1356</td></tr><tr><td>Recall — SAM eggs matched (IoU ≥ 0.5)</td><td>0.535</td><td>0.848</td></tr><tr><td>Precision — classical eggs that match a SAM egg</td><td>0.591</td><td>0.976</td></tr><tr><td>Mean IoU of matched eggs</td><td>0.910</td><td>0.940</td></tr><tr><td>Mean IoU per frame, all eggs (frames with eggs)</td><td>0.671</td><td>0.864</td></tr><tr><td>Egg count exactly right (frames with eggs)</td><td>0.406</td><td>0.700</td></tr><tr><td>ID switches</td><td>8</td><td>2</td></tr><tr><td>MOTA</td><td>0.159</td><td>0.826</td></tr><tr><td>IDF1</td><td>0.216</td><td>0.605</td></tr><tr><td>Egg ids: SAM / classical</td><td>2 / 7</td><td>2 / 6</td></tr><tr><td>False eggs in frames without eggs</td><td>1</td><td>1</td></tr></table>
+<figure><img src="../results/task4/timeline_T21.png" style="width:100%"><figcaption>Every frame: eggs found (top) and IoU vs SAM (bottom). Gaps = frames without eggs in either.</figcaption></figure>
+<ul>
+  <li>T21 is the planned pipeline (frozen in round 3, before the video). The T11 column was added after the fresh test below, so it saw the video and is not a clean test. The text here is about T21</li>
+  <li>When an egg is matched, its mask is close to SAM's: matched IoU 0.910 → the outline is fine; finding and separating the eggs is not</li>
+  <li>Low MOTA (0.159): misses (727) + false eggs (578) out of 1562 reference eggs. Id switches (8) are a tiny part</li>
+  <li>Outside the egg scene (title cards, iris wipe): 1 false egg in total</li>
+</ul>
+
+<h3>Where the errors come from</h3>
+<ul><li>Each missed SAM egg and each false classical egg gets one cause, from the masks (<code>errors()</code> in <code>task4_analyze.py</code>); checked by eye on frames from each group</li></ul>
+<table class='num'><tr><th>Error, one cause each</th><th>Count</th><th>Share</th><th>When (s)</th></tr>
+<tr><td colspan=4><b>Missed SAM eggs: 727</b></td></tr>
+<tr><td>merged with the other egg</td><td>374</td><td>51%</td><td>9–17, 19–21, 29–30</td></tr>
+<tr><td>mask too big (spills onto table or reflection)</td><td>132</td><td>18%</td><td>12–15, 20, 22, 27–29, 30 …</td></tr>
+<tr><td>mask too small (part of the egg)</td><td>4</td><td>1%</td><td>13, 16, 19</td></tr>
+<tr><td>mask off target</td><td>17</td><td>2%</td><td>10, 16, 31–34, 41</td></tr>
+<tr><td>segmented, but not kept by the tracker</td><td>12</td><td>2%</td><td>20, 23, 28, 30, 34</td></tr>
+<tr><td>not segmented</td><td>188</td><td>26%</td><td>9, 10, 20, 21–23, 27–34 …</td></tr>
+<tr><td colspan=4><b>False classical eggs: 578</b></td></tr>
+<tr><td>wrong shape of a real egg</td><td>374</td><td>65%</td><td>9–17, 19–21, 22, 27–29, 31–37 …</td></tr>
+<tr><td>below an egg (reflection position)</td><td>192</td><td>33%</td><td>10–12, 31–34, 35–42</td></tr>
+<tr><td>elsewhere</td><td>12</td><td>2%</td><td>20–22, 23, 42</td></tr></table>
+<ul>
+  <li><b>Touching eggs</b>, 9–17 s (374 misses, 51%): the two eggs touch and stand on their own bright reflections → eggs + reflections become one blob, and watershed doesn't split it. Round 1 separates the same two eggs (fresh test below), so the reflections are the problem more than the touching</li>
+  <li><b>Reflections</b>: the table is glossy, and the reflection under an egg is white, egg-sized and roughly egg-shaped → 192 false eggs right below a real egg, and masks that spill onto the reflection (132 misses)</li>
+  <li><b>Hand + spin</b>, mostly 27–34 s (188 misses): the egg under the fingers is blurred and half hidden → not segmented at all. SAM keeps it from its memory of earlier frames</li>
+  <li><b>The tracker</b> drops only 12 eggs the segmentation had → the low score comes from segmentation, not from matching</li>
+  <li>No step of the pipeline handles reflections or motion blur, and none was tuned on this video → a scene shift, as on eval</li>
+</ul>
+
+<h3 class="pb">Worst frames</h3>
+<figure><img src="../results/task4/worst_frames_T21.jpg" style="width:60%"><figcaption>The six lowest-IoU frames, at least 1 s apart. Left: SAM 2.1, right: classical T21 + tracker. Same colour = same egg.</figcaption></figure>
+<ul>
+  <li>9.2 s, 10.4 s: two touching eggs, nothing shown. The only detection is one blob over both eggs (IoU 0.3 with each). At 9.2 s it is in its 2nd frame, and a new egg needs 3. Around 10.4 s the detection flickers between one merged blob and two separate eggs, frame to frame. The merged blob went to an unconfirmed track, so nothing is drawn</li>
+  <li>30.5 s: a hand covers both eggs. SAM still has both; the classical pipeline finds neither</li>
+  <li>31.8 s, 33.7 s: the egg under the hand is missed; the other egg's mask includes its reflection (and at 33.7 s the reflection is a second egg)</li>
+  <li>41.8 s: iris wipe at the end, a sliver of egg; the classical pipeline marks a bright patch at the top-left edge instead</li>
+</ul>
+
+<h3>ID switches</h3>
+<ul>
+  <li>7 classical ids for SAM's 2. Two switches traced by hand:</li>
+  <li>~21 s: one blob held the egg in the hand, a strip of light background above it and the other egg. When it split, its id stayed on the wrong egg</li>
+  <li>~33.8 s: the egg under the hand was lost and its track coasted; it then took the other egg, whose mask had spilled into a big blob. My gate scales with the larger of the two sizes, so the oversized blob widened it → a flaw in my tracker. Left as found, not tuned on this video</li>
+  <li>The colours in the classical video follow the SAM egg each id matches most → after a switch the colours disagree; that is the switch, not a drawing bug</li>
+</ul>
+
+<h3>Fresh test: rounds 1–3 on the video</h3>
+<ul><li>None of the three rounds was built with this video in view → a clean test after eval was looked at three times. Segmentation only, no tracker, every 6th egg frame vs SAM</li></ul>
+<table class='num narrow'><tr><th>Video frames (every 6th with an egg), no tracker</th><th>IoU mean</th><th>IoU median</th><th>90% interval (2 s blocks)</th><th>Frames with IoU &lt; 0.5</th></tr>
+<tr><td>Round 1 (T11)</td><td>0.868</td><td>0.957</td><td>0.811 – 0.920</td><td>4 / 131</td></tr>
+<tr><td>Round 2 (T18)</td><td>0.677</td><td>0.697</td><td>0.613 – 0.740</td><td>29 / 131</td></tr>
+<tr><td>Round 3 (T21)</td><td>0.681</td><td>0.697</td><td>0.616 – 0.746</td><td>28 / 131</td></tr>
+<tr><td>Round 3 − round 1, same frames</td><td>-0.187</td><td></td><td>-0.253 – -0.123</td><td></td></tr>
+<tr><td>Round 3 − round 2, same frames</td><td>+0.004</td><td></td><td>+0.001 – +0.007</td><td></td></tr>
+<tr><td>Round 2 − round 1, same frames</td><td>-0.191</td><td></td><td>-0.262 – -0.128</td><td></td></tr></table>
+<ul>
+  <li><b>Round 1 is clearly best on the video</b>: 0.868 vs 0.681 for round 3, paired -0.187 (90%: -0.253 to -0.123). On eval the three rounds were tied (§6) → the changes made on dev hurt on this new scene</li>
+  <li>Still one scene (one table, one light, two eggs) → it says the round-2/3 changes are not safe everywhere. It doesn't say round 1 is better in general</li>
+</ul>
+
+<h3>Which round-3 change costs on the video</h3>
+<ul><li>Diagnosis after the numbers above were seen. Same frames, round 3's path one change at a time; only reported, nothing chosen from it</li></ul>
+<table class='num'><tr><th>Round 3's path, one change per step</th><th>Change</th><th>Video IoU</th><th>Step Δ</th><th>90% interval</th><th>Dev scene Δ when kept</th></tr>
+<tr><td>T11</td><td>round-1 pipeline</td><td>0.868</td><td>–</td><td>–</td><td>–</td></tr>
+<tr><td>T19</td><td>ellipse prior</td><td>0.811</td><td>-0.057</td><td>-0.098 – -0.022</td><td>+0.051</td></tr>
+<tr><td>T20</td><td>shape / texture reject</td><td>0.811</td><td>+0.000</td><td>+0.000 – +0.000</td><td>+0.013</td></tr>
+<tr><td>T21</td><td>skin filter off</td><td>0.681</td><td>-0.130</td><td>-0.192 – -0.070</td><td>+0.011</td></tr></table>
+<ul>
+  <li><b>Skin filter off</b> costs the most. In this video the skin colour box (Chai &amp; Ngan, YCbCr) covers 95% of the table just under the eggs (where the reflections are) and 49% of everything else, but only 7% of the eggs (every 6th egg frame)</li>
+  <li>So with the filter on, the table and the reflections are taken out before the egg search → the eggs stay apart. Off → egg + reflection + the other egg become one blob (the merges and spills above)</li>
+  <li>On the photos the same box ate warm-lit eggs (T12: #100, #140), which is why rounds 2 and 3 turned it off. The scene rule kept that by a thin margin: dev scenes +0.011, 3 helped / 2 hurt, P(gain) 0.95, and one step earlier it had failed (P 0.898)</li>
+  <li><b>Ellipse prior</b> costs less, mostly in hand frames (19–21 s, 28–35 s): the egg's mask grows a halo into the dark table beside it</li>
+  <li>Lesson: a colour filter can be noise on one set of scenes and essential on another. 14 dev scenes are too few to tell → more varied scenes before trusting any keep / drop (as in §6)</li>
+</ul>
+
+<h3>Round 1 + the same tracker (run after the fresh test)</h3>
+<ul>
+  <li>Not planned: run because the fresh test showed round 1 is better here → it saw the video and is not a clean test. Same tracker, same settings, nothing tuned. Numbers in the second column of the table above</li>
+  <li>MOTA 0.159 → <b>0.826</b>, IDF1 0.216 → 0.605, precision 0.976: with the eggs segmented apart and no reflections, the same tracker does well</li>
+  <li>No merges, spills or reflection eggs left. The 230 "not segmented" misses fall at 19–23 s and 27–34 s (an egg in or under the hand, checked on sample frames) and in the iris wipe. The 32 false eggs are mostly at 19–22 s (at 20.4 s: a strip of light background between the hand and the shirt)</li>
+  <li>2 id switches, both the same kind: an egg under the hand for longer than the 2 s coast (~27–31 s and ~31–34 s) comes back with a new id → IDF1 stays at 0.605. With two identical eggs a longer coast would only be a guess, so I left it</li>
+</ul>
+<figure><img src="../results/task4/timeline_T11.png" style="width:100%"><figcaption>Round 1 (T11) + the same tracker vs SAM 2.1, every frame.</figcaption></figure>
+
+<h3>What I'd do next</h3>
+<ul>
+  <li>Skin box: on for this kind of scene, off for warm-lit eggs on the photos → it needs a rule, not one global switch. One candidate is T12b (skin removed only in big regions touching the border): here the table is one such region. Untested on the video, and it would need new scenes to judge, not this one</li>
+  <li>Reflections: a reflection is darker and blurrier than the egg right above it → reject a blob that sits under a brighter egg-shaped blob</li>
+  <li>Eggs under the hand: carry the mask forward with optical flow while the egg is covered, instead of dropping it</li>
+  <li>Tracker gate: use the track's own size, not the larger of the two, so a spilled blob can't widen it</li>
+</ul>
 
 <h2>8. How to run</h2>
 <pre>pip install -r requirements.txt
@@ -749,13 +874,19 @@ python scripts/scene_check.py              # -> results/round3/scene_check.json,
 python scripts/loso.py                     # -> results/round3/grid_dev.csv, loso.json
 python scripts/final_eval.py --config configs/final_round3.yaml --out results/final_eval_round3
 python scripts/round3_check.py             # -> results/round3/check.json, predicted_vs_eval.png
+
+# Task 4: the video is not in the repo (download it from YouTube, see README)
+python scripts/task4_sam_video.py --video &lt;mp4&gt;   # frames + SAM 2.1 tracks -> data/video/
+python scripts/task4_track.py --trial T21  # classical T21 + tracker
+python scripts/task4_analyze.py --trial T21  # -> results/task4/ (metrics, plots, the 3 videos)
+python scripts/task4_holdout.py            # rounds 1-3 on the video -> results/task4/holdout.json
 python scripts/build_report.py             # -> report/report.html + report.pdf
 pytest tests/</pre>
 <ul><li>Tested on Windows 11, Python 3.13, PyTorch 2.6 + CUDA 12.4, RTX 4070 Laptop (8 GB). Task 2/3 need only OpenCV, NumPy, PyYAML, matplotlib (CPU)</li></ul>
 
 <h2>9. AI tools</h2>
 <ul>
-  <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures) and drafting this report</li>
+  <li>Claude Code (AI coding assistant) used for: writing the scripts (GT pipeline, split, classical pipeline, experiment runner, evaluation, figures, Task 4 tracker and video export) and drafting this report</li>
   <li>Decisions (what to try next, keep / discard, failure labels) were made by looking at dev results and worst-case panels; every number in this report is filled in by <code>build_report.py</code> from saved result files</li>
 </ul>
 
@@ -772,6 +903,9 @@ pytest tests/</pre>
   <li>S. Liu et al. Grounding DINO: marrying DINO with grounded pre-training for open-set object detection. 2023</li>
   <li>N. Ravi et al. SAM 2: Segment anything in images and videos. 2024</li>
   <li>M. Oquab et al. DINOv2: learning robust visual features without supervision. 2023</li>
+  <li>H. W. Kuhn. The Hungarian method for the assignment problem. Naval Research Logistics Quarterly, 1955</li>
+  <li>K. Bernardin, R. Stiefelhagen. Evaluating multiple object tracking performance: the CLEAR MOT metrics. EURASIP JIVP, 2008</li>
+  <li>E. Ristani et al. Performance measures and a data set for multi-target, multi-camera tracking (IDF1). ECCV workshops, 2016</li>
 </ol>
 
 </body>

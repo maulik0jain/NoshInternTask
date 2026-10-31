@@ -1,0 +1,28 @@
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+detecting on 1440 of 1440 frames, 6 workers
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+C:\Users\mauli\.antigravity-ide\NoshInternTask\scripts\task4_track.py:27: UserWarning: A NumPy version >=1.23.5 and <2.5.0 is required for this version of SciPy (detected version 2.5.3)
+  from scipy.optimize import linear_sum_assignment
+  120/1440
+  240/1440
+  360/1440
+  480/1440
+  600/1440
+  720/1440
+  840/1440
+  960/1440
+  1080/1440
+  1200/1440
+  1320/1440
+  1440/1440
+7 egg ids over 1440 frames (T21)

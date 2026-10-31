@@ -12,7 +12,7 @@ Egg segmentation: pretrained-model ground truth → classical image-processing s
 | Task 3 — evaluation & analysis | done ([results/](results/)) |
 | Round 2 — the improvements from the Task 3 analysis (T12–T18) | done; round-1 results kept as they were ([results/round2/](results/round2/)) |
 | Round 3 — scene-level decisions + leave-one-scene-out (T19–T21) | done ([results/round3/](results/round3/)) |
-| Task 4 — video tracking | next |
+| Task 4 — video tracking (SAM 2.1 reference vs classical T21 + tracker) | done ([results/task4/](results/task4/)); videos on Google Drive (link in the report) |
 
 ## Setup
 
@@ -82,6 +82,19 @@ python scripts/final_eval.py --config configs/final_round3.yaml --out results/fi
 python scripts/round3_check.py             # dev prediction vs eval, per round
 ```
 
+### Task 4 — video tracking
+
+The video is not in the repo: "Raw and Boiled Egg Spinning — Cool Science Experiment" (Mocomi, YouTube),
+60 s, 1080p. Download it and pass its path. Frames and masks go to `data/video/` and the annotated
+videos to `results/task4/videos/` (both gitignored; the videos are on Google Drive, link in the report).
+
+```bash
+python scripts/task4_sam_video.py --video <mp4>   # frames + SAM 2.1 video tracks (reference), needs the GPU
+python scripts/task4_track.py --trial T21  # classical T21 per frame + my tracker
+python scripts/task4_analyze.py --trial T21  # MOTA / IDF1 vs SAM, error causes, plots, 3 annotated videos
+python scripts/task4_holdout.py            # rounds 1-3 on the video as a fresh test
+```
+
 ## Layout
 
 ```
@@ -104,6 +117,8 @@ results/final_eval_round3/   round-3 eval run (third look, after freezing T21)
 results/round3/              per-scene check, dev grid, leave-one-scene-out, prediction vs eval
 results/analysis/            Task 3 tables, plots, failure sheets and labels
 results/ablation/            dev-only ablation of the final pipeline
+results/task4/               video tracking: metrics, error causes, timeline, worst frames, holdout
+data/video/                  (gitignored) video frames, SAM and classical id maps
 scripts/                     entry points
 report/                      report source (HTML), figures, PDF
 ```
