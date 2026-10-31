@@ -12,7 +12,7 @@ Egg segmentation: pretrained-model ground truth → classical image-processing s
 | Task 3 — evaluation & analysis | done ([results/](results/)) |
 | Round 2 — the improvements from the Task 3 analysis (T12–T18) | done; round-1 results kept as they were ([results/round2/](results/round2/)) |
 | Round 3 — scene-level decisions + leave-one-scene-out (T19–T21) | done ([results/round3/](results/round3/)) |
-| Task 4 — video tracking (SAM 2.1 reference vs classical T21 + tracker) | done ([results/task4/](results/task4/)); videos on Google Drive (link in the report) |
+| Task 4 — video tracking (SAM 2.1 reference vs classical T21 + tracker) | done ([results/task4/](results/task4/)); videos on [Google Drive](https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc?usp=sharing) |
 
 ## Setup
 
@@ -86,7 +86,7 @@ python scripts/round3_check.py             # dev prediction vs eval, per round
 
 The video is not in the repo: "Raw and Boiled Egg Spinning — Cool Science Experiment" (Mocomi, YouTube),
 60 s, 1080p. Download it and pass its path. Frames and masks go to `data/video/` and the annotated
-videos to `results/task4/videos/` (both gitignored; the videos are on Google Drive, link in the report).
+videos to `results/task4/videos/` (both gitignored; the videos are on [Google Drive](https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc?usp=sharing)).
 
 ```bash
 python scripts/task4_sam_video.py --video <mp4>   # frames + SAM 2.1 video tracks (reference), needs the GPU

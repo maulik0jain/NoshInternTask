@@ -54,7 +54,7 @@
   <tr><td>Task 3 — evaluation &amp; analysis</td><td class="done">done — eval IoU {{final.eval.iou.mean:.3f}} (§4)</td></tr>
   <tr><td>Round 2 — the five improvements from §4, tried on dev</td><td class="done">done — dev IoU {{cmp.splits.dev.round1.iou_mean:.3f}} → {{cmp.splits.dev.round2.iou_mean:.3f}}, eval {{cmp.splits.eval.round1.iou_mean:.3f}} → {{cmp.splits.eval.round2.iou_mean:.3f}} (§5)</td></tr>
   <tr><td>Round 3 — stopping the overfitting (scene rule, leave-one-scene-out)</td><td class="done">done — held-out-scene estimate {{r3.rounds.3.loso:.3f}}, eval {{final3.eval.iou.mean:.3f}} (§6)</td></tr>
-  <tr><td>Task 4 — video tracking (videos: <span class="todo"><!-- DRIVE -->Drive link to be added<!-- /DRIVE --></span>)</td><td class="done">done — vs SAM 2.1: MOTA {{t4.mota:.3f}}, IDF1 {{t4.idf1:.3f}}, matched-egg IoU {{t4.mean_matched_iou:.3f}} (§7)</td></tr>
+  <tr><td>Task 4 — video tracking (videos: <!-- DRIVE --><a href="https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc?usp=sharing">Google Drive</a><!-- /DRIVE -->)</td><td class="done">done — vs SAM 2.1: MOTA {{t4.mota:.3f}}, IDF1 {{t4.idf1:.3f}}, matched-egg IoU {{t4.mean_matched_iou:.3f}} (§7)</td></tr>
 </table>
 
 <h3>Summary</h3>
@@ -555,7 +555,7 @@
 
 <h2 class="pb">7. Task 4 — video tracking</h2>
 <ul>
-  <li><b>Output videos (Google Drive): <span class="todo"><!-- DRIVE -->link to be added<!-- /DRIVE --></span></b></li>
+  <li><b>Output videos (Google Drive): <!-- DRIVE --><a href="https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc?usp=sharing">https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc</a><!-- /DRIVE --></b></li>
   <li>Five videos, 1280×720, 24 fps: <code>sam2_tracking.mp4</code> (reference), <code>classical_T21_tracking.mp4</code> (planned pipeline + tracker), <code>side_by_side_T21.mp4</code>, and the round-1 versions <code>classical_T11_tracking.mp4</code>, <code>side_by_side_T11.mp4</code> (run after the fresh test, below)</li>
   <li>Same colour = same egg: each classical id takes the colour of the SAM egg it follows most</li>
 </ul>
