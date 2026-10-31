@@ -306,6 +306,45 @@ def holdout_table(ctx):
     return "\n".join(rows) + "</table>"
 
 
+ROUND2_CHANGES = "skin filter off, ellipse prior, blob splitting, edge ranking, shape / texture reject"
+
+
+def glance_table(ctx):
+    """The three final pipelines on every test they were measured on."""
+    r3, h = ctx["r3"]["rounds"], ctx["t4h"]["rounds"]
+    chosen3 = ", ".join(OPTION_LABEL[o] for o in ctx["loso"]["final"]["chosen"])
+    track = {"1": ctx["t4r1"], "3": ctx["t4"]}
+    rows = ["<table class='num'><tr><th>Pipeline</th><th>Changes vs round 1</th><th>Dev, scenes it was tuned on</th>"
+            "<th>Dev, held-out scene (LOSO)</th><th>Eval (25 images)</th><th>Video IoU (fresh test)</th>"
+            "<th>Video + tracker: MOTA / IDF1</th></tr>"]
+    for r, what in (("1", "– (built in Task 2)"), ("2", ROUND2_CHANGES), ("3", chosen3)):
+        v = r3[r]
+        mot = "–" if r not in track else f"{track[r]['mota']:.3f} / {track[r]['idf1']:.3f}" + (" *" if r == "1" else "")
+        rows.append(f"<tr><td>Round {r} ({v['trial']})</td><td>{what}</td><td>{v['dev_in_sample']:.3f}</td>"
+                    f"<td>{fmt(v.get('loso'))}</td><td>{v['eval']:.3f}</td><td>{h[r]['iou_mean']:.3f}</td><td>{mot}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
+def all_trials_table(ctx):
+    """Every trial in one list: what changed, dev IoU, change vs the trial it builds on, kept or not."""
+    log = ctx["log"]["trials"]
+    by_id = {t["id"]: t for t in log}
+    names = {1: "Round 1 — building the pipeline (Task 2)", 2: "Round 2 — fixes from the Task 3 analysis",
+             3: "Round 3 — per-scene decisions + leave-one-scene-out"}
+    rows = ["<table class='num small'><tr><th>Trial</th><th>Change</th><th>Dev IoU</th><th>Δ vs parent</th><th>Kept?</th></tr>"]
+    last = None
+    for t in log:
+        r = t.get("round") or 1
+        if r != last:
+            rows.append(f"<tr><td colspan=5><b>{names.get(r, f'Round {r}')}</b></td></tr>")
+            last = r
+        p = by_id.get(t.get("extends"))
+        d = "–" if p is None else f"{t['iou'] - p['iou']:+.3f}"
+        rows.append(f"<tr><td>{t['id']}</td><td>{t['what']}</td><td>{t['iou']:.3f}</td><td>{d}</td>"
+                    f"<td>{'yes' if t['decision'] == 'kept' else 'no'}</td></tr>")
+    return "\n".join(rows) + "</table>"
+
+
 def holdout_path_table(ctx):
     h, log = ctx["t4h"], trial_by_id(ctx)
     rows = ["<table class='num'><tr><th>Round 3's path, one change per step</th><th>Change</th>"
@@ -338,7 +377,7 @@ def track_errors_table(ctx):
 
 BLOCKS = {
     "track_table": track_table, "holdout_table": holdout_table, "track_errors_table": track_errors_table,
-    "holdout_path_table": holdout_path_table,
+    "holdout_path_table": holdout_path_table, "glance_table": glance_table, "all_trials_table": all_trials_table,
     "scene_rule_table": scene_rule_table, "selection_table": selection_table, "loso_table": loso_table,
     "stability_table": stability_table, "predict_table": predict_table,
     "exp_table_r3": lambda c: exp_table(c, 3), "trial_cards_r3": lambda c: trial_cards(c, 3),

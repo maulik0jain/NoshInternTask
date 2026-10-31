@@ -22,6 +22,7 @@
   th { background: #efefef; }
   table.num td, table.num th { font-size: 8.8pt; padding: 3px 5px; }
   table.narrow { width: auto; min-width: 55%; }
+  table.small td, table.small th { font-size: 8pt; padding: 2px 4px; }
   tr.dropped td { color: #6b6b6b; }
   .status td:first-child { width: 58%; }
   .done { color: #1b7f2a; font-weight: 600; }
@@ -69,6 +70,27 @@
   <li><b>Task 4</b> (§7): SAM 2.1 video tracking is the reference. T21 + my tracker: MOTA {{t4.mota:.3f}}, IDF1 {{t4.idf1:.3f}}. The errors are in the segmentation (touching eggs merged with their reflections on a glossy table, an egg under the hand), not in the tracking</li>
   <li><b>Video as a fresh test</b>: round 1 beats rounds 2/3 here (IoU {{t4h.rounds.1.iou_mean:.3f}} vs {{t4h.rounds.3.iou_mean:.3f}}). The skin filter rounds 2/3 turned off is what keeps the reflections out → one more sign the dev decisions don't carry to new scenes</li>
 </ul>
+
+<h2 class="pb">At a glance — what I changed and what it did</h2>
+<h3>The three pipelines, on every test</h3>
+{{@glance_table}}
+<ul>
+  <li>* Round 1 + tracker was run after the video's fresh test showed round 1 is best there → not a clean number. The planned Task 4 run is round 3 (T21)</li>
+  <li>Eval was looked at once per round (3 times, each disclosed). The clean, one-shot number is round 1: {{final.eval.iou.mean:.3f}}</li>
+</ul>
+
+<h3>What the numbers say</h3>
+<ul>
+  <li><b>Round 1 → 2</b>: dev {{r3.rounds.1.dev_in_sample:.3f}} → {{r3.rounds.2.dev_in_sample:.3f}}, eval {{r3.rounds.1.eval:.3f}} → {{r3.rounds.2.eval:.3f}} → the fixes worked on the dev scenes they were made for, not on new ones (overfitting to dev)</li>
+  <li><b>Round 2 → 3</b>: decisions judged per scene, and the selection checked on held-out scenes. Eval stays at {{r3.rounds.3.eval:.3f}}, but now the estimate made before eval ({{r3.rounds.3.loso:.3f}}) matches it. 3 changes instead of 5</li>
+  <li><b>Video</b> (a scene none of the rounds saw): round 1 {{t4h.rounds.1.iou_mean:.3f}} vs round 3 {{t4h.rounds.3.iou_mean:.3f}}. Turning the skin filter off: {{t4h.round3_path.3.delta:+.3f}} IoU there, because on this video the filter also removes the brown table and the egg reflections</li>
+  <li><b>Tracking</b>: same tracker on both. MOTA {{t4.mota:.3f}} with round 3, {{t4r1.mota:.3f}} with round 1 → the tracker works; the segmentation decides the score</li>
+  <li>By far the biggest single step: GrabCut edge refinement in round 1 (T8, table below)</li>
+</ul>
+
+<h3 class="pb">Every trial, in order</h3>
+<ul><li>Dev split only. Δ = change in dev IoU vs the trial it builds on. Dropped trials stay in the list (details per trial: §3, §5, §6; full log: <code>experiments/LOG.md</code>)</li></ul>
+{{@all_trials_table}}
 
 <h2>0. Dataset — quick facts</h2>
 <ul>

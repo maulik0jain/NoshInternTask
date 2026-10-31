@@ -22,6 +22,7 @@
   th { background: #efefef; }
   table.num td, table.num th { font-size: 8.8pt; padding: 3px 5px; }
   table.narrow { width: auto; min-width: 55%; }
+  table.small td, table.small th { font-size: 8pt; padding: 2px 4px; }
   tr.dropped td { color: #6b6b6b; }
   .status td:first-child { width: 58%; }
   .done { color: #1b7f2a; font-weight: 600; }
@@ -69,6 +70,65 @@
   <li><b>Task 4</b> (§7): SAM 2.1 video tracking is the reference. T21 + my tracker: MOTA 0.159, IDF1 0.216. The errors are in the segmentation (touching eggs merged with their reflections on a glossy table, an egg under the hand), not in the tracking</li>
   <li><b>Video as a fresh test</b>: round 1 beats rounds 2/3 here (IoU 0.868 vs 0.681). The skin filter rounds 2/3 turned off is what keeps the reflections out → one more sign the dev decisions don't carry to new scenes</li>
 </ul>
+
+<h2 class="pb">At a glance — what I changed and what it did</h2>
+<h3>The three pipelines, on every test</h3>
+<table class='num'><tr><th>Pipeline</th><th>Changes vs round 1</th><th>Dev, scenes it was tuned on</th><th>Dev, held-out scene (LOSO)</th><th>Eval (25 images)</th><th>Video IoU (fresh test)</th><th>Video + tracker: MOTA / IDF1</th></tr>
+<tr><td>Round 1 (T11)</td><td>– (built in Task 2)</td><td>0.589</td><td>–</td><td>0.618</td><td>0.868</td><td>0.826 / 0.605 *</td></tr>
+<tr><td>Round 2 (T18)</td><td>skin filter off, ellipse prior, blob splitting, edge ranking, shape / texture reject</td><td>0.669</td><td>0.639</td><td>0.613</td><td>0.677</td><td>–</td></tr>
+<tr><td>Round 3 (T21)</td><td>ellipse prior, shape / texture reject, skin filter off</td><td>0.655</td><td>0.615</td><td>0.612</td><td>0.681</td><td>0.159 / 0.216</td></tr></table>
+<ul>
+  <li>* Round 1 + tracker was run after the video's fresh test showed round 1 is best there → not a clean number. The planned Task 4 run is round 3 (T21)</li>
+  <li>Eval was looked at once per round (3 times, each disclosed). The clean, one-shot number is round 1: 0.618</li>
+</ul>
+
+<h3>What the numbers say</h3>
+<ul>
+  <li><b>Round 1 → 2</b>: dev 0.589 → 0.669, eval 0.618 → 0.613 → the fixes worked on the dev scenes they were made for, not on new ones (overfitting to dev)</li>
+  <li><b>Round 2 → 3</b>: decisions judged per scene, and the selection checked on held-out scenes. Eval stays at 0.612, but now the estimate made before eval (0.615) matches it. 3 changes instead of 5</li>
+  <li><b>Video</b> (a scene none of the rounds saw): round 1 0.868 vs round 3 0.681. Turning the skin filter off: -0.130 IoU there, because on this video the filter also removes the brown table and the egg reflections</li>
+  <li><b>Tracking</b>: same tracker on both. MOTA 0.159 with round 3, 0.826 with round 1 → the tracker works; the segmentation decides the score</li>
+  <li>By far the biggest single step: GrabCut edge refinement in round 1 (T8, table below)</li>
+</ul>
+
+<h3 class="pb">Every trial, in order</h3>
+<ul><li>Dev split only. Δ = change in dev IoU vs the trial it builds on. Dropped trials stay in the list (details per trial: §3, §5, §6; full log: <code>experiments/LOG.md</code>)</li></ul>
+<table class='num small'><tr><th>Trial</th><th>Change</th><th>Dev IoU</th><th>Δ vs parent</th><th>Kept?</th></tr>
+<tr><td colspan=5><b>Round 1 — building the pipeline (Task 2)</b></td></tr>
+<tr><td>T0</td><td>Otsu threshold on grayscale (baseline)</td><td>0.366</td><td>–</td><td>no</td></tr>
+<tr><td>T1</td><td>Otsu on CIE Lab L* instead of grayscale</td><td>0.340</td><td>-0.025</td><td>no</td></tr>
+<tr><td>T2</td><td>+ gray-world white balance and CLAHE on L*</td><td>0.266</td><td>-0.074</td><td>no</td></tr>
+<tr><td>T3</td><td>+ remove skin pixels (YCbCr box, Chai & Ngan 1999)</td><td>0.377</td><td>+0.011</td><td>yes</td></tr>
+<tr><td>T4</td><td>+ keep only low-saturation pixels (HSV S <= 60)</td><td>0.392</td><td>+0.015</td><td>yes</td></tr>
+<tr><td>T5</td><td>k-means (k=3) in Lab instead of Otsu; keep the brightest, least-coloured cluster</td><td>0.408</td><td>+0.032</td><td>yes</td></tr>
+<tr><td>T5b</td><td>k-means candidate + low-saturation filter (S <= 40, from the T4 sweep)</td><td>0.415</td><td>+0.006</td><td>yes</td></tr>
+<tr><td>T6</td><td>+ morphology (open r=3, close r=7, fill holes)</td><td>0.416</td><td>+0.001</td><td>yes</td></tr>
+<tr><td>T7</td><td>+ connected-component filters (area, solidity, axis ratio, border contact)</td><td>0.312</td><td>-0.103</td><td>no</td></tr>
+<tr><td>T7b</td><td>Multi-threshold egg search (24 thresholds, blobs scored by ellipse fit x solidity) replaces the single Otsu/k-means threshold</td><td>0.448</td><td>+0.032</td><td>yes</td></tr>
+<tr><td>T7c</td><td>Search on Lab L* instead of grayscale (from the T7b channel sweep)</td><td>0.464</td><td>+0.016</td><td>yes</td></tr>
+<tr><td>T8</td><td>+ GrabCut refinement seeded from the mask (eroded = sure egg, >70 px outside = sure background)</td><td>0.566</td><td>+0.102</td><td>yes</td></tr>
+<tr><td>T9</td><td>+ ellipse regularisation (blobs with ellipse IoU >= 0.9 are replaced by their fitted ellipse)</td><td>0.561</td><td>-0.005</td><td>no</td></tr>
+<tr><td>T10</td><td>+ distance-transform watershed to split touching eggs into separate instances</td><td>0.566</td><td>+0.000</td><td>yes</td></tr>
+<tr><td>T11</td><td>Fallback pass with a looser shape score (0.65) for images where the search found nothing</td><td>0.589</td><td>+0.023</td><td>yes</td></tr>
+<tr><td>T11b</td><td>Fallback pass returns at most 1 egg</td><td>0.579</td><td>-0.010</td><td>no</td></tr>
+<tr><td colspan=5><b>Round 2 — fixes from the Task 3 analysis</b></td></tr>
+<tr><td>T12</td><td>skin filter off</td><td>0.609</td><td>+0.020</td><td>yes</td></tr>
+<tr><td>T12b</td><td>skin filter only removes large skin regions that touch the image border</td><td>0.592</td><td>+0.003</td><td>no</td></tr>
+<tr><td>T13</td><td>GrabCut also gets each egg's fitted ellipse (x1.15) as 'probably egg'</td><td>0.646</td><td>+0.037</td><td>yes</td></tr>
+<tr><td>T13b</td><td>Local Otsu growth around each found egg before GrabCut</td><td>0.633</td><td>+0.024</td><td>no</td></tr>
+<tr><td>T13c</td><td>T13 + local Otsu growth (both shaded-side fixes together)</td><td>0.645</td><td>-0.001</td><td>no</td></tr>
+<tr><td>T14</td><td>Split non-egg-shaped blobs with watershed inside the search and score each piece</td><td>0.650</td><td>+0.004</td><td>yes</td></tr>
+<tr><td>T15</td><td>Egg score also rewards blob outlines that lie on Canny edges (weight 0.5)</td><td>0.339</td><td>-0.307</td><td>no</td></tr>
+<tr><td>T15b</td><td>Add ellipses fitted to Canny edge chains as extra egg candidates</td><td>0.573</td><td>-0.073</td><td>no</td></tr>
+<tr><td>T15c</td><td>Edge support only ranks candidates; the 0.80 cut stays on the plain shape score</td><td>0.652</td><td>+0.006</td><td>yes</td></tr>
+<tr><td>T16</td><td>Reject rectangular blobs (area / min bounding rect > 0.9) and textured blobs (mean |Laplacian| > 5)</td><td>0.655</td><td>+0.009</td><td>yes</td></tr>
+<tr><td>T17</td><td>All kept round-2 changes together: T13 + T14 + T15c + T16</td><td>0.660</td><td>+0.005</td><td>yes</td></tr>
+<tr><td>T18</td><td>T17 with edge weight 0.3 (from sweep T17_edge_weight)</td><td>0.669</td><td>+0.009</td><td>yes</td></tr>
+<tr><td colspan=5><b>Round 3 — per-scene decisions + leave-one-scene-out</b></td></tr>
+<tr><td>T19</td><td>Round 3, step 1: ellipse prior on the round-1 pipeline</td><td>0.635</td><td>+0.046</td><td>yes</td></tr>
+<tr><td>T19b</td><td>Round 3, step 1 alternative: ellipse prior + clip (GrabCut may not grow past the fitted ellipse x 1.3)</td><td>0.569</td><td>-0.020</td><td>no</td></tr>
+<tr><td>T20</td><td>Round 3, step 2: shape / texture reject on T19</td><td>0.643</td><td>+0.008</td><td>yes</td></tr>
+<tr><td>T21</td><td>Round 3, step 3: skin filter off on T20 - final round-3 pipeline</td><td>0.655</td><td>+0.013</td><td>yes</td></tr></table>
 
 <h2>0. Dataset — quick facts</h2>
 <ul>
