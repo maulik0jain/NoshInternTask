@@ -2,7 +2,11 @@
 
 Egg segmentation: pretrained-model ground truth → classical image-processing segmentation → evaluation → video tracking.
 
-**Report:** [report/report.pdf](report/report.pdf)
+**Report:** [Nosh_CV_Task_Report.pdf](Nosh_CV_Task_Report.pdf) — 2 pages: what I did, what went wrong, what I learned, and where I used AI
+
+**Dissection of the task:** [report/report.pdf](report/report.pdf) — the full write-up (47 pages): every trial with its parameters and result, all plots, failure sheets, the round 2 / round 3 analysis and the video tracking, with numbers filled in from `results/`
+
+**Tracking videos:** [Google Drive](https://drive.google.com/drive/folders/14QTbN2sMEghD2fOjj1JwozyTFmwKRztc?usp=sharing)
 
 | Part | Status |
 |---|---|
@@ -120,7 +124,8 @@ results/ablation/            dev-only ablation of the final pipeline
 results/task4/               video tracking: metrics, error causes, timeline, worst frames, holdout
 data/video/                  (gitignored) video frames, SAM and classical id maps
 scripts/                     entry points
-report/                      report source (HTML), figures, PDF
+report/                      detailed report (task dissection): source (HTML), figures, PDF
+Nosh_CV_Task_Report.pdf      the 2-page report
 ```
 
 ## Dataset
